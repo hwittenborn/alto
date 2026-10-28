@@ -29,6 +29,7 @@ import { FolderList } from './components/FolderList';
 import { FolderPage } from './components/FolderPage';
 import { LoginDialog, LoginPage } from './components/LoginDialog';
 import { buildMainMenu, Sidebar } from './components/Sidebar';
+import { withoutTransitions } from './transitions';
 import { host, ToastProvider, useRetained, useToast } from './ui';
 
 const client = createAltoClient(window.altoTransport);
@@ -212,15 +213,7 @@ function sidebarMotionParts(
       for (const element of added) element.remove();
       // The rows draw themselves again at once, as their copies go: a theme
       // whose rows transition their background would fade it back in.
-      for (const row of marked) {
-        row.style.transition = 'none';
-        delete row.dataset.altoMoving;
-      }
-      for (const row of marked) {
-        // Applied before transitions are back.
-        getComputedStyle(row).getPropertyValue('background-color');
-        row.style.transition = '';
-      }
+      withoutTransitions(marked, (row) => delete row.dataset.altoMoving);
     },
   };
 }
