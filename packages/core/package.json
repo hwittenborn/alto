@@ -1,0 +1,22 @@
+{
+  "name": "@alto/core",
+  "version": "0.1.0",
+  "description": "Platform-agnostic sync engine, rclone rc client and providers for Alto",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "ignore": "^7.0.5",
+    "nanoid": "^5.1.16",
+    "p-queue": "^9.0.0",
+    "zustand": "^5.0.8"
+  }
+}

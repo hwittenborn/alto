@@ -1,7 +1,0 @@
-contact_links:
-  - name: Support
-    url: https://discord.gg/FtNhPepvj7
-    about: Anything that's not a bug report should be asked here.
-  - name: Bug reports
-    url: https://github.com/hwittenborn/celeste/issues/new
-    about: Create a new bug report.
