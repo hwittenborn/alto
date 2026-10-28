@@ -4,7 +4,6 @@ import {
   AdwaitaProvider,
   AdwAlertDialog,
   AdwBreakpointBin,
-  AdwButtonContent,
   AdwHeaderBar,
   AdwNavigationSplitView,
   AdwNavigationView,
@@ -14,8 +13,6 @@ import {
   GtkMenuButton,
   type GtkMenuModel,
   GtkSpinner,
-  GtkStack,
-  GtkStackPage,
   GtkToggleButton,
   GtkWindow,
   GtkWindowTitle,
@@ -24,30 +21,18 @@ import { createGtkIconFromSvg } from '@gtk-js/icon-helpers';
 import * as adwaitaIcons from '@gtk-js/icons-adwaita';
 import googleGSvg from '../../assets/auth/google-g.svg?raw';
 import appIconSvg from '../../assets/icons/com.hunterwittenborn.Alto.svg?raw';
-import {
-  Component,
-  type HTMLAttributes,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Component, type ReactNode, useCallback, useEffect, useMemo, useLayoutEffect, useRef, useState } from 'react';
 import { AddFolderDialog } from './components/AddFolderDialog';
 import { AboutDialog, PreferencesDialog } from './components/AppDialogs';
 import { ErrorDialog } from './components/ErrorDialog';
 import { FolderList } from './components/FolderList';
 import { FolderPage } from './components/FolderPage';
-import { LoginDialog } from './components/LoginDialog';
-import { SetupPage, WelcomePage } from './components/SetupPage';
+import { LoginDialog, LoginPage } from './components/LoginDialog';
 import { buildMainMenu, Sidebar } from './components/Sidebar';
-import type { SetupState } from '@/ipc-shared';
 import { host, ToastProvider, useRetained, useToast } from './ui';
 
 const client = createAltoClient(window.altoTransport);
-// The application icon, by name like an icon theme's, for the about dialog and greeter.
+// The application icon, by name like an icon theme's, for the about dialog and the welcome on the login page.
 // Inlined, so it's drawn with the window instead of popping in after it.
 const icons = {
   ...adwaitaIcons,
@@ -293,21 +278,6 @@ function useSidebarMotion(rail: boolean, view: React.RefObject<HTMLDivElement | 
 }
 
 /** Without accounts: Alto is set up, and the next step is connecting one. */
-function Ready({ onConnect }: { onConnect(): void }) {
-  return (
-    <AdwStatusPage
-      iconName="ObjectSelect"
-      className="alto-ready"
-      title="Alto Is Ready to Go"
-      description="Let's connect your cloud storage provider."
-    >
-      <GtkButton className="pill suggested-action" halign="center" data-action="connect" onClicked={onConnect}>
-        <AdwButtonContent iconName="FolderRemote" label="Connect" />
-      </GtkButton>
-    </AdwStatusPage>
-  );
-}
-
 interface ContentProps {
   remoteName: string;
   stack: string[];
@@ -494,8 +464,8 @@ function FolderPageView({
   );
 }
 
-/** The app. Other props go to its root, as a stack page's must (GtkStack hides a page with them). */
-function Shell(props: HTMLAttributes<HTMLDivElement>) {
+/** The app. */
+function Shell() {
   const ready = useAltoState((s) => s.ready);
   const error = useAltoState((s) => s.error);
   const remotes = useAltoState((s) => s.remotes.map((r) => r.name));
@@ -598,7 +568,6 @@ function Shell(props: HTMLAttributes<HTMLDivElement>) {
   if (error) {
     return (
       <AdwToolbarView
-        {...props}
         style={{ height: '100%' }}
         topBars={<AdwHeaderBar titleWidget={<GtkWindowTitle title="Alto" />} />}
         content={
@@ -613,7 +582,6 @@ function Shell(props: HTMLAttributes<HTMLDivElement>) {
   if (!ready) {
     return (
       <AdwToolbarView
-        {...props}
         style={{ height: '100%' }}
         topBars={<AdwHeaderBar titleWidget={<GtkWindowTitle title="Alto" />} />}
         content={<GtkSpinner spinning halign="center" valign="center" style={{ width: 32, height: 32 }} />}
@@ -636,7 +604,6 @@ function Shell(props: HTMLAttributes<HTMLDivElement>) {
       <AdwToolbarView
         style={{ height: '100%' }}
         topBars={<AdwHeaderBar showStartTitleButtons={collapsed} start={sidebarButton} showTitle={false} />}
-        content={<Ready onConnect={() => setDialog('login')} />}
       />
     ) : (
       <RemoteContent
@@ -653,28 +620,10 @@ function Shell(props: HTMLAttributes<HTMLDivElement>) {
   return (
     <>
       {remotes.length === 0 ? (
-        // No accounts: a full-window greeter, like Fractal's.
-        <AdwToolbarView
-          {...props}
-          style={{ height: '100%' }}
-          topBars={
-            <AdwHeaderBar
-              showTitle={false}
-              end={
-                <GtkMenuButton
-                  iconName="OpenMenu"
-                  hasFrame={false}
-                  primary
-                  menuModel={mainMenu}
-                  tooltipText="Main Menu"
-                />
-              }
-            />
-          }
-          content={<Ready onConnect={() => setDialog('login')} />}
-        />
+        // No accounts: logging in to one is the whole window.
+        <LoginPage menu={mainMenu} onLoggedIn={select} />
       ) : (
-        <AdwBreakpointBin {...props} breakpoints={breakpoints} style={{ height: '100%' }}>
+        <AdwBreakpointBin breakpoints={breakpoints} style={{ height: '100%' }}>
           <AdwNavigationSplitView
             style={{ height: '100%' }}
             collapsed={collapsed}
@@ -731,52 +680,6 @@ function Shell(props: HTMLAttributes<HTMLDivElement>) {
   );
 }
 
-/**
- * What comes before the app: without accounts, a welcome page first; then,
- * while Alto downloads what it needs to run, the setup page; each sliding
- * over to the next.
- */
-function Startup() {
-  // Undefined until the main process tells, for a moment.
-  const [setup, setSetup] = useState<SetupState | null | undefined>(undefined);
-  const [welcome, setWelcome] = useState<boolean | undefined>(undefined);
-  const [welcomed, setWelcomed] = useState(false);
-  useEffect(() => {
-    let mounted = true;
-    const off = window.electronAPI.onSetup(setSetup);
-    void window.electronAPI
-      .invoke('app:get-setup')
-      .then((state) => mounted && setSetup((current) => (current === undefined ? state : current)));
-    void window.electronAPI.invoke('app:get-welcome').then((first) => mounted && setWelcome(first));
-    return () => {
-      mounted = false;
-      off();
-    };
-  }, []);
-  // Keep the page's content while it slides away.
-  const shown = useRetained(setup ?? null);
-  // Once set up, Alto starts: the page stays until it has, to slide straight to what comes next.
-  const starting = useAltoState((s) => !s.ready && !s.error);
-  if (setup === undefined || welcome === undefined) return null;
-  const page = welcome && !welcomed ? 'welcome' : setup || (shown && starting) ? 'setup' : 'app';
-  return (
-    <GtkStack visibleChildName={page} transitionType="slide-left" style={{ height: '100%' }}>
-      <GtkStackPage name="welcome">
-        <WelcomePage
-          onContinue={() => {
-            setWelcomed(true);
-            window.electronAPI.send('app:start-setup');
-          }}
-        />
-      </GtkStackPage>
-      <GtkStackPage name="setup">{shown && <SetupPage state={shown} />}</GtkStackPage>
-      <GtkStackPage name="app">
-        <Shell />
-      </GtkStackPage>
-    </GtkStack>
-  );
-}
-
 /** Shows unexpected renderer errors instead of a blank window. */
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null as Error | null };
@@ -826,7 +729,7 @@ export default function App() {
         >
           <ToastProvider>
             <ErrorBoundary>
-              <Startup />
+              <Shell />
             </ErrorBoundary>
           </ToastProvider>
         </GtkWindow>

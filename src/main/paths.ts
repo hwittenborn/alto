@@ -17,7 +17,12 @@ export function assetPath(...parts: string[]): string {
   return path.join(base, ...parts);
 }
 
-/** Where Alto installs rclone (`~/.cache/alto/bin`): the binary and the release it is. */
-export function rcloneDir(): string {
-  return path.join(cacheDir(), 'bin');
+/**
+ * The rclone binary bundled with Alto (forge.config.ts): in its resources once
+ * packaged, and where the build downloaded it to under `npm start`.
+ */
+export function bundledRclone(): string {
+  return app.isPackaged
+    ? path.join(process.resourcesPath, 'bin', 'rclone')
+    : path.join(app.getAppPath(), '.rclone', process.arch, 'rclone');
 }

@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 26
           cache: npm
-      # The integration tests run against the rclone release Alto installs.
+      # The integration tests run against the rclone release Alto bundles.
       - name: Install rclone
         run: |
           version="$(sed -n "s/^export const RCLONE_VERSION = '\(.*\)';$/\1/p" packages/node/src/rclone-install.ts)"

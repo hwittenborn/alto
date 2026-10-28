@@ -26,8 +26,8 @@ These environment variables are handy while developing:
 | Variable             | Effect                                                                                               |
 | -------------------- | ---------------------------------------------------------------------------------------------------- |
 | `ALTO_CONFIG_DIR`    | Use a separate configuration directory, so testing doesn't touch your real accounts                  |
-| `ALTO_RCLONE`        | Use this rclone binary instead of installing one                                                     |
-| `ALTO_RCLONE_MIRROR` | Install rclone from a mirror of its releases (like `https://downloads.rclone.org`) instead of GitHub |
+| `ALTO_RCLONE`        | Use this rclone binary instead of the bundled one                                                    |
+| `ALTO_RCLONE_MIRROR` | Build with rclone from a mirror of its releases (like `https://downloads.rclone.org`), not GitHub    |
 | `ALTO_DEBUG=1`       | Verbose logs                                                                                         |
 
 ## Project layout
@@ -45,9 +45,9 @@ Alto is split into packages so the sync engine can be reused outside Electron (i
 
 ### rclone
 
-On its first start, Alto downloads the rclone release it was built for into `~/.cache/alto/bin` and verifies it
-against the release's checksums. It replaces it when an update of Alto moves to another release. On a fresh install,
-the download waits until you continue past the welcome page.
+Alto bundles the rclone release it runs (`RCLONE_VERSION` in `packages/node/src/rclone-install.ts`). The build
+(`start`, `package` and `make`) downloads it for each architecture it builds into `.rclone/`, verifies it against
+the release's checksums, and packages it as `resources/bin/rclone`. `npm start` runs it from `.rclone/`.
 
 Alto then runs its own `rclone rcd`, on a random localhost port with random credentials, and talks to it over HTTP:
 

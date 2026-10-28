@@ -11,6 +11,7 @@ import {
 import { useAlto, useAltoState } from '@alto/react';
 import {
   AdwActionRow,
+  AdwClamp,
   AdwDialog,
   AdwEntryRow,
   AdwHeaderBar,
@@ -24,11 +25,13 @@ import {
   GtkButton,
   GtkImage,
   GtkLabel,
+  GtkMenuButton,
+  type GtkMenuModel,
   GtkScrolledWindow,
   GtkSpinner,
   GtkWindowTitle,
 } from '@gtk-js/adwaita';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ProviderAvatar } from '../providers';
 import { host } from '../ui';
 import { ErrorDialog } from './ErrorDialog';
@@ -112,14 +115,20 @@ function fieldRow(
   }
 }
 
-export function LoginDialog({
-  visible,
-  onClosed,
+/** Without accounts, the login is the window's page: the main menu, and a welcome above the providers. */
+interface WelcomeProps {
+  menu: GtkMenuModel;
+}
+
+/** Signing in to an account: a provider, its form, and the browser for OAuth providers. */
+function LoginFlow({
+  welcome,
   onLoggedIn,
+  onFailed,
 }: {
-  visible: boolean;
-  onClosed(): void;
+  welcome?: WelcomeProps;
   onLoggedIn(name: string): void;
+  onFailed(error: ActionError): void;
 }) {
   const alto = useAlto();
   const remoteNames = useAltoState((s) => s.remotes.map((r) => r.name));
@@ -129,7 +138,6 @@ export function LoginDialog({
   const [name, setName] = useState('');
   const [values, setValues] = useState<ProviderValues>({});
   const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<ActionError | null>(null);
   // The accounts there were when the form opened: the one it adds mustn't count against its own name.
   const [takenNames, setTakenNames] = useState<string[]>([]);
 
@@ -141,19 +149,15 @@ export function LoginDialog({
   );
   const login = logins.find((l) => l.name === name.trim());
 
-  const reset = () => {
-    setStack(['providers']);
-    setValues({});
-    setName('');
-    setBusy(false);
-  };
-
-  // The form resets once the dialog has animated out (onHidden), so it
-  // doesn't navigate back while closing.
-  const close = () => {
-    if (login) void alto.cancelLogin(login.name);
-    onClosed();
-  };
+  // A browser login still going when the flow goes away (its dialog closed) is cancelled.
+  const pending = useRef<string | null>(null);
+  pending.current = login && ['starting', 'waiting', 'verifying'].includes(login.status) ? login.name : null;
+  useEffect(
+    () => () => {
+      if (pending.current) void alto.cancelLogin(pending.current);
+    },
+    [alto],
+  );
 
   const pick = (id: ProviderId) => {
     const def = getProvider(id);
@@ -179,7 +183,7 @@ export function LoginDialog({
     }
     if (provider.auth === 'oauth') setStack(['providers', 'form']);
     if (result.error.code !== 'cancelled') {
-      setFailure(result.error);
+      onFailed(result.error);
     }
   };
 
@@ -195,54 +199,56 @@ export function LoginDialog({
       topBars={<AdwHeaderBar titleWidget={<GtkWindowTitle title={provider.label} />} />}
       content={
         <GtkScrolledWindow hscrollbarPolicy="never" style={{ height: '100%' }}>
-          <GtkBox orientation="vertical" spacing={24} valign="center" className="alto-dialog-content">
-            <GtkBox orientation="vertical" spacing={12} halign="center">
-              <ProviderAvatar provider={providerId} size={64} />
-              <GtkLabel
-                className="dim-label"
-                wrap
-                justify="center"
-                label={
-                  provider.auth === 'oauth'
-                    ? `Alto will open your browser so you can sign in to ${provider.label}.`
-                    : `Enter the details of your ${provider.label} account.`
-                }
-              />
-            </GtkBox>
-            <AdwPreferencesGroup>
-              <AdwEntryRow
-                title="Name"
-                text={name}
-                className={nameError ? 'error' : undefined}
-                tooltipText={nameError}
-                data-field="name"
-                onChanged={setName}
-                onEntryActivated={submit}
-              />
-              {provider.fields.map((field, i) =>
-                fieldRow(
-                  field,
-                  values,
-                  (id, v) => setValues((current) => ({ ...current, [id]: v })),
-                  fieldErrors[i],
-                  submit,
-                ),
-              )}
-            </AdwPreferencesGroup>
-            {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
-            <GtkButton
-              className={google ? 'pill' : 'pill suggested-action'}
-              halign="center"
-              disabled={!validation.valid || busy}
-              onClicked={submit}
-              data-action="login"
-            >
-              <GtkBox spacing={6}>
-                {busy && <GtkSpinner spinning valign="center" />}
-                {google ? <GoogleSignIn /> : <GtkLabel label={busy ? 'Logging in…' : 'Log in'} />}
+          <AdwClamp maximumSize={440}>
+            <GtkBox orientation="vertical" spacing={24} valign="center" className="alto-dialog-content">
+              <GtkBox orientation="vertical" spacing={12} halign="center">
+                <ProviderAvatar provider={providerId} size={64} />
+                <GtkLabel
+                  className="dim-label"
+                  wrap
+                  justify="center"
+                  label={
+                    provider.auth === 'oauth'
+                      ? `Alto will open your browser so you can sign in to ${provider.label}.`
+                      : `Enter the details of your ${provider.label} account.`
+                  }
+                />
               </GtkBox>
-            </GtkButton>
-          </GtkBox>
+              <AdwPreferencesGroup>
+                <AdwEntryRow
+                  title="Name"
+                  text={name}
+                  className={nameError ? 'error' : undefined}
+                  tooltipText={nameError}
+                  data-field="name"
+                  onChanged={setName}
+                  onEntryActivated={submit}
+                />
+                {provider.fields.map((field, i) =>
+                  fieldRow(
+                    field,
+                    values,
+                    (id, v) => setValues((current) => ({ ...current, [id]: v })),
+                    fieldErrors[i],
+                    submit,
+                  ),
+                )}
+              </AdwPreferencesGroup>
+              {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
+              <GtkButton
+                className={google ? 'pill' : 'pill suggested-action'}
+                halign="center"
+                disabled={!validation.valid || busy}
+                onClicked={submit}
+                data-action="login"
+              >
+                <GtkBox spacing={6}>
+                  {busy && <GtkSpinner spinning valign="center" />}
+                  {google ? <GoogleSignIn /> : <GtkLabel label={busy ? 'Logging in…' : 'Log in'} />}
+                </GtkBox>
+              </GtkButton>
+            </GtkBox>
+          </AdwClamp>
         </GtkScrolledWindow>
       }
     />
@@ -290,6 +296,83 @@ export function LoginDialog({
     />
   );
 
+  const providersPage = welcome ? (
+    <AdwToolbarView
+      style={{ height: '100%' }}
+      topBars={
+        <AdwHeaderBar
+          showTitle={false}
+          end={
+            <GtkMenuButton
+              iconName="OpenMenu"
+              hasFrame={false}
+              primary
+              menuModel={welcome.menu}
+              tooltipText="Main Menu"
+            />
+          }
+        />
+      }
+      content={
+        <AdwPreferencesPage>
+          <GtkBox orientation="vertical" spacing={12} halign="center">
+            <GtkImage iconName="ComHunterwittenbornAlto" pixelSize={96} />
+            <GtkLabel className="title-1" label="Welcome to Alto" wrap justify="center" />
+          </GtkBox>
+          <ProviderPicker onPick={pick} />
+        </AdwPreferencesPage>
+      }
+    />
+  ) : (
+    <AdwToolbarView
+      style={{ height: '100%' }}
+      topBars={<AdwHeaderBar titleWidget={<GtkWindowTitle title="Add Account" />} />}
+      content={
+        <AdwPreferencesPage>
+          <ProviderPicker onPick={pick} />
+        </AdwPreferencesPage>
+      }
+    />
+  );
+
+  return (
+    <AdwNavigationView
+      stack={stack}
+      onStackChange={setStack}
+      style={{ height: '100%' }}
+      pages={[
+        { tag: 'providers', title: welcome ? 'Alto' : 'Add Account', children: providersPage },
+        { tag: 'form', title: provider.label, children: formPage },
+        { tag: 'browser', title: provider.label, canPop: false, children: browserPage },
+      ]}
+    />
+  );
+}
+
+/** The login as the window's page, when there are no accounts yet. */
+export function LoginPage({ menu, onLoggedIn }: { menu: GtkMenuModel; onLoggedIn(name: string): void }) {
+  const [failure, setFailure] = useState<ActionError | null>(null);
+  return (
+    <>
+      <LoginFlow welcome={{ menu }} onLoggedIn={onLoggedIn} onFailed={setFailure} />
+      <ErrorDialog error={failure} onClose={() => setFailure(null)} />
+    </>
+  );
+}
+
+/** Adding another account. */
+export function LoginDialog({
+  visible,
+  onClosed,
+  onLoggedIn,
+}: {
+  visible: boolean;
+  onClosed(): void;
+  onLoggedIn(name: string): void;
+}) {
+  // A fresh flow each time, once the dialog has animated out, so it doesn't navigate back while closing.
+  const [flow, setFlow] = useState(0);
+  const [failure, setFailure] = useState<ActionError | null>(null);
   return (
     <>
       <AdwDialog
@@ -297,33 +380,10 @@ export function LoginDialog({
         title="Add Account"
         contentWidth={440}
         contentHeight={620}
-        onClosed={close}
-        onHidden={reset}
+        onClosed={onClosed}
+        onHidden={() => setFlow((n) => n + 1)}
       >
-        <AdwNavigationView
-          stack={stack}
-          onStackChange={setStack}
-          style={{ height: '100%' }}
-          pages={[
-            {
-              tag: 'providers',
-              title: 'Add Account',
-              children: (
-                <AdwToolbarView
-                  style={{ height: '100%' }}
-                  topBars={<AdwHeaderBar titleWidget={<GtkWindowTitle title="Add Account" />} />}
-                  content={
-                    <AdwPreferencesPage>
-                      <ProviderPicker onPick={pick} />
-                    </AdwPreferencesPage>
-                  }
-                />
-              ),
-            },
-            { tag: 'form', title: provider.label, children: formPage },
-            { tag: 'browser', title: provider.label, canPop: false, children: browserPage },
-          ]}
-        />
+        <LoginFlow key={flow} onLoggedIn={onLoggedIn} onFailed={setFailure} />
       </AdwDialog>
       <ErrorDialog error={failure} onClose={() => setFailure(null)} />
     </>

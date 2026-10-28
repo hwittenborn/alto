@@ -1,7 +1,7 @@
 {
   "name": "@alto/node",
   "version": "0.1.0",
-  "description": "Node.js/Electron host adapters for Alto: rclone install and daemon, local file system, SQLite storage",
+  "description": "Node.js/Electron host adapters for Alto: rclone download and daemon, local file system, SQLite storage",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-or-later",
