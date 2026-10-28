@@ -17,6 +17,10 @@ npm start              # run the app with hot reload
 | `npm run package` / `make`   | Package the app / build `.deb`, `.rpm` and `.zip` distributables                                           |
 | `npm run icons`              | Render the PNG icons from the SVGs in `assets/` (`start`, `package` and `make` do this first)              |
 
+Pull requests are squash merged, so their title becomes the commit on `main`. Titles have to follow
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (like `fix: keep the window size`), since
+`CHANGELOG.md` and the version bump in each release are generated from them.
+
 These environment variables are handy while developing:
 
 | Variable             | Effect                                                                                               |
