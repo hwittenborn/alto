@@ -210,7 +210,17 @@ function sidebarMotionParts(
     parts,
     restore() {
       for (const element of added) element.remove();
-      for (const row of marked) delete row.dataset.altoMoving;
+      // The rows draw themselves again at once, as their copies go: a theme
+      // whose rows transition their background would fade it back in.
+      for (const row of marked) {
+        row.style.transition = 'none';
+        delete row.dataset.altoMoving;
+      }
+      for (const row of marked) {
+        // Applied before transitions are back.
+        getComputedStyle(row).getPropertyValue('background-color');
+        row.style.transition = '';
+      }
     },
   };
 }

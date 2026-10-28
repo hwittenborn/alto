@@ -83,6 +83,8 @@ body,
   position: relative;
   isolation: isolate;
   background: none !important;
+  /* At once, not faded out by a theme whose rows transition their background. */
+  transition: none !important;
 }
 
 .alto-row-motion,
