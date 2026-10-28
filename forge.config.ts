@@ -2,6 +2,7 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb, type MakerDebConfig } from '@electron-forge/maker-deb';
 import { MakerRpm, type MakerRpmConfig } from '@electron-forge/maker-rpm';
+import { MakerAppImage, type MakerAppImageConfig } from '@reforged/maker-appimage';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
@@ -67,6 +68,17 @@ const config: ForgeConfig = {
     new MakerZIP({}, ['linux']),
     new MakerDeb({ options: { ...linuxOptions, section: 'net' } } satisfies MakerDebConfig),
     new MakerRpm({ options: { ...linuxOptions, license: 'GPL-3.0-or-later' } } satisfies MakerRpmConfig),
+    new MakerAppImage({
+      options: {
+        name: linuxOptions.name,
+        bin: linuxOptions.bin,
+        productName: linuxOptions.productName,
+        genericName: linuxOptions.genericName,
+        categories: linuxOptions.categories,
+        desktopFile: linuxOptions.desktopTemplate,
+        icon: linuxOptions.icon,
+      },
+    } satisfies MakerAppImageConfig),
   ],
   plugins: [
     new VitePlugin({
