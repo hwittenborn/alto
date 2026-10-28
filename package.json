@@ -62,6 +62,8 @@
     "@gtk-js/adwaita": "^0.1.11",
     "@gtk-js/icon-helpers": "^0.1.6",
     "@gtk-js/icons-adwaita": "^0.1.6",
+    "@gtk-js/theme-mactahoe": "^0.0.9",
+    "@gtk-js/theme-whitesur": "^0.0.9",
     "@iconify/utils": "^3.1.7",
     "chokidar": "^4.0.3",
     "react": "^19.2.5",
