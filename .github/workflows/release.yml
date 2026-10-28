@@ -31,12 +31,13 @@ jobs:
     needs: [release-please, build]
     runs-on: ubuntu-latest
     steps:
+      # The run's artifacts are the packages (build.yml).
       - uses: actions/download-artifact@v8
         with:
-          name: alto-linux-x64
           path: packages
+          merge-multiple: true
       - name: Attach the packages to the release
-        run: gh release upload "${TAG}" packages/*/x64/* --repo "${GITHUB_REPOSITORY}"
+        run: gh release upload "${TAG}" packages/* --repo "${GITHUB_REPOSITORY}"
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.release-please.outputs.tag_name }}
