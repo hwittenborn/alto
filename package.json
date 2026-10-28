@@ -46,6 +46,7 @@
     "electron": "41.5.0",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
+    "prettier": "^3.9.10",
     "sharp": "^0.35.5",
     "typescript": "~6.0.3",
     "unplugin-icons": "^24.0.0",
