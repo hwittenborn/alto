@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Alto
+GenericName=File Synchronizer
+Comment=Keep folders in sync with Google Drive, Dropbox, Proton Drive, Nextcloud and more
+Exec=alto %U
+Icon=alto
+Terminal=false
+Categories=Network;FileTransfer;GTK;
+Keywords=sync;cloud;backup;rclone;dropbox;drive;proton;nextcloud;owncloud;webdav;
+StartupNotify=true
+StartupWMClass=Alto
+SingleMainWindow=true

@@ -1,71 +1,47 @@
-### Help support Celeste
-Hey! I'm Hunter Wittenborn, the creator and maintainer of Celeste.
+# Alto
 
-I've had a blast working on Celeste in the time I've had available, but I'm currently not able to put all the time I'd like into it. I'm a university student which keeps me busy at times, but I also have part-time jobs on the side that keep me quite busy, even when I'm not occupied with my school work.
+Alto keeps folders on your computer in sync with your cloud storage, such as Google Drive, Dropbox, Proton Drive and
+[more](#supported-providers). It's built to look and feel native on your desktop, with current support for Linux
+(GNOME specifically, with apps for macOS, Windows, and Android in the works).
 
-If you'd like to help me keep driving Celeste forward, I humbly ask that you consider [sponsoring my work](https://github.com/sponsors/hwittenborn). With your help, I can use more of my time on Celeste's development, allowing it to flourish into a program that people everywhere can use!
+> [!NOTE]
+> Looking for the old Celeste code? It's on the [`celeste-rs`](https://github.com/hwittenborn/alto/tree/celeste-rs)
+> branch.
 
-# Celeste
-<a href="https://flathub.org/apps/details/com.hunterwittenborn.Celeste"><img width="150" src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" /></a>
-<a href="https://snapcraft.io/celeste"><img width="150" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /></a>
-
-Celeste is a GUI file synchronization client that can connect to virtually any cloud provider.
-
-- Backed by [rclone](https://rclone.org/), giving you a reliable and battle-tested way to sync your files anywhere
-- Written with GTK4 and Libadwaita, giving Celeste a native look and feel on your desktop
-- Written in Rust, making Celeste ***blazingly fast*** to use
-
-![](/assets/main-window.png)
+![Alto's main window](https://raw.githubusercontent.com/wiki/hwittenborn/alto/screenshots/main.png)
 
 ## Features
-- Two-way sync
-- Asking what to do when a local and remote file have both been updated since last sync
-- Ability to exclude files/folders from sync
-- Connecting to multiple cloud providers at the same time
 
-## Supported cloud providers
-Celeste can currently connect to the following cloud providers:
-- Dropbox
+- **True two-way sync.** New files, edits and deletions go both ways.
+- **All your clouds in one place.** Connect as many accounts as you like, across different providers, and sync folders
+  from all of them at once.
+- **Safe across several computers.** Before overwriting or deleting anything, Alto checks that things haven't changed
+  since it last looked, so a change made on another computer in the meantime is never lost.
+- **Shared exclusions.** Skip files with `.gitignore`-style patterns in the folder's `.altoignore`. It syncs too, so
+  every computer skips the same files.
+
+## Supported providers
+
 - Google Drive
-- Nextcloud
-- Owncloud
-- pCloud
+- Dropbox
 - Proton Drive
+- Nextcloud
+- ownCloud
 - WebDAV
 
-## Installation
-Celeste can be installed via the methods listed below:
+More cloud providers are on the way. Want one that isn't listed?
+[Open an issue](https://github.com/hwittenborn/alto/issues), or see
+[`CONTRIBUTING.md`](CONTRIBUTING.md#adding-a-provider) to add it yourself.
 
-### Flatpak
-Celeste is available on [Flathub](https://flathub.org/apps/details/com.hunterwittenborn.Celeste). First make sure you have [set up Flatpak](https://flatpak.org/setup/) on your system, and then run the following:
+## Coming from Celeste?
 
-```sh
-flatpak install flathub com.hunterwittenborn.Celeste
-```
-
-### Snap
-Celeste is available on the [Snap Store](https://snapcraft.io/celeste), which can be installed on any system that has Snap installed.
-
-```sh
-snap install celeste
-```
-
-### Prebuilt-MPR (Debian/Ubuntu)
-If you're on Ubuntu 22.10 or later, you can install Celeste from the Prebuilt-MPR. First make sure [the Prebuilt-MPR is set up](https://docs.makedeb.org/prebuilt-mpr/getting-started/) on your system, and then run the following:
-
-```sh
-sudo apt install celeste
-```
-
-## Support
-Celeste has multiple communication rooms available if you need assistance, want to talk about the project, or to just hang around with some fellow users:
-- Discord: https://discord.gg/FtNhPepvj7
-- Matrix: https://matrix.to/#/#celeste:gnome.org
-
-**Bugs and features can be discussed in the rooms if you feel like there's information that should be talked about, but such should ultimately fall into the [issue tracker](https://github.com/hwittenborn/celeste/issues).**
+Alto is the successor to [Celeste](https://github.com/hwittenborn/celeste), rebuilt from the ground up. It doesn't
+import Celeste's settings, so you'll need to add your accounts and folders again.
 
 ## Contributing
-Instructions still largely need to be written up - if you'd like to help with that, feel free to submit a PR!
 
-### Translating
-Celeste uses [Weblate](https://weblate.org) to manage translations. See <https://hosted.weblate.org/projects/celeste/celeste> if you'd like to assist in translating.
+To build Alto from source, see how it works, or help out, read [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## License
+
+[GPL-3.0-or-later](LICENSE)

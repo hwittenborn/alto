@@ -1,4 +1,15 @@
-/celeste/src/style.css
-/celeste_*.snap
-/target
-/src/style.css
+node_modules/
+.vite/
+out/
+coverage/
+*.log
+*.tgz
+*.tsbuildinfo
+.eslintcache
+.env
+.DS_Store
+
+# PNG icons rendered from the SVGs by `npm run icons` (Forge runs it before
+# start, package and make)
+assets/icons/hicolor/
+assets/tray/*.png

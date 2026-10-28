@@ -1,0 +1,109 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Sidebar rows (Fractal's account switcher style). */
+.alto-remote-row {
+  padding: 6px 2px;
+  min-height: 40px;
+}
+
+.alto-remote-name {
+  font-weight: bold;
+}
+
+/* The sidebar narrowed to avatars: Add Account under them, its icon centered on theirs. */
+.alto-add-row {
+  padding: 6px 2px;
+  min-height: 24px;
+}
+
+.alto-add-row > .gtk-image {
+  margin-left: 10px;
+}
+
+/* An account's activity in its avatar's corner. */
+.alto-rail-badge {
+  margin: 0 -3px -3px 0;
+  padding: 1px;
+  border-radius: 50%;
+  background: var(--sidebar-bg-color);
+}
+
+.alto-status-icon {
+  min-width: 16px;
+  min-height: 16px;
+}
+
+.alto-dialog-content {
+  padding: 12px 18px 24px;
+}
+
+.alto-progress {
+  min-width: 120px;
+}
+
+/* The ready page's checkmark: done, in the theme's success color. */
+.alto-ready .gtk-image.icon {
+  color: var(--success-color);
+}
+
+/* The sidebar's content, which is wider than it while it moves between full and narrowed. */
+.alto-sidebar-clip {
+  contain: inline-size;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Moving, the sidebar is drawn over the content, laid out full, with the pane's
+   background and edge; it slides to narrow (see useSidebarMotion()). */
+.sidebar-pane:has(.alto-sidebar-clip.moving) {
+  z-index: 1;
+}
+
+.alto-sidebar-clip.moving {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--sidebar-bg-color);
+}
+
+.alto-sidebar-clip.moving::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 1px;
+  background: var(--sidebar-border-color);
+}
+
+/* Moving, a row draws what it draws (selected, hovered) with a copy that slides
+   under a window as rounded as the row, so it narrows with its rounded ends. */
+.alto-sidebar-clip .gtk-row[data-alto-moving] {
+  position: relative;
+  isolation: isolate;
+  background: none !important;
+}
+
+.alto-row-motion,
+.alto-row-motion > div {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Over the row's padding too: not in the cell its bin layout puts children in. */
+.gtk-row > .alto-row-motion {
+  grid-area: auto;
+}
+
+.alto-row-motion {
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}

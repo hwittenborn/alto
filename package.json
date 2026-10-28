@@ -1,0 +1,75 @@
+{
+  "name": "alto",
+  "productName": "Alto",
+  "version": "0.9.0",
+  "description": "The best client for your cloud storage",
+  "main": ".vite/build/main.cjs",
+  "private": true,
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "make:deb": "electron-forge make --targets deb",
+    "make:rpm": "electron-forge make --targets rpm",
+    "lint": "eslint --ext .ts,.tsx src packages",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "icons": "node scripts/render-icons.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": {
+    "name": "Hunter Wittenborn",
+    "email": "hunter@hunterwittenborn.com"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@electron-forge/cli": "^8.0.1",
+    "@electron-forge/maker-deb": "^8.0.1",
+    "@electron-forge/maker-rpm": "^8.0.1",
+    "@electron-forge/maker-zip": "^8.0.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^8.0.1",
+    "@electron-forge/plugin-fuses": "^8.0.1",
+    "@electron-forge/plugin-vite": "^8.0.1",
+    "@electron/fuses": "^2.1.3",
+    "@iconify-json/selfhst": "^1.2.26",
+    "@iconify-json/simple-icons": "^1.2.101",
+    "@rolldown/plugin-babel": "^0.2.4",
+    "@types/node": "^24.9.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "electron": "41.5.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-import": "^2.32.0",
+    "sharp": "^0.35.5",
+    "typescript": "~6.0.3",
+    "unplugin-icons": "^24.0.0",
+    "vite": "^8.0.10",
+    "vitest": "^5.0.4"
+  },
+  "dependencies": {
+    "@alto/core": "0.1.0",
+    "@alto/node": "0.1.0",
+    "@alto/react": "0.1.0",
+    "@gtk-js/adwaita": "^0.1.11",
+    "@gtk-js/icon-helpers": "^0.1.6",
+    "@gtk-js/icons-adwaita": "^0.1.6",
+    "@iconify/utils": "^3.1.7",
+    "chokidar": "^4.0.3",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "zustand": "^5.0.8"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "desktopName": "alto.desktop",
+  "allowScripts": {
+    "electron": true
+  }
+}
