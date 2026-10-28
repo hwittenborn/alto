@@ -8,23 +8,15 @@ import {
   initialState,
   RcloneClient,
 } from '@alto/core';
-import {
-  installedRclone,
-  installRclone,
-  NodeLocalFs,
-  RCLONE_VERSION,
-  rcloneBinary,
-  RcloneDaemon,
-  SqliteStorage,
-} from '@alto/node';
-import { app, BrowserWindow, dialog, net, Notification, shell } from 'electron';
+import { NodeLocalFs, RcloneDaemon, SqliteStorage } from '@alto/node';
+import { app, BrowserWindow, dialog, Notification, shell } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { copyFile, rm } from 'node:fs/promises';
 import { hostname } from 'node:os';
 import path from 'node:path';
 import ipc from '@/ipc-main';
-import type { MainEvents, SetupState } from '@/ipc-shared';
-import { assetPath, cacheDir, configDir, rcloneDir } from './main/paths';
+import type { MainEvents } from '@/ipc-shared';
+import { assetPath, bundledRclone, cacheDir, configDir } from './main/paths';
 import { isAutostartEnabled, loadPreferences, savePreferences, setAutostart } from './main/preferences';
 import { AltoTray } from './main/tray';
 
@@ -49,12 +41,8 @@ let storage: SqliteStorage | null = null;
 let tray: AltoTray | null = null;
 let quitting = false;
 let startupError: string | null = null;
-let rclonePath: string | null = null;
-let setup: SetupState | null = null;
-let retrySetup: (() => void) | null = null;
-let startSetup: (() => void) | null = null;
-/** No accounts at start: the window greets the user before anything is downloaded. */
-let welcome = false;
+/** The rclone binary Alto runs: `$ALTO_RCLONE`, or the one bundled with it. */
+const rclonePath = process.env.ALTO_RCLONE || bundledRclone();
 
 function send<K extends keyof MainEvents>(channel: K, ...args: Parameters<MainEvents[K]>): void {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(channel, ...args);
@@ -201,8 +189,6 @@ function registerIpc(): void {
     if (win) fork(win).setDecorationInsets?.({ top, right, bottom, left });
   });
   ipc.on('app:quit', () => quit());
-  ipc.on('app:retry-setup', () => retrySetup?.());
-  ipc.on('app:start-setup', () => startSetup?.());
 
   ipc.handle('alto:invoke', async (_e, method, args) => {
     if (!alto) throw new Error('Alto is not running');
@@ -232,64 +218,6 @@ function registerIpc(): void {
     rclonePath,
   }));
   ipc.handle('app:set-autostart', async (_e, enabled) => setAutostart(enabled));
-  ipc.handle('app:get-setup', async () => setup);
-  ipc.handle('app:get-welcome', async () => welcome);
-}
-
-function setSetup(state: SetupState | null): void {
-  setup = state;
-  send('app:setup', state);
-}
-
-/** The rclone binary to run without setting up: `$ALTO_RCLONE`, or the release Alto installed in its cache. */
-async function readyRclone(): Promise<string | null> {
-  return process.env.ALTO_RCLONE || installedRclone({ dir: rcloneDir() });
-}
-
-/**
- * Install the rclone release Alto runs in its cache, on the first start and
- * after an update to another release, while the window shows the setup page.
- * Without accounts, it waits until the user has left the welcome page.
- * `$ALTO_RCLONE_MIRROR` is a mirror of rclone's releases (like
- * https://downloads.rclone.org) to download it from instead of GitHub.
- */
-async function setUpRclone(): Promise<string> {
-  const dir = rcloneDir();
-  const mirror = process.env.ALTO_RCLONE_MIRROR?.replace(/\/+$/, '');
-  if (setup?.phase === 'pending') {
-    await new Promise<void>((resolve) => (startSetup = resolve));
-    startSetup = null;
-  }
-  for (;;) {
-    setSetup({ phase: 'downloading', received: 0, total: null });
-    let reported = 0;
-    try {
-      const binary = await installRclone({
-        dir,
-        baseUrl: mirror && `${mirror}/${RCLONE_VERSION}`,
-        fetch: net.fetch as typeof fetch,
-        onProgress: ({ received, total }) => {
-          // A few updates a second are plenty.
-          if (Date.now() - reported < 100 && received !== total) return;
-          reported = Date.now();
-          setSetup({ phase: 'downloading', received, total });
-        },
-      });
-      setSetup(null);
-      return binary;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      // An update that can't be downloaded now: the release already there still works.
-      const previous = await rcloneBinary(dir);
-      if (previous) {
-        console.warn(`Unable to update rclone, using the installed release: ${message}`);
-        setSetup(null);
-        return previous;
-      }
-      setSetup({ phase: 'failed', message });
-      await new Promise<void>((resolve) => (retrySetup = resolve));
-    }
-  }
 }
 
 function showNotice(notice: AttentionNotice): void {
@@ -376,22 +304,12 @@ app.on('ready', async () => {
   registerIpc();
   tray = new AltoTray({ open: showWindow, syncNow: () => void alto?.syncNow(), quit });
   storage = new SqliteStorage(path.join(configDir(), 'alto.db'));
-  // A config Alto can't read isn't a first start: starting reports it.
-  welcome = await storage.loadConfig().then(
-    (config) => config.remotes.length === 0,
-    () => false,
-  );
-  // Known before the window's first frame, so it opens on the right page.
-  const installed = await readyRclone().catch(() => null);
-  if (!installed) setup = welcome ? { phase: 'pending' } : { phase: 'downloading', received: 0, total: null };
   createWindow();
   try {
-    rclonePath = installed || (await setUpRclone());
     await startAlto(rclonePath, storage);
   } catch (err) {
     startupError = String((err as Error)?.message ?? err);
-    if (alto) alto.store.setState({ error: startupError });
-    else setSetup({ phase: 'failed', message: startupError });
+    alto?.store.setState({ error: startupError });
   }
 });
 

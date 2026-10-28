@@ -9,6 +9,9 @@ coverage/
 .env
 .DS_Store
 
+# The rclone releases the build bundles (forge.config.ts)
+.rclone/
+
 # PNG icons rendered from the SVGs by `npm run icons` (Forge runs it before
 # start, package and make)
 assets/icons/hicolor/

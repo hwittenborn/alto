@@ -7,9 +7,10 @@ import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import { execFile } from 'node:child_process';
-import { readdir, rm } from 'node:fs/promises';
+import { chmod, copyFile, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
+import { installedRclone, installRclone, RCLONE_VERSION } from './packages/node/src/rclone-install.ts';
 
 /** Shared by the deb and rpm packages. */
 const linuxOptions = {
@@ -29,19 +30,45 @@ const linuxOptions = {
   icon: 'assets/icons/hicolor/512x512/com.hunterwittenborn.Alto.png',
 };
 
+/** Where the build keeps the rclone release it bundles for `arch` (`npm start` runs it from there too). */
+const rcloneDir = (arch: string) => path.join(__dirname, '.rclone', arch);
+
+/**
+ * Download the rclone release Alto bundles for `arch`, checked against the
+ * release's checksums, unless it's already there. `$ALTO_RCLONE_MIRROR` is a
+ * mirror of rclone's releases (like https://downloads.rclone.org) to download
+ * it from instead of GitHub.
+ */
+async function fetchRclone(arch: string): Promise<string> {
+  const options = { dir: rcloneDir(arch), arch: arch as NodeJS.Architecture };
+  const installed = await installedRclone(options);
+  if (installed) return installed;
+  const mirror = process.env.ALTO_RCLONE_MIRROR?.replace(/\/+$/, '');
+  return installRclone({ ...options, baseUrl: mirror && `${mirror}/${RCLONE_VERSION}` });
+}
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     executableName: 'alto',
-    // Tray/notification icons and the sign-in page images. rclone isn't
-    // bundled: Alto installs it on its first start (src/main.ts).
+    // Tray/notification icons and the sign-in page images. rclone is added
+    // per architecture (packageAfterExtract below).
     extraResource: ['assets'],
   },
   rebuildConfig: {},
   hooks: {
     // Render the PNG icons from their SVGs (scripts/render-icons.mjs).
-    generateAssets: async () => {
+    // Download the rclone release Alto bundles, for each architecture built.
+    generateAssets: async (_config, _platform, arch) => {
       await promisify(execFile)(process.execPath, ['scripts/render-icons.mjs']);
+      for (const each of arch.split(',')) await fetchRclone(each);
+    },
+    // Bundle rclone as `resources/bin/rclone`, next to Alto's assets (src/main/paths.ts).
+    packageAfterExtract: async (_config, buildPath, _electronVersion, _platform, arch) => {
+      const bin = path.join(buildPath, 'resources', 'bin');
+      await mkdir(bin, { recursive: true });
+      await copyFile(await fetchRclone(arch), path.join(bin, 'rclone'));
+      await chmod(path.join(bin, 'rclone'), 0o755);
     },
     // Alto's Electron fork ships with debug info (about 1.7 GB of it): strip
     // the packaged Electron binaries when binutils is around.

@@ -50,11 +50,6 @@ body,
   min-width: 120px;
 }
 
-/* The ready page's checkmark: done, in the theme's success color. */
-.alto-ready .gtk-image.icon {
-  color: var(--success-color);
-}
-
 /* The sidebar's content, which is wider than it while it moves between full and narrowed. */
 .alto-sidebar-clip {
   contain: inline-size;

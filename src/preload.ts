@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { AltoState } from '@alto/core';
 import { invoke, send } from '@/ipc-renderer';
-import type { SetupState } from '@/ipc-shared';
 
 function on<T extends unknown[]>(channel: string, callback: (...args: T) => void): () => void {
   const handler = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => callback(...(args as T));
@@ -14,7 +13,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   send,
   onWindowStateChanged: (callback: (noShadow: boolean) => void) => on('window:state-changed', callback),
   onShowFolder: (callback: (folderId: string) => void) => on('app:show-folder', callback),
-  onSetup: (callback: (state: SetupState | null) => void) => on('app:setup', callback),
 });
 
 /** Transport for `createAltoClient` from `@alto/core`. */

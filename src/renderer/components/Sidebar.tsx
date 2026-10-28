@@ -70,7 +70,7 @@ function RemoteRow({ remote, rail, moving }: { remote: RemoteView; rail: boolean
   );
 }
 
-/** The primary menu (in the sidebar, or the greeter without accounts). */
+/** The primary menu (in the sidebar, or the login page without accounts). */
 export function buildMainMenu(actions: { onPreferences(): void; onAbout(): void; onQuit(): void }): GtkMenuModel {
   return [
     [{ label: 'Preferences', accel: 'Ctrl+,', onActivate: actions.onPreferences }],

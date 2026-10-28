@@ -3,7 +3,7 @@ import { access, chmod, constants, mkdir, mkdtemp, readFile, rename, rm, writeFi
 import path from 'node:path';
 import extract from 'extract-zip';
 
-/** The rclone release Alto runs. Alto installs it on start when it has another one (or none). */
+/** The rclone release Alto runs. The build downloads it and bundles it with the app (forge.config.ts). */
 export const RCLONE_VERSION = 'v1.75.2';
 
 const ARCHES: Partial<Record<NodeJS.Architecture, string>> = {

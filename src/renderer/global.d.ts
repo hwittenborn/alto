@@ -1,5 +1,5 @@
 import type { AltoTransport } from '@alto/core';
-import type { RequestChannels, RequestResponseChannels, SetupState } from '@/ipc-shared';
+import type { RequestChannels, RequestResponseChannels } from '@/ipc-shared';
 
 declare global {
   interface Window {
@@ -11,7 +11,6 @@ declare global {
       send<T extends keyof RequestChannels>(channel: T, ...args: Parameters<RequestChannels[T]>): void;
       onWindowStateChanged(callback: (noShadow: boolean) => void): () => void;
       onShowFolder(callback: (folderId: string) => void): () => void;
-      onSetup(callback: (state: SetupState | null) => void): () => void;
     };
     altoTransport: AltoTransport;
   }

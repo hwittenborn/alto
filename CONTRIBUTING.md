@@ -23,12 +23,12 @@ Pull requests are squash merged, so their title becomes the commit on `main`. Ti
 
 These environment variables are handy while developing:
 
-| Variable             | Effect                                                                                               |
-| -------------------- | ---------------------------------------------------------------------------------------------------- |
-| `ALTO_CONFIG_DIR`    | Use a separate configuration directory, so testing doesn't touch your real accounts                  |
-| `ALTO_RCLONE`        | Use this rclone binary instead of installing one                                                     |
-| `ALTO_RCLONE_MIRROR` | Install rclone from a mirror of its releases (like `https://downloads.rclone.org`) instead of GitHub |
-| `ALTO_DEBUG=1`       | Verbose logs                                                                                         |
+| Variable             | Effect                                                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `ALTO_CONFIG_DIR`    | Use a separate configuration directory, so testing doesn't touch your real accounts                            |
+| `ALTO_RCLONE`        | Run this rclone binary instead of the bundled one                                                              |
+| `ALTO_RCLONE_MIRROR` | Download rclone at build time from a mirror of its releases (like `https://downloads.rclone.org`), not GitHub  |
+| `ALTO_DEBUG=1`       | Verbose logs                                                                                                   |
 
 ## Project layout
 
@@ -45,9 +45,11 @@ Alto is split into packages so the sync engine can be reused outside Electron (i
 
 ### rclone
 
-On its first start, Alto downloads the rclone release it was built for into `~/.cache/alto/bin` and verifies it
-against the release's checksums. It replaces it when an update of Alto moves to another release. On a fresh install,
-the download waits until you continue past the welcome page.
+Alto ships with its own copy of rclone, pinned by `RCLONE_VERSION` in `packages/node/src/rclone-install.ts`.
+`npm start`, `npm run package` and `npm run make` download that release into `.rclone/<arch>/` the first time (and
+reuse it after that), checking it against the release's checksums. Packaged builds include it as
+`resources/bin/rclone`, and `npm start` runs it straight from `.rclone/`. To move to another rclone release, change
+`RCLONE_VERSION`.
 
 Alto then runs its own `rclone rcd`, on a random localhost port with random credentials, and talks to it over HTTP:
 
