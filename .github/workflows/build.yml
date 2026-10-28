@@ -1,0 +1,27 @@
+name: Build packages
+on:
+  workflow_call:
+
+jobs:
+  build:
+    # Alto's Electron fork is only built for linux-x64 so far.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - name: Install packaging tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fakeroot rpm squashfs-tools
+      - run: npm ci
+      - name: Build the .deb, .rpm and AppImage
+        run: npx electron-forge make --targets deb,rpm,AppImage
+      - uses: actions/upload-artifact@v7
+        with:
+          name: alto-linux-x64
+          path: |
+            out/make/deb/x64/*.deb
+            out/make/rpm/x64/*.rpm
+            out/make/AppImage/x64/*.AppImage
+          if-no-files-found: error
