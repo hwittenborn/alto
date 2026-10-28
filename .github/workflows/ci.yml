@@ -1,0 +1,44 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run format:check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      # The integration tests run against the rclone release Alto installs.
+      - name: Install rclone
+        run: |
+          version="$(sed -n "s/^export const RCLONE_VERSION = '\(.*\)';$/\1/p" packages/node/src/rclone-install.ts)"
+          curl -fsSLO "https://downloads.rclone.org/${version}/rclone-${version}-linux-amd64.zip"
+          unzip -q "rclone-${version}-linux-amd64.zip"
+          echo "RCLONE=${PWD}/rclone-${version}-linux-amd64/rclone" >> "${GITHUB_ENV}"
+      - run: npm ci
+      - run: npm test
+
+  build:
+    uses: ./.github/workflows/build.yml
