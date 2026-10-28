@@ -29,6 +29,8 @@ These environment variables are handy while developing:
 | `ALTO_RCLONE`        | Run this rclone binary instead of the bundled one                                                              |
 | `ALTO_RCLONE_MIRROR` | Download rclone at build time from a mirror of its releases (like `https://downloads.rclone.org`), not GitHub  |
 | `ALTO_DEBUG=1`       | Verbose logs                                                                                                   |
+| `ALTO_THEME`         | Look like another system: `adwaita` (GNOME), `whitesur` (macOS before Tahoe) or `mactahoe` (macOS 26 and later) |
+| `GTK_JS_DIR`         | Build the UI against a gtk-js checkout (after `vp run build:packages` there), to use changes it hasn't released |
 
 ## Project layout
 
@@ -42,6 +44,16 @@ Alto is split into packages so the sync engine can be reused outside Electron (i
 | `src/`           | The Electron app: the main process (tray, notifications, autostart, sign-in page) and the gtk-js UI    |
 
 ## How it works
+
+### Themes
+
+The UI is gtk-js: libadwaita's widgets, in the theme of the system Alto runs on (`src/renderer/theme.tsx`).
+On Linux that's Adwaita; on macOS it's the MacTahoe GTK and icon themes from macOS 26 (Tahoe) and the WhiteSur ones
+before, with the window buttons on the left. A macOS theme and its icons load only on macOS, so they don't slow
+down starting up elsewhere.
+
+The macOS themes' providers aren't in a gtk-js release yet: until they are, build against a gtk-js checkout with
+`GTK_JS_DIR`. Without it, Alto shows Adwaita there.
 
 ### rclone
 

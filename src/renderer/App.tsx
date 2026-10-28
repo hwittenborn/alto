@@ -1,7 +1,6 @@
 import { baseName, createAltoClient, type FolderView, formatLocalPath, formatRemotePath } from '@alto/core';
 import { AltoProvider, useAlto, useAltoState, useFolder, useHomeDir, useRemote } from '@alto/react';
 import {
-  AdwaitaProvider,
   AdwAlertDialog,
   AdwBreakpointBin,
   AdwHeaderBar,
@@ -15,10 +14,10 @@ import {
   GtkSpinner,
   GtkToggleButton,
   GtkWindow,
+  GtkWindowControls,
   GtkWindowTitle,
 } from '@gtk-js/adwaita';
 import { createGtkIconFromSvg } from '@gtk-js/icon-helpers';
-import * as adwaitaIcons from '@gtk-js/icons-adwaita';
 import googleGSvg from '../../assets/auth/google-g.svg?raw';
 import appIconSvg from '../../assets/icons/com.hunterwittenborn.Alto.svg?raw';
 import { Component, type ReactNode, useCallback, useEffect, useMemo, useLayoutEffect, useRef, useState } from 'react';
@@ -29,13 +28,13 @@ import { FolderList } from './components/FolderList';
 import { FolderPage } from './components/FolderPage';
 import { LoginDialog, LoginPage } from './components/LoginDialog';
 import { buildMainMenu, Sidebar } from './components/Sidebar';
+import type { Theme } from './theme';
 import { host, ToastProvider, useRetained, useToast } from './ui';
 
 const client = createAltoClient(window.altoTransport);
-// The application icon, by name like an icon theme's, for the about dialog and the welcome on the login page.
-// Inlined, so it's drawn with the window instead of popping in after it.
+// The app's own icons, over the theme's. The application icon, by name like an icon theme's, for the about dialog
+// and the welcome on the login page. Inlined, so it's drawn with the window instead of popping in after it.
 const icons = {
-  ...adwaitaIcons,
   ComHunterwittenbornAlto: createGtkIconFromSvg('ComHunterwittenbornAlto', appIconSvg),
   // Google's "G" from its Sign in with Google assets, which its branding
   // requires on the button that starts a Google Drive login.
@@ -590,13 +589,18 @@ function Shell() {
   }
 
   const sidebarButton = collapsed ? null : (
-    <GtkToggleButton
-      iconName="SidebarShow"
-      hasFrame={false}
-      active={!rail}
-      tooltipText="Toggle Sidebar"
-      onToggled={toggleRail}
-    />
+    <>
+      {/* The window buttons at the start of the window (macOS's are) have no
+          room in the sidebar narrowed to avatars: they come before it. */}
+      {railed && <GtkWindowControls side="start" />}
+      <GtkToggleButton
+        iconName="SidebarShow"
+        hasFrame={false}
+        active={!rail}
+        tooltipText="Toggle Sidebar"
+        onToggled={toggleRail}
+      />
+    </>
   );
 
   const content =
@@ -705,13 +709,13 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
   }
 }
 
-export default function App() {
+export default function App({ theme }: { theme: Theme }) {
   const [noShadow, setNoShadow] = useState(false);
 
   useEffect(() => window.electronAPI.onWindowStateChanged(setNoShadow), []);
 
   return (
-    <AdwaitaProvider style={{ height: '100%' }} icons={icons}>
+    <theme.Provider style={{ height: '100%' }} icons={icons}>
       <AltoProvider client={client}>
         <GtkWindow
           allocateShadow
@@ -734,6 +738,6 @@ export default function App() {
           </ToastProvider>
         </GtkWindow>
       </AltoProvider>
-    </AdwaitaProvider>
+    </theme.Provider>
   );
 }

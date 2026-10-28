@@ -45,6 +45,26 @@ const CONTENT_SECURITY_POLICY = [
   "form-action 'none'",
 ].join('; ');
 
+/**
+ * `$GTK_JS_DIR`: a gtk-js checkout to build against instead of the released
+ * packages, to use its changes before they're released (run `vp run
+ * build:packages` there first). Its packages by their built bundles, its icon
+ * sets by their sources (as they're published), with Alto's React.
+ */
+const gtkJs = process.env.GTK_JS_DIR && path.resolve(process.env.GTK_JS_DIR);
+const GTK_JS_PACKAGES = ['gtk4', 'adwaita', 'gtk-css', 'icon-helpers'];
+const gtkJsAliases = gtkJs
+  ? [
+      ...GTK_JS_PACKAGES.map((name) => ({
+        find: new RegExp(`^@gtk-js/${name}$`),
+        replacement: path.join(gtkJs, 'packages', name, 'dist/index.js'),
+      })),
+      { find: /^@gtk-js\/icons-([\w-]+)$/, replacement: path.join(gtkJs, 'icons/$1/src/index.ts') },
+      { find: /^@gtk-js\/theme-([\w-]+)$/, replacement: path.join(gtkJs, 'themes/$1/dist/index.js') },
+      { find: /^react(-dom)?(\/.*)?$/, replacement: path.resolve(__dirname, 'node_modules/react$1$2') },
+    ]
+  : [];
+
 // https://vitejs.dev/config
 export default defineConfig({
   plugins: [
@@ -72,13 +92,18 @@ export default defineConfig({
     ALTO_RELEASE_NOTES: JSON.stringify(releaseNotes()),
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
       // The workspace packages by their sources (rather than through
       // node_modules), so the dev server watches and reloads them.
-      '@alto/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
-      '@alto/react': path.resolve(__dirname, 'packages/react/src/index.tsx'),
-    },
+      { find: '@alto/core', replacement: path.resolve(__dirname, 'packages/core/src/index.ts') },
+      { find: '@alto/react', replacement: path.resolve(__dirname, 'packages/react/src/index.tsx') },
+      ...gtkJsAliases,
+    ],
     dedupe: ['react', 'react-dom'],
   },
+  // A checkout's icon sets are thousands of modules: bundled once, like the released ones.
+  optimizeDeps: gtkJs
+    ? { include: ['@gtk-js/icons-adwaita', '@gtk-js/icons-gtk4', '@gtk-js/icons-mactahoe', '@gtk-js/icons-whitesur'] }
+    : undefined,
 });

@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   send,
   onWindowStateChanged: (callback: (noShadow: boolean) => void) => on('window:state-changed', callback),
   onShowFolder: (callback: (folderId: string) => void) => on('app:show-folder', callback),
+  // Which theme fits the system (see platformTheme()).
+  platform: { os: process.platform, version: process.getSystemVersion(), theme: process.env.ALTO_THEME ?? null },
 });
 
 /** Transport for `createAltoClient` from `@alto/core`. */
