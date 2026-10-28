@@ -1,7 +1,7 @@
 import { baseName, createAltoClient, type FolderView, formatLocalPath, formatRemotePath } from '@alto/core';
 import { AltoProvider, useAlto, useAltoState, useFolder, useHomeDir, useRemote } from '@alto/react';
 import {
-  AdwaitaProvider,
+  GtkProvider,
   AdwAlertDialog,
   AdwBreakpointBin,
   AdwButtonContent,
@@ -21,7 +21,8 @@ import {
   GtkWindowTitle,
 } from '@gtk-js/adwaita';
 import { createGtkIconFromSvg } from '@gtk-js/icon-helpers';
-import * as adwaitaIcons from '@gtk-js/icons-adwaita';
+import * as mactahoeIcons from '@gtk-js/icons-mactahoe';
+import { MacTahoeTheme } from '@gtk-js/theme-mactahoe';
 import googleGSvg from '../../assets/auth/google-g.svg?raw';
 import appIconSvg from '../../assets/icons/com.hunterwittenborn.Alto.svg?raw';
 import {
@@ -50,12 +51,14 @@ const client = createAltoClient(window.altoTransport);
 // The application icon, by name like an icon theme's, for the about dialog and greeter.
 // Inlined, so it's drawn with the window instead of popping in after it.
 const icons = {
-  ...adwaitaIcons,
+  ...mactahoeIcons,
   ComHunterwittenbornAlto: createGtkIconFromSvg('ComHunterwittenbornAlto', appIconSvg),
   // Google's "G" from its Sign in with Google assets, which its branding
   // requires on the button that starts a Google Drive login.
   GoogleG: createGtkIconFromSvg('GoogleG', googleGSvg),
 };
+
+const theme = new MacTahoeTheme({ colorScheme: 'light' });
 
 /** Below this width the split view collapses into a single pane. */
 const COLLAPSE_WIDTH = 640;
@@ -808,7 +811,7 @@ export default function App() {
   useEffect(() => window.electronAPI.onWindowStateChanged(setNoShadow), []);
 
   return (
-    <AdwaitaProvider style={{ height: '100%' }} icons={icons}>
+    <GtkProvider style={{ height: '100%' }} theme={theme} icons={icons}>
       <AltoProvider client={client}>
         <GtkWindow
           allocateShadow
@@ -831,6 +834,6 @@ export default function App() {
           </ToastProvider>
         </GtkWindow>
       </AltoProvider>
-    </AdwaitaProvider>
+    </GtkProvider>
   );
 }
