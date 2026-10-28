@@ -44,9 +44,13 @@ function uniqueName(base: string, existing: string[]): string {
   }
 }
 
-function ProviderPicker({ onPick }: { onPick(id: ProviderId): void }) {
+/** The providers to pick from. Bare, without its title and description, under the login page's welcome. */
+function ProviderPicker({ bare, onPick }: { bare?: boolean; onPick(id: ProviderId): void }) {
   return (
-    <AdwPreferencesGroup title="Server Type" description="Choose where the files you want to sync are stored.">
+    <AdwPreferencesGroup
+      title={bare ? undefined : 'Server Type'}
+      description={bare ? undefined : 'Choose where the files you want to sync are stored.'}
+    >
       {PROVIDERS.map((p) => (
         <AdwActionRow
           key={p.id}
@@ -317,9 +321,12 @@ function LoginFlow({
         <AdwPreferencesPage>
           <GtkBox orientation="vertical" spacing={12} halign="center">
             <GtkImage iconName="ComHunterwittenbornAlto" pixelSize={96} />
-            <GtkLabel className="title-1" label="Welcome to Alto" wrap justify="center" />
+            <GtkBox orientation="vertical" spacing={6}>
+              <GtkLabel className="title-1" label="Welcome to Alto" wrap justify="center" />
+              <GtkLabel className="dim-label" label="Let's get set up." wrap justify="center" />
+            </GtkBox>
           </GtkBox>
-          <ProviderPicker onPick={pick} />
+          <ProviderPicker bare onPick={pick} />
         </AdwPreferencesPage>
       }
     />
