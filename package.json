@@ -13,6 +13,7 @@
     "make:deb": "electron-forge make --targets deb",
     "make:rpm": "electron-forge make --targets rpm",
     "make:appimage": "electron-forge make --targets AppImage",
+    "make:snap": "electron-forge package && snapcraft pack",
     "lint": "eslint --ext .ts,.tsx src packages",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",

@@ -16,6 +16,7 @@ npm start              # run the app with hot reload
 | `npm run format`             | Prettier                                                                                                   |
 | `npm run package` / `make`   | Package the app / build `.deb`, `.rpm` and `.zip` distributables                                           |
 | `npm run icons`              | Render the PNG icons from the SVGs in `assets/` (`start`, `package` and `make` do this first)              |
+| `npm run make:snap`          | Build the snap (needs `snapcraft`, see [Building the snap](#building-the-snap))                            |
 
 Pull requests are squash merged, so their title becomes the commit on `main`. Titles have to follow
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (like `fix: keep the window size`), since
@@ -29,6 +30,17 @@ These environment variables are handy while developing:
 | `ALTO_RCLONE`        | Run this rclone binary instead of the bundled one                                                              |
 | `ALTO_RCLONE_MIRROR` | Download rclone at build time from a mirror of its releases (like `https://downloads.rclone.org`), not GitHub  |
 | `ALTO_DEBUG=1`       | Verbose logs                                                                                                   |
+
+### Building the snap
+
+`npm run make:snap` packages the app with Forge, then wraps it with `snapcraft` (`snap/snapcraft.yaml`). Snapcraft
+builds in an LXD container, and installs LXD the first time if it's missing:
+
+```bash
+sudo snap install snapcraft --classic
+npm run make:snap
+sudo snap install --dangerous ./alto_*.snap
+```
 
 ## Project layout
 
