@@ -1,11 +1,19 @@
 name: alto
 title: Alto
-summary: Bidirectional file sync for GNOME, powered by rclone
+summary: The best application for all of your cloud storage
 description: |
-  Alto keeps folders on your computer in sync with cloud storage: Google Drive,
-  Dropbox, Proton Drive, Nextcloud, ownCloud and WebDAV. Changes on both sides
-  are merged, conflicts are never overwritten silently, and exclusion patterns
-  are shared between all your devices.
+  Alto keeps folders on your computer in sync with your cloud storage, such as
+  Google Drive, Dropbox, Proton Drive and more.
+
+  - **True two-way sync.** New files, edits and deletions go both ways.
+  - **All your clouds in one place.** Connect as many accounts as you like,
+    across different providers, and sync folders from all of them at once.
+  - **Safe across several computers.** Before overwriting or deleting anything,
+    Alto checks that things haven't changed since it last looked, so a change
+    made on another computer in the meantime is never lost.
+  - **Shared exclusions.** Skip files with `.gitignore`-style patterns in the
+    folder's `.altoignore`. It syncs too, so every computer skips the same
+    files.
 license: GPL-3.0-or-later
 website: https://github.com/hwittenborn/alto
 source-code: https://github.com/hwittenborn/alto
@@ -33,8 +41,8 @@ apps:
 
 parts:
   alto:
-    # The app Forge packaged (`electron-forge package`/`make`, run before
-    # snapcraft): Electron, Alto and the bundled rclone.
+    # The app as Forge packages it (Electron, Alto and the bundled rclone).
+    # CI runs `electron-forge make` before snapcraft.
     plugin: dump
     source: out/Alto-linux-x64
     organize:
