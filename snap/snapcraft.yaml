@@ -22,7 +22,7 @@ platforms:
 
 apps:
   alto:
-    command: alto/alto
+    command: opt/alto/alto
     extensions: [gnome]
     desktop: meta/gui/alto.desktop
     plugs:
@@ -38,7 +38,7 @@ parts:
     plugin: dump
     source: out/Alto-linux-x64
     organize:
-      '*': alto/
+      '*': opt/alto/
     override-build: |
       craftctl default
       craftctl set version="$(sed -n 's/^  "version": "\(.*\)",$/\1/p' "${CRAFT_PROJECT_DIR}/package.json")"
