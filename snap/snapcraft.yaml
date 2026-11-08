@@ -1,0 +1,44 @@
+name: alto
+title: Alto
+summary: Bidirectional file sync for GNOME, powered by rclone
+description: |
+  Alto keeps folders on your computer in sync with cloud storage: Google Drive,
+  Dropbox, Proton Drive, Nextcloud, ownCloud and WebDAV. Changes on both sides
+  are merged, conflicts are never overwritten silently, and exclusion patterns
+  are shared between all your devices.
+license: GPL-3.0-or-later
+website: https://github.com/hwittenborn/alto
+source-code: https://github.com/hwittenborn/alto
+issues: https://github.com/hwittenborn/alto/issues
+icon: assets/icons/com.hunterwittenborn.Alto.svg
+base: core24
+grade: stable
+confinement: strict
+adopt-info: alto
+
+# Alto's Electron fork is only built for linux-x64 so far.
+platforms:
+  amd64:
+
+apps:
+  alto:
+    command: alto/alto
+    extensions: [gnome]
+    desktop: meta/gui/alto.desktop
+    plugs:
+      - home
+      - network
+      - network-bind
+      - browser-support
+
+parts:
+  alto:
+    # The app Forge packaged (`electron-forge package`/`make`, run before
+    # snapcraft): Electron, Alto and the bundled rclone.
+    plugin: dump
+    source: out/Alto-linux-x64
+    organize:
+      '*': alto/
+    override-build: |
+      craftctl default
+      craftctl set version="$(sed -n 's/^  "version": "\(.*\)",$/\1/p' "${CRAFT_PROJECT_DIR}/package.json")"
