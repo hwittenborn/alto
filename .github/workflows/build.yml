@@ -31,6 +31,9 @@ jobs:
       - name: Build the snap
         run: |
           sudo snap install snapcraft --classic
+          # Docker on the runner drops forwarded traffic, which cuts LXD's
+          # build container off from the network.
+          sudo iptables -P FORWARD ACCEPT
           sudo snapcraft pack --verbose
       # Each package is its own artifact, uploaded as is (not zipped), so it
       # downloads as the package itself. Its name is the file's.
