@@ -32,7 +32,7 @@ apps:
   alto:
     command: opt/alto/alto
     extensions: [gnome]
-    desktop: meta/gui/alto.desktop
+    desktop: usr/share/applications/alto.desktop
     plugs:
       - home
       - network
@@ -50,3 +50,12 @@ parts:
     override-build: |
       craftctl default
       craftctl set version="$(sed -n 's/^  "version": "\(.*\)",$/\1/p' "${CRAFT_PROJECT_DIR}/package.json")"
+
+  desktop:
+    # The launcher the deb, rpm and AppImage use (assets/linux/alto.desktop),
+    # with its icon pointed at the snap's.
+    plugin: nil
+    source: assets/linux
+    override-build: |
+      install -D -m644 alto.desktop "${CRAFT_PART_INSTALL}/usr/share/applications/alto.desktop"
+      sed -i 's|^Icon=alto$|Icon=${SNAP}/meta/gui/icon.svg|' "${CRAFT_PART_INSTALL}/usr/share/applications/alto.desktop"

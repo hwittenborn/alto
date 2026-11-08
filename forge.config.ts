@@ -18,7 +18,6 @@ const linuxOptions = {
   name: 'alto',
   bin: 'alto',
   productName: 'Alto',
-  genericName: 'File Synchronizer',
   description: 'Bidirectional file sync for GNOME, powered by rclone',
   productDescription:
     'Alto keeps folders on your computer in sync with cloud storage: Google Drive, Dropbox, Proton Drive, ' +
@@ -103,7 +102,6 @@ const config: ForgeConfig = {
         name: linuxOptions.name,
         bin: linuxOptions.bin,
         productName: linuxOptions.productName,
-        genericName: linuxOptions.genericName,
         categories: linuxOptions.categories,
         desktopFile: linuxOptions.desktopTemplate,
         icon: linuxOptions.icon,
