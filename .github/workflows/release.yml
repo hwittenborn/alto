@@ -28,6 +28,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       release: true
+    secrets: inherit
 
   upload:
     needs: [release-please, build]

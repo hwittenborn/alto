@@ -57,3 +57,23 @@ jobs:
           path: '*.snap'
           archive: false
           if-no-files-found: error
+
+  # Pushes to main publish their snap to edge, and releases to stable.
+  publish-snap:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: snap-store
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*.snap'
+          path: snap
+          merge-multiple: true
+      - name: Publish the snap
+        run: |
+          sudo snap install snapcraft --classic
+          snapcraft upload snap/*.snap --release="${CHANNEL}"
+        env:
+          CHANNEL: ${{ inputs.release && 'stable' || 'edge' }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

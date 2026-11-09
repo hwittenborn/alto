@@ -49,7 +49,8 @@ parts:
       '*': opt/alto/
     override-build: |
       craftctl default
-      craftctl set version="$(sed -n 's/^  "version": "\(.*\)",$/\1/p' "${CRAFT_PROJECT_DIR}/package.json")"
+      # A release's version, or a nightly's commit (packages/node/src/build-info.ts).
+      craftctl set version="$(python3 -c 'import json, sys; info = json.load(open(sys.argv[1])); print(info["version"] if info["release"] else info["commit"])' "${CRAFT_PROJECT_DIR}/packages/node/src/build-info.generated.json")"
 
   desktop:
     # The launcher the deb, rpm and AppImage use (assets/linux/alto.desktop),
