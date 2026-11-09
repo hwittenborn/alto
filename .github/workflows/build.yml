@@ -1,11 +1,20 @@
 name: Build packages
 on:
   workflow_call:
+    inputs:
+      release:
+        description: Build a release, rather than a nightly (packages/node/src/build-info.ts)
+        type: boolean
+        default: false
 
 jobs:
   build:
-    # Alto's Electron fork is only built for linux-x64 so far.
-    runs-on: ubuntu-latest
+    # Alto's Electron fork is only built for linux-x64 so far. Pinned to 24.04:
+    # electron-installer-redhat (the rpm maker) breaks with the newer rpmbuild
+    # on 26.04 (electron-userland/electron-installer-redhat#343).
+    runs-on: ubuntu-24.04
+    env:
+      ALTO_RELEASE: ${{ inputs.release && '1' || '' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

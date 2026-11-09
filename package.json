@@ -6,6 +6,7 @@
   "main": ".vite/build/main.cjs",
   "private": true,
   "scripts": {
+    "prepare": "node packages/node/src/build-info.ts",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
