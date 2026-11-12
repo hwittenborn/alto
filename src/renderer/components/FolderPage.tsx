@@ -1,4 +1,5 @@
 import {
+  baseName,
   describeIssue,
   type FolderView,
   folderStatusText,
@@ -14,8 +15,10 @@ import { useAlto, useHomeDir } from '@alto/react';
 import {
   AdwActionRow,
   AdwEntryRow,
+  AdwExpanderRow,
   AdwPreferencesGroup,
   AdwPreferencesPage,
+  GtkBox,
   GtkButton,
   GtkImage,
   GtkLabel,
@@ -155,24 +158,92 @@ function IssueRow({ issue, folder, onOpen }: { issue: SyncIssue; folder: FolderV
   );
 }
 
+function SyncDetails({ folder, expanded }: { folder: FolderView; expanded: boolean }) {
+  const now = useNow(expanded ? 1000 : 30_000);
+  const { check, progress, message, lastCheckedAt } = folder.runtime;
+  const lines: string[] = [];
+  if (check) {
+    const elapsed = Math.max(0, Math.floor((now - check.startedAt) / 1000));
+    lines.push(elapsed < 60 ? `Elapsed: ${elapsed} s` : `Elapsed: ${Math.floor(elapsed / 60)} min ${elapsed % 60} s`);
+    if (check.stage === 'preparing') lines.push('Preparing the local folder and contacting the server…');
+    if (check.stage === 'changed-paths') lines.push('Checking recently changed paths…');
+    if (check.stage === 'listing' || check.stage === 'comparing') {
+      for (const [label, count] of [
+        ['Local', check.local],
+        ['Server', check.remote],
+      ] as const) {
+        lines.push(
+          count
+            ? `${label}: ${count.folders.toLocaleString()} folders, ${count.files.toLocaleString()} files`
+            : `${label}: listing files and folders…`,
+        );
+      }
+      if (check.stage === 'comparing' && !progress) lines.push('Comparing both listings…');
+    }
+  }
+  if (progress) {
+    lines.push(progressCountText(progress));
+    const bytes = progressBytesText(progress);
+    if (bytes) lines.push(bytes);
+  }
+  if (message) lines.push(message);
+  if (lastCheckedAt !== null) lines.push(lastCheckedText(lastCheckedAt, now));
+  if (lines.length === 0) lines.push(folderStatusText(folder));
+  const creating = progress?.current.filter(({ op }) => op === 'mkdir-local' || op === 'mkdir-remote') ?? [];
+  return (
+    <AdwActionRow
+      title=""
+      data-sync-details={folder.id}
+      prefixWidget={
+        <GtkBox orientation="vertical" spacing={4}>
+          {lines.map((line, index) => (
+            <GtkLabel key={index} label={line} className="subtitle dimmed" xalign={0} wrap />
+          ))}
+          {creating.map(({ op, path }) => (
+            <GtkLabel
+              key={`${op}:${path}`}
+              label={op === 'mkdir-local' ? `Creating ${path}` : `Creating ${path} on the server`}
+              data-creating-path
+              xalign={0}
+              wrap
+              wrapMode="word-char"
+            />
+          ))}
+        </GtkBox>
+      }
+    />
+  );
+}
+
 function StatusGroup({ folder }: { folder: FolderView }) {
+  const [expanded, setExpanded] = useState(false);
   const now = useNow();
   const { runtime } = folder;
   const progress =
     runtime.phase === 'syncing' && runtime.progress && runtime.progress.total > 0 ? runtime.progress : null;
+  const firstDirectory = progress?.current.find(({ op }) => op === 'mkdir-local' || op === 'mkdir-remote');
+  const creatingFolders =
+    progress &&
+    progress.current.length > 1 &&
+    progress.current.every(({ op }) => op === 'mkdir-local' || op === 'mkdir-remote');
   const failed = runtime.phase === 'offline' || runtime.phase === 'error';
   const detail = failed
     ? runtime.message
     : progress
-      ? progressBytesText(progress)
+      ? firstDirectory && progress.current.length > 1
+        ? baseName(firstDirectory.path)
+        : progressBytesText(progress)
       : runtime.lastCheckedAt !== null && runtime.phase !== 'checking'
         ? lastCheckedText(runtime.lastCheckedAt, now)
         : null;
   return (
     <AdwPreferencesGroup>
       {/* One line each, so the row keeps its height while the file names change. */}
-      <AdwActionRow
-        title={folderStatusText(folder)}
+      <AdwExpanderRow
+        data-sync-status
+        expanded={expanded}
+        onExpandedChanged={setExpanded}
+        title={creatingFolders ? 'Creating folders' : folderStatusText(folder)}
         titleLines={1}
         subtitle={detail ?? undefined}
         subtitleLines={failed ? 3 : 1}
@@ -188,7 +259,9 @@ function StatusGroup({ folder }: { folder: FolderView }) {
             />
           )
         }
-      />
+      >
+        <SyncDetails folder={folder} expanded={expanded} />
+      </AdwExpanderRow>
     </AdwPreferencesGroup>
   );
 }

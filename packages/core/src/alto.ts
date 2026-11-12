@@ -164,6 +164,14 @@ export class Alto implements AltoClient {
     for (const login of this.logins.values()) login.abort.abort();
   }
 
+  suspendSync(): void {
+    this.engine.suspend();
+  }
+
+  resumeSync(): void {
+    this.engine.resume();
+  }
+
   private async saveConfig(): Promise<void> {
     await this.storage.saveConfig(this.config);
   }

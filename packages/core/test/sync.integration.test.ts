@@ -1,10 +1,11 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   type Backend,
   type ServerEnv,
   serverRead,
   serverTree,
   serverWrite,
+  sleep,
   startServers,
   TestClient,
 } from './harness.ts';
@@ -41,6 +42,41 @@ async function pair(backend: Backend, options: { trash?: boolean } = {}) {
 describe.each(BACKENDS)(
   'two clients over %s',
   (backend) => {
+    it('creates sibling folders concurrently and creates parents before children', async () => {
+      const { b, remotePath, close } = await pair(backend);
+      try {
+        for (let i = 0; i < 6; i += 1) {
+          serverWrite(env, `${remotePath}/folder-${i}/nested/file.txt`, 'from the server');
+        }
+        const client = b.daemon.client;
+        const mkdir = client.mkdir.bind(client);
+        let active = 0;
+        let peak = 0;
+        const earlyChildren: string[] = [];
+        vi.spyOn(client, 'mkdir').mockImplementation(async (fs, path, options) => {
+          if (fs !== b.dir) return mkdir(fs, path, options);
+          const parent = path.split('/').slice(0, -1).join('/');
+          if (parent && !b.exists(parent)) earlyChildren.push(path);
+          active += 1;
+          peak = Math.max(peak, active);
+          try {
+            await sleep(20);
+            await mkdir(fs, path, options);
+          } finally {
+            active -= 1;
+          }
+        });
+
+        await b.sync();
+        expect(peak).toBe(4);
+        expect(earlyChildren).toEqual([]);
+        expect(b.read('folder-5/nested/file.txt')).toBe('from the server');
+        expect(b.issues).toEqual([]);
+      } finally {
+        await close();
+      }
+    });
+
     it('propagates new files, edits and folders in both directions', async () => {
       const { a, b, remotePath, close } = await pair(backend);
       try {
