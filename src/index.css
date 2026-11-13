@@ -102,3 +102,65 @@ body,
   overflow: hidden;
   pointer-events: none;
 }
+
+/*
+ * TODO: Remove once gtk-js lays out Cantarell like Pango does (gtk-js/gtk-js PR to come).
+ *
+ * gtk-js's default font is Cantarell. Chromium places Cantarell's baseline by its
+ * OS/2 typo metrics (the line gap split above and below), 13px down an 11pt line,
+ * where Pango uses its hhea ascent and descent (14.42px and 3.18px). So every
+ * label's text sits about 2px higher than in native GTK, and icons beside text,
+ * like an expander's arrow, look low. Declaring Cantarell's own hhea metrics puts
+ * the text where Pango does. It only changes Cantarell (all its weights share
+ * these metrics), so other fonts and themes are unaffected; where the static
+ * Cantarell faces aren't installed, the faces fail to load and Cantarell is used
+ * as before.
+ */
+@font-face {
+  font-family: 'Cantarell (Pango metrics)';
+  font-weight: 100;
+  src: local('Cantarell Thin'), local('Cantarell-Thin');
+  ascent-override: 98.3%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Cantarell (Pango metrics)';
+  font-weight: 300;
+  src: local('Cantarell Light'), local('Cantarell-Light');
+  ascent-override: 98.3%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Cantarell (Pango metrics)';
+  font-weight: 400;
+  src: local('Cantarell Regular'), local('Cantarell-Regular');
+  ascent-override: 98.3%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Cantarell (Pango metrics)';
+  font-weight: 700;
+  src: local('Cantarell Bold'), local('Cantarell-Bold');
+  ascent-override: 98.3%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Cantarell (Pango metrics)';
+  font-weight: 800;
+  src: local('Cantarell Extra Bold'), local('Cantarell-ExtraBold');
+  ascent-override: 98.3%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
+
+[data-gtk-provider] {
+  --gtk-font-family: 'Cantarell (Pango metrics)', Cantarell, sans-serif;
+}
