@@ -14,6 +14,7 @@ import {
   AdwClamp,
   AdwDialog,
   AdwEntryRow,
+  AdwExpanderRow,
   AdwHeaderBar,
   AdwNavigationView,
   AdwPasswordEntryRow,
@@ -178,7 +179,7 @@ function LoginFlow({
     if (provider.auth === 'oauth') setStack(['providers', 'form', 'browser']);
     const result =
       provider.auth === 'oauth'
-        ? await alto.loginWithBrowser({ provider: providerId, name: name.trim() })
+        ? await alto.loginWithBrowser({ provider: providerId, name: name.trim(), values })
         : await alto.createRemote({ provider: providerId, name: name.trim(), values });
     setBusy(false);
     if (result.ok) {
@@ -196,6 +197,14 @@ function LoginFlow({
   const nameError = name !== '' ? validation.errors.name : undefined;
   const fieldErrors = provider.fields.map((f) => ((values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined));
   const shownError = [nameError, ...fieldErrors].find(Boolean);
+  const rows = provider.fields.map((field, i) => ({ field, error: fieldErrors[i] }));
+  const fieldRows = (advanced: boolean) =>
+    rows
+      .filter(({ field }) => !!field.advanced === advanced)
+      .map(({ field, error }) =>
+        fieldRow(field, values, (id, v) => setValues((current) => ({ ...current, [id]: v })), error, submit),
+      );
+  const advancedRows = fieldRows(true);
 
   const formPage = (
     <AdwToolbarView
@@ -228,16 +237,27 @@ function LoginFlow({
                   onChanged={setName}
                   onEntryActivated={submit}
                 />
-                {provider.fields.map((field, i) =>
-                  fieldRow(
-                    field,
-                    values,
-                    (id, v) => setValues((current) => ({ ...current, [id]: v })),
-                    fieldErrors[i],
-                    submit,
-                  ),
-                )}
+                {fieldRows(false)}
               </AdwPreferencesGroup>
+              {advancedRows.length > 0 && (
+                <AdwPreferencesGroup>
+                  <AdwExpanderRow
+                    title="Advanced"
+                    subtitle={provider.auth === 'oauth' ? 'Use your own OAuth client' : undefined}
+                    data-section="advanced"
+                  >
+                    {advancedRows}
+                    {provider.oauth && (
+                      <AdwActionRow
+                        title="Making Your Own Client"
+                        activatable
+                        onActivated={() => void host.openUrl(provider.oauth!.customClientHelpUrl)}
+                        suffixWidget={<GtkImage iconName="AdwExternalLink" />}
+                      />
+                    )}
+                  </AdwExpanderRow>
+                </AdwPreferencesGroup>
+              )}
               {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
               <GtkButton
                 className={google ? 'pill' : 'pill suggested-action'}

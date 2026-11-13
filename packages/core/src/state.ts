@@ -81,6 +81,13 @@ export interface CreateRemoteInput {
   values: ProviderValues;
 }
 
+export interface BrowserLoginInput {
+  provider: ProviderId;
+  name: string;
+  /** The form's values, like a custom OAuth client. */
+  values?: ProviderValues;
+}
+
 export interface AddFolderInput {
   remote: string;
   localPath: string;
@@ -92,7 +99,7 @@ export interface AddFolderInput {
 export interface AltoApi {
   createRemote(input: CreateRemoteInput): Promise<ActionResult<{ name: string }>>;
   /** Log in to an OAuth provider in the browser. Progress is reported in `state.logins`. */
-  loginWithBrowser(input: { provider: ProviderId; name: string }): Promise<ActionResult<{ name: string }>>;
+  loginWithBrowser(input: BrowserLoginInput): Promise<ActionResult<{ name: string }>>;
   cancelLogin(name: string): Promise<void>;
   deleteRemote(name: string): Promise<void>;
   refreshRemoteUsage(name: string): Promise<void>;

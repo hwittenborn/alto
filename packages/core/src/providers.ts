@@ -5,7 +5,7 @@
 
 export type ProviderId = 'gdrive' | 'dropbox' | 'protondrive' | 'nextcloud' | 'owncloud' | 'webdav';
 
-export type ProviderFieldId = 'url' | 'username' | 'password' | 'totp';
+export type ProviderFieldId = 'url' | 'username' | 'password' | 'totp' | 'clientId' | 'clientSecret';
 
 export interface ProviderField {
   id: ProviderFieldId;
@@ -14,11 +14,15 @@ export interface ProviderField {
   kind: 'text' | 'url' | 'password' | 'totp';
   required: boolean;
   defaultValue?: string;
+  /** Shown under the form's Advanced options, collapsed by default. */
+  advanced?: boolean;
 }
 
 export interface ProviderOAuth {
   clientId: string;
   clientSecret: string;
+  /** How to make your own OAuth client for the provider. */
+  customClientHelpUrl: string;
 }
 
 export interface ProviderDefinition {
@@ -60,16 +64,26 @@ const passwordField: ProviderField = {
   required: true,
 };
 const urlField: ProviderField = { id: 'url', label: 'Server URL', kind: 'url', required: true };
+/**
+ * An OAuth client of the user's own, in place of Alto's: for getting around
+ * rate limits on Alto's, or for organizations that only allow approved clients.
+ */
+const oauthClientFields: ProviderField[] = [
+  { id: 'clientId', label: 'Client ID', kind: 'text', required: false, advanced: true },
+  { id: 'clientSecret', label: 'Client Secret', kind: 'password', required: false, advanced: true },
+];
 
 // OAuth client credentials registered for Celeste, which Alto succeeds.
 // They are public by design (installed-app OAuth), exactly as in Celeste.
 const GDRIVE_OAUTH: ProviderOAuth = {
   clientId: '617798216802-gpgajsc7o768ukbdegk5esa3jf6aekgj.apps.googleusercontent.com',
   clientSecret: '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',
+  customClientHelpUrl: 'https://rclone.org/drive/#making-your-own-client-id',
 };
 const DROPBOX_OAUTH: ProviderOAuth = {
   clientId: 'hke0fgr43viaq03',
   clientSecret: 'o4cpx8trcnneq7a',
+  customClientHelpUrl: 'https://rclone.org/dropbox/#get-your-own-dropbox-app-id',
 };
 
 export const PROVIDERS: readonly ProviderDefinition[] = [
@@ -78,7 +92,7 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
     label: 'Google Drive',
     rcloneType: 'drive',
     auth: 'oauth',
-    fields: [],
+    fields: oauthClientFields,
     color: 'FFFFFF',
     iconSlug: 'google-drive',
     fallbackIcon: 'folder-remote-symbolic',
@@ -89,7 +103,7 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
     label: 'Dropbox',
     rcloneType: 'dropbox',
     auth: 'oauth',
-    fields: [],
+    fields: oauthClientFields,
     color: '0061FF',
     iconSlug: 'dropbox-light',
     fallbackIcon: 'folder-remote-symbolic',
@@ -158,9 +172,11 @@ export function buildRemoteConfig(id: ProviderId, values: ProviderValues): Rclon
   switch (id) {
     case 'dropbox':
     case 'gdrive': {
+      // A custom client is used only when both halves of it are given (validation requires that).
+      const custom = v('clientId') !== '' && v('clientSecret') !== '';
       const parameters: Record<string, string | boolean> = {
-        client_id: provider.oauth!.clientId,
-        client_secret: provider.oauth!.clientSecret,
+        client_id: custom ? v('clientId') : provider.oauth!.clientId,
+        client_secret: custom ? v('clientSecret') : provider.oauth!.clientSecret,
         // Let rclone open our callback flow instead of trying xdg-open itself.
         config_auth_no_browser: 'true',
       };
