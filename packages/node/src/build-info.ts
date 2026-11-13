@@ -69,5 +69,6 @@ export function gitHeadFiles(): string[] {
   return [path.join(gitDir, 'HEAD'), path.join(commonDir, 'refs'), path.join(commonDir, 'packed-refs')];
 }
 
-// `node packages/node/src/build-info.ts` (npm's `prepare`, after `npm install`).
+// `tsx packages/node/src/build-info.ts` (npm's `prepare`, after `npm install`).
+// Not plain `node`: distro builds of Node (like Ubuntu's) can't run TypeScript.
 if (import.meta.main) writeBuildInfo();
