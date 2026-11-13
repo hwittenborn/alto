@@ -59,11 +59,13 @@ jobs:
           if-no-files-found: error
 
   # Pushes to main publish their snap to edge, and releases to stable.
+  # SNAPCRAFT_STORE_CREDENTIALS is a repository secret, limited in the store to
+  # Alto's edge and stable channels (`snapcraft export-login --snaps=alto
+  # --channels=edge,stable`).
   publish-snap:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    environment: snap-store
     steps:
       - uses: actions/download-artifact@v8
         with:
