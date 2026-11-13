@@ -22,7 +22,9 @@ import {
   GtkButton,
   GtkImage,
   GtkLabel,
+  GtkListBox,
   GtkProgressBar,
+  GtkScrolledWindow,
 } from '@gtk-js/adwaita';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNow, useToast } from '../ui';
@@ -268,19 +270,41 @@ function StatusGroup({ folder }: { folder: FolderView }) {
 
 export function FolderPage({ folder }: { folder: FolderView }) {
   const [openIssue, setOpenIssue] = useState<SyncIssue | null>(null);
+  const alto = useAlto();
+  const toast = useToast();
   const home = useHomeDir();
   const { local, remote } = folderTitle(folder, home);
   const issues = folder.runtime.issues;
+  const hasErrors = issues.some((issue) => issue.kind === 'error');
 
   return (
     <>
       <AdwPreferencesPage>
         <StatusGroup folder={folder} />
         {issues.length > 0 && (
-          <AdwPreferencesGroup title="Issues" description="These items need your attention before they can be synced.">
-            {issues.map((issue) => (
-              <IssueRow key={issue.id} issue={issue} folder={folder} onOpen={() => setOpenIssue(issue)} />
-            ))}
+          <AdwPreferencesGroup
+            title="Issues"
+            description="These items need your attention before they can be synced."
+            headerSuffix={
+              hasErrors && (
+                <GtkButton
+                  label="Dismiss All"
+                  tooltipText="Dismiss all errors for this folder"
+                  valign="center"
+                  onClicked={() => {
+                    void alto.dismissErrors(folder.id).catch(() => toast('Unable to dismiss errors.'));
+                  }}
+                />
+              )
+            }
+          >
+            <GtkScrolledWindow hscrollbarPolicy="never" propagateNaturalHeight maxContentHeight={320}>
+              <GtkListBox className="boxed-list" selectionMode="none">
+                {issues.map((issue) => (
+                  <IssueRow key={issue.id} issue={issue} folder={folder} onOpen={() => setOpenIssue(issue)} />
+                ))}
+              </GtkListBox>
+            </GtkScrolledWindow>
           </AdwPreferencesGroup>
         )}
         <ExclusionsGroup folder={folder} />

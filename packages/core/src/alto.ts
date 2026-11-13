@@ -546,6 +546,11 @@ export class Alto implements AltoClient {
     this.notify();
   }
 
+  async dismissErrors(folderId: string): Promise<void> {
+    this.engine.get(folderId)?.dismissErrors();
+    this.notify();
+  }
+
   async inspectConflict(
     folderId: string,
     path: string,

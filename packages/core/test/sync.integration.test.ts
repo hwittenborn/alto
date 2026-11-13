@@ -42,6 +42,24 @@ async function pair(backend: Backend, options: { trash?: boolean } = {}) {
 describe.each(BACKENDS)(
   'two clients over %s',
   (backend) => {
+    it('dismisses all transfer errors while keeping conflicts for review', async () => {
+      const { b, remotePath, close } = await pair(backend);
+      try {
+        b.write('conflict.txt', 'local edit');
+        serverWrite(env, `${remotePath}/conflict.txt`, 'a different remote edit');
+        serverWrite(env, `${remotePath}/one.txt`, 'remote file');
+        serverWrite(env, `${remotePath}/two.txt`, 'another remote file');
+        vi.spyOn(b.daemon.client, 'copyFile').mockRejectedValue(new Error('Transfer failed'));
+
+        await b.sync();
+        expect(b.issues.filter(({ kind }) => kind === 'error')).toHaveLength(2);
+        await b.alto.dismissErrors(b.folderId);
+        expect(b.issues.map(({ kind }) => kind)).toEqual(['conflict']);
+      } finally {
+        await close();
+      }
+    });
+
     it('creates sibling folders concurrently and creates parents before children', async () => {
       const { b, remotePath, close } = await pair(backend);
       try {

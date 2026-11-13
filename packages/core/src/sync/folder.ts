@@ -283,6 +283,13 @@ export class SyncFolder {
     this.update({});
   }
 
+  dismissErrors(): void {
+    for (const [id, issue] of this.issues) {
+      if (issue.kind === 'error') this.issues.delete(id);
+    }
+    this.update({});
+  }
+
   // --- listing -------------------------------------------------------------
 
   private async statSide(side: Side, path: string): Promise<ItemState | null> {
