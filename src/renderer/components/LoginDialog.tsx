@@ -23,6 +23,7 @@ import {
   AdwToolbarView,
   GtkBox,
   GtkButton,
+  GtkExpander,
   GtkImage,
   GtkLabel,
   GtkMenuButton,
@@ -248,30 +249,14 @@ function LoginFlow({
               </AdwPreferencesGroup>
               {advancedRows.length > 0 && (
                 <GtkBox orientation="vertical" spacing={12}>
-                  <GtkButton
-                    className="flat"
+                  {/* Only the toggle: the fields go below it, so it can be centered over them. */}
+                  <GtkExpander
                     halign="center"
-                    onClicked={() => setShowAdvanced((shown) => !shown)}
+                    labelWidget={<GtkLabel className="dim-label" label="Advanced" />}
+                    expanded={showAdvanced}
+                    onExpandedChanged={setShowAdvanced}
                     data-action="advanced"
-                  >
-                    <GtkBox spacing={6} className="dim-label">
-                      {/*
-                        Trimmed to its capitals, so the arrow is centered on them rather than on
-                        the line, whose space above the capitals would leave the arrow looking low.
-                      */}
-                      <GtkLabel
-                        label="Advanced"
-                        style={{
-                          fontWeight: 'normal',
-                          display: 'block',
-                          minHeight: 0,
-                          alignSelf: 'center',
-                          textBox: 'trim-both cap alphabetic',
-                        }}
-                      />
-                      <GtkImage iconName={showAdvanced ? 'PanDown' : 'PanEnd'} valign="center" />
-                    </GtkBox>
-                  </GtkButton>
+                  />
                   {showAdvanced && (
                     <AdwPreferencesGroup>
                       {advancedRows}
