@@ -16,3 +16,6 @@ coverage/
 # start, package and make)
 assets/icons/hicolor/
 assets/tray/*.png
+
+# Build information generated at build time (packages/node/src/build-info.ts)
+packages/node/src/build-info.generated.json
