@@ -30,9 +30,18 @@ platforms:
 
 apps:
   alto:
-    command: opt/alto/alto
+    # Chromium's sandbox needs browser-support's `allow-sandbox`, which the
+    # Snap Store doesn't auto-connect without an approved request. Without it,
+    # Chromium can't create the sandbox's user namespace and aborts on startup
+    # (sandbox/linux/services/credentials.cc), so run without the sandbox until
+    # then.
+    command: opt/alto/alto --no-sandbox
     extensions: [gnome]
     desktop: usr/share/applications/alto.desktop
+    environment:
+      # Chromium writes the tray icon to a file under $TMPDIR and has the panel
+      # load it from there, which it can't from the snap's private /tmp.
+      TMPDIR: $XDG_RUNTIME_DIR
     plugs:
       - home
       - network
