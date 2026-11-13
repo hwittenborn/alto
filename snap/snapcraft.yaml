@@ -1,0 +1,71 @@
+name: alto
+title: Alto
+summary: The best application for all of your cloud storage
+description: |
+  Alto keeps folders on your computer in sync with your cloud storage, such as
+  Google Drive, Dropbox, Proton Drive and more.
+
+  - **True two-way sync.** New files, edits and deletions go both ways.
+  - **All your clouds in one place.** Connect as many accounts as you like,
+    across different providers, and sync folders from all of them at once.
+  - **Safe across several computers.** Before overwriting or deleting anything,
+    Alto checks that things haven't changed since it last looked, so a change
+    made on another computer in the meantime is never lost.
+  - **Shared exclusions.** Skip files with `.gitignore`-style patterns in the
+    folder's `.altoignore`. It syncs too, so every computer skips the same
+    files.
+license: GPL-3.0-or-later
+website: https://github.com/hwittenborn/alto
+source-code: https://github.com/hwittenborn/alto
+issues: https://github.com/hwittenborn/alto/issues
+icon: assets/icons/com.hunterwittenborn.Alto.svg
+base: core24
+grade: stable
+confinement: strict
+adopt-info: alto
+
+# Alto's Electron fork is only built for linux-x64 so far.
+platforms:
+  amd64:
+
+apps:
+  alto:
+    # Chromium's sandbox needs browser-support's `allow-sandbox`, which the
+    # Snap Store doesn't auto-connect without an approved request. Without it,
+    # Chromium can't create the sandbox's user namespace and aborts on startup
+    # (sandbox/linux/services/credentials.cc), so run without the sandbox until
+    # then.
+    command: opt/alto/alto --no-sandbox
+    extensions: [gnome]
+    desktop: usr/share/applications/alto.desktop
+    environment:
+      # Chromium writes the tray icon to a file under $TMPDIR and has the panel
+      # load it from there, which it can't from the snap's private /tmp.
+      TMPDIR: $XDG_RUNTIME_DIR
+    plugs:
+      - home
+      - network
+      - network-bind
+      - browser-support
+
+parts:
+  alto:
+    # The app as Forge packages it (Electron, Alto and the bundled rclone).
+    # CI runs `electron-forge make` before snapcraft.
+    plugin: dump
+    source: out/Alto-linux-x64
+    organize:
+      '*': opt/alto/
+    override-build: |
+      craftctl default
+      # A release's version, or a nightly's commit (packages/node/src/build-info.ts).
+      craftctl set version="$(python3 -c 'import json, sys; info = json.load(open(sys.argv[1])); print(info["version"] if info["release"] else info["commit"])' "${CRAFT_PROJECT_DIR}/packages/node/src/build-info.generated.json")"
+
+  desktop:
+    # The launcher the deb, rpm and AppImage use (assets/linux/alto.desktop),
+    # with its icon pointed at the snap's.
+    plugin: nil
+    source: assets/linux
+    override-build: |
+      install -D -m644 alto.desktop "${CRAFT_PART_INSTALL}/usr/share/applications/alto.desktop"
+      sed -i 's|^Icon=alto$|Icon=${SNAP}/meta/gui/icon.svg|' "${CRAFT_PART_INSTALL}/usr/share/applications/alto.desktop"

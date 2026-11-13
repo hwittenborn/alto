@@ -1,11 +1,20 @@
 name: Build packages
 on:
   workflow_call:
+    inputs:
+      release:
+        description: Build a release, rather than a nightly (packages/node/src/build-info.ts)
+        type: boolean
+        default: false
 
 jobs:
   build:
-    # Alto's Electron fork is only built for linux-x64 so far.
-    runs-on: ubuntu-latest
+    # Alto's Electron fork is only built for linux-x64 so far. Pinned to 24.04:
+    # electron-installer-redhat (the rpm maker) breaks with the newer rpmbuild
+    # on 26.04 (electron-userland/electron-installer-redhat#343).
+    runs-on: ubuntu-24.04
+    env:
+      ALTO_RELEASE: ${{ inputs.release && '1' || '' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -17,6 +26,15 @@ jobs:
       - run: npm ci
       - name: Build the .deb, .rpm and AppImage
         run: npx electron-forge make --targets deb,rpm,AppImage
+      # Wraps the app Forge just packaged (out/Alto-linux-x64) as a snap
+      # (snap/snapcraft.yaml). Snapcraft sets up LXD itself.
+      - name: Build the snap
+        run: |
+          sudo snap install snapcraft --classic
+          # Docker on the runner drops forwarded traffic, which cuts LXD's
+          # build container off from the network.
+          sudo iptables -P FORWARD ACCEPT
+          sudo snapcraft pack --verbose
       # Each package is its own artifact, uploaded as is (not zipped), so it
       # downloads as the package itself. Its name is the file's.
       - uses: actions/upload-artifact@v7
@@ -34,3 +52,30 @@ jobs:
           path: out/make/AppImage/x64/*.AppImage
           archive: false
           if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          path: '*.snap'
+          archive: false
+          if-no-files-found: error
+
+  # Pushes to main publish their snap to edge, and releases to stable.
+  # SNAPCRAFT_STORE_CREDENTIALS is a repository secret, limited in the store to
+  # Alto's edge and stable channels (`snapcraft export-login --snaps=alto
+  # --channels=edge,stable`).
+  publish-snap:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*.snap'
+          path: snap
+          merge-multiple: true
+      - name: Publish the snap
+        run: |
+          sudo snap install snapcraft --classic
+          snapcraft upload snap/*.snap --release="${CHANNEL}"
+        env:
+          CHANNEL: ${{ inputs.release && 'stable' || 'edge' }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

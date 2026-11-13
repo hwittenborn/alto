@@ -2,8 +2,10 @@ import { defineConfig } from 'vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
 import icons from 'unplugin-icons/vite';
+import { watch } from 'chokidar';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { gitHeadFiles, writeBuildInfo } from './packages/node/src/build-info.ts';
 
 const pkg = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'));
 
@@ -56,6 +58,24 @@ export default defineConfig({
     // imported are bundled, as SVG strings.
     icons({ compiler: 'raw', scale: 1 }),
     {
+      // Regenerate the build information (packages/node/src/build-info.ts)
+      // when the checked-out commit changes, so the dev server hot-reloads it.
+      name: 'alto-build-info',
+      apply: 'serve',
+      configureServer(server) {
+        writeBuildInfo();
+        // Git writes a ref to a lock file and renames it into place, so wait
+        // for it to settle.
+        let timer: NodeJS.Timeout | undefined;
+        const regenerate = () => {
+          clearTimeout(timer);
+          timer = setTimeout(writeBuildInfo, 200);
+        };
+        const watcher = watch(gitHeadFiles(), { ignoreInitial: true }).on('all', regenerate);
+        server.httpServer?.on('close', () => void watcher.close());
+      },
+    },
+    {
       name: 'alto-content-security-policy',
       apply: 'build',
       transformIndexHtml: () => [
@@ -68,7 +88,6 @@ export default defineConfig({
     },
   ],
   define: {
-    ALTO_VERSION: JSON.stringify(pkg.version),
     ALTO_RELEASE_NOTES: JSON.stringify(releaseNotes()),
   },
   resolve: {
@@ -78,6 +97,7 @@ export default defineConfig({
       // node_modules), so the dev server watches and reloads them.
       '@alto/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
       '@alto/react': path.resolve(__dirname, 'packages/react/src/index.tsx'),
+      '@alto/node/build-info.json': path.resolve(__dirname, 'packages/node/src/build-info.generated.json'),
     },
     dedupe: ['react', 'react-dom'],
   },

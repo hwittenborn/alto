@@ -26,6 +26,9 @@ jobs:
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
     uses: ./.github/workflows/build.yml
+    with:
+      release: true
+    secrets: inherit
 
   upload:
     needs: [release-please, build]

@@ -1,3 +1,4 @@
+import buildInfo from '@alto/node/build-info.json';
 import { useAltoState } from '@alto/react';
 import {
   AdwAboutDialog,
@@ -14,7 +15,6 @@ import { useEffect, useState } from 'react';
 import type { AppInfo } from '@/ipc-shared';
 import { host } from '../ui';
 
-declare const ALTO_VERSION: string;
 declare const ALTO_RELEASE_NOTES: string;
 
 export function AboutDialog({ visible, onClosed }: { visible: boolean; onClosed(): void }) {
@@ -27,14 +27,14 @@ export function AboutDialog({ visible, onClosed }: { visible: boolean; onClosed(
       applicationName="Alto"
       applicationIcon="ComHunterwittenbornAlto"
       developerName="Hunter Wittenborn"
-      version={ALTO_VERSION}
+      version={buildInfo.displayVersion}
       comments="Keep your files in sync with the cloud."
       website="https://github.com/hwittenborn/alto"
       supportUrl="https://github.com/hwittenborn/alto/discussions"
       issueUrl="https://github.com/hwittenborn/alto/issues"
       releaseNotes={ALTO_RELEASE_NOTES}
-      releaseNotesVersion={ALTO_VERSION}
-      debugInfo={`Alto ${ALTO_VERSION}\nrclone ${rcloneVersion ?? 'unknown'}\n${navigator.userAgent}`}
+      releaseNotesVersion={buildInfo.version}
+      debugInfo={`Alto ${buildInfo.displayVersion}\nrclone ${rcloneVersion ?? 'unknown'}\n${navigator.userAgent}`}
       copyright="© 2022-2026 Hunter Wittenborn"
       licenseType="GPL-3.0-or-later"
       developers={['Hunter Wittenborn https://hunterwittenborn.com']}

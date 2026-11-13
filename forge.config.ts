@@ -10,6 +10,7 @@ import { execFile } from 'node:child_process';
 import { chmod, copyFile, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
+import { writeBuildInfo } from './packages/node/src/build-info.ts';
 import { installedRclone, installRclone, RCLONE_VERSION } from './packages/node/src/rclone-install.ts';
 
 /** Shared by the deb and rpm packages. */
@@ -17,7 +18,6 @@ const linuxOptions = {
   name: 'alto',
   bin: 'alto',
   productName: 'Alto',
-  genericName: 'File Synchronizer',
   description: 'Bidirectional file sync for GNOME, powered by rclone',
   productDescription:
     'Alto keeps folders on your computer in sync with cloud storage: Google Drive, Dropbox, Proton Drive, ' +
@@ -57,10 +57,12 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   hooks: {
-    // Render the PNG icons from their SVGs (scripts/render-icons.mjs).
+    // Render the PNG icons from their SVGs (scripts/render-icons.mjs), and
+    // generate the build information (packages/node/src/build-info.ts).
     // Download the rclone release Alto bundles, for each architecture built.
     generateAssets: async (_config, _platform, arch) => {
       await promisify(execFile)(process.execPath, ['scripts/render-icons.mjs']);
+      writeBuildInfo();
       for (const each of arch.split(',')) await fetchRclone(each);
     },
     // Bundle rclone as `resources/bin/rclone`, next to Alto's assets (src/main/paths.ts).
@@ -100,7 +102,6 @@ const config: ForgeConfig = {
         name: linuxOptions.name,
         bin: linuxOptions.bin,
         productName: linuxOptions.productName,
-        genericName: linuxOptions.genericName,
         categories: linuxOptions.categories,
         desktopFile: linuxOptions.desktopTemplate,
         icon: linuxOptions.icon,
