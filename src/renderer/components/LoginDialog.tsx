@@ -14,7 +14,6 @@ import {
   AdwClamp,
   AdwDialog,
   AdwEntryRow,
-  AdwExpanderRow,
   AdwHeaderBar,
   AdwNavigationView,
   AdwPasswordEntryRow,
@@ -143,6 +142,7 @@ function LoginFlow({
   const [name, setName] = useState('');
   const [values, setValues] = useState<ProviderValues>({});
   const [busy, setBusy] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   // The accounts there were when the form opened: the one it adds mustn't count against its own name.
   const [takenNames, setTakenNames] = useState<string[]>([]);
 
@@ -170,6 +170,7 @@ function LoginFlow({
     setTakenNames(remoteNames);
     setName(uniqueName(def.label, remoteNames));
     setValues(Object.fromEntries(def.fields.filter((f) => f.defaultValue).map((f) => [f.id, f.defaultValue])));
+    setShowAdvanced(false);
     setStack(['providers', 'form']);
   };
 
@@ -240,23 +241,32 @@ function LoginFlow({
                 {fieldRows(false)}
               </AdwPreferencesGroup>
               {advancedRows.length > 0 && (
-                <AdwPreferencesGroup>
-                  <AdwExpanderRow
-                    title="Advanced"
-                    subtitle={provider.auth === 'oauth' ? 'Use your own OAuth client' : undefined}
-                    data-section="advanced"
+                <GtkBox orientation="vertical" spacing={12}>
+                  <GtkButton
+                    className="flat"
+                    halign="start"
+                    onClicked={() => setShowAdvanced((shown) => !shown)}
+                    data-action="advanced"
                   >
-                    {advancedRows}
-                    {provider.oauth && (
-                      <AdwActionRow
-                        title="Making Your Own Client"
-                        activatable
-                        onActivated={() => void host.openUrl(provider.oauth!.customClientHelpUrl)}
-                        suffixWidget={<GtkImage iconName="AdwExternalLink" />}
-                      />
-                    )}
-                  </AdwExpanderRow>
-                </AdwPreferencesGroup>
+                    <GtkBox spacing={6} className="dim-label">
+                      <GtkLabel label="Advanced" style={{ fontWeight: 'normal' }} />
+                      <GtkImage iconName={showAdvanced ? 'PanDown' : 'PanEnd'} valign="center" />
+                    </GtkBox>
+                  </GtkButton>
+                  {showAdvanced && (
+                    <AdwPreferencesGroup>
+                      {advancedRows}
+                      {provider.oauth && (
+                        <AdwActionRow
+                          title="Making Your Own Client"
+                          activatable
+                          onActivated={() => void host.openUrl(provider.oauth!.customClientHelpUrl)}
+                          suffixWidget={<GtkImage iconName="AdwExternalLink" />}
+                        />
+                      )}
+                    </AdwPreferencesGroup>
+                  )}
+                </GtkBox>
               )}
               {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
               <GtkButton
