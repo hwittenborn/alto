@@ -255,13 +255,21 @@ function LoginFlow({
                     data-action="advanced"
                   >
                     <GtkBox spacing={6} className="dim-label">
-                      <GtkLabel label="Advanced" style={{ fontWeight: 'normal' }} />
-                      {/* Centered on the text's capitals: the arrows' boxes are, but the arrows are drawn below their middle. */}
-                      <GtkImage
-                        iconName={showAdvanced ? 'PanDown' : 'PanEnd'}
-                        valign="center"
-                        style={{ transform: `translateY(${showAdvanced ? -3 : -2}px)` }}
+                      {/*
+                        Trimmed to its capitals, so the arrow is centered on them rather than on
+                        the line, whose space above the capitals would leave the arrow looking low.
+                      */}
+                      <GtkLabel
+                        label="Advanced"
+                        style={{
+                          fontWeight: 'normal',
+                          display: 'block',
+                          minHeight: 0,
+                          alignSelf: 'center',
+                          textBox: 'trim-both cap alphabetic',
+                        }}
                       />
+                      <GtkImage iconName={showAdvanced ? 'PanDown' : 'PanEnd'} valign="center" />
                     </GtkBox>
                   </GtkButton>
                   {showAdvanced && (
