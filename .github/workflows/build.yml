@@ -63,17 +63,31 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    environment: snap-store
+    environment:
+      name: snap-store
+      url: ${{ steps.publish.outputs.url }}
     steps:
       - uses: actions/download-artifact@v8
         with:
           pattern: '*.snap'
           path: snap
           merge-multiple: true
+      # The deployment links to the store page, tagged with what was published:
+      # a nightly's store revision, or a release's version.
       - name: Publish the snap
+        id: publish
+        shell: bash
         run: |
           sudo snap install snapcraft --classic
-          snapcraft upload snap/*.snap --release="${CHANNEL}"
+          snapcraft upload snap/*.snap --release="${CHANNEL}" 2>&1 | tee upload.log
+          if [ "${CHANNEL}" = stable ]; then
+            # alto_<version>_amd64.snap
+            tag="$(basename snap/*.snap | cut -d_ -f2)"
+          else
+            # "Revision 42 created for 'alto' ..."
+            tag="revision-$(grep -oP 'Revision \K[0-9]+' upload.log | head -1)"
+          fi
+          echo "url=https://snapcraft.io/alto#${tag}" >> "$GITHUB_OUTPUT"
         env:
           CHANNEL: ${{ inputs.release && 'stable' || 'edge' }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
