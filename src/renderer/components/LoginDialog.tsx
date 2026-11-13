@@ -196,8 +196,14 @@ function LoginFlow({
   // Fields aren't flagged until they're filled in; the first problem is also
   // spelled out below them.
   const nameError = name !== '' ? validation.errors.name : undefined;
-  const fieldErrors = provider.fields.map((f) => ((values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined));
+  // Advanced fields (a custom OAuth client) aren't flagged: their only problem
+  // is a missing half, which isn't the filled-in half's fault. It's explained
+  // when hovering the login button instead.
+  const fieldErrors = provider.fields.map((f) =>
+    !f.advanced && (values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined,
+  );
   const shownError = [nameError, ...fieldErrors].find(Boolean);
+  const advancedError = provider.fields.map((f) => (f.advanced ? validation.errors[f.id] : undefined)).find(Boolean);
   const rows = provider.fields.map((field, i) => ({ field, error: fieldErrors[i] }));
   const fieldRows = (advanced: boolean) =>
     rows
@@ -244,13 +250,18 @@ function LoginFlow({
                 <GtkBox orientation="vertical" spacing={12}>
                   <GtkButton
                     className="flat"
-                    halign="start"
+                    halign="center"
                     onClicked={() => setShowAdvanced((shown) => !shown)}
                     data-action="advanced"
                   >
                     <GtkBox spacing={6} className="dim-label">
                       <GtkLabel label="Advanced" style={{ fontWeight: 'normal' }} />
-                      <GtkImage iconName={showAdvanced ? 'PanDown' : 'PanEnd'} valign="center" />
+                      {/* Centered on the text's capitals: the arrows' boxes are, but the arrows are drawn below their middle. */}
+                      <GtkImage
+                        iconName={showAdvanced ? 'PanDown' : 'PanEnd'}
+                        valign="center"
+                        style={{ transform: `translateY(${showAdvanced ? -3 : -2}px)` }}
+                      />
                     </GtkBox>
                   </GtkButton>
                   {showAdvanced && (
@@ -273,6 +284,7 @@ function LoginFlow({
                 className={google ? 'pill' : 'pill suggested-action'}
                 halign="center"
                 disabled={!validation.valid || busy}
+                tooltipText={advancedError}
                 onClicked={submit}
                 data-action="login"
               >

@@ -85,11 +85,11 @@ export function validateLoginForm(
   }
 
   // A custom OAuth client needs both its ID and its secret. The error goes on
-  // the half that was filled in, since empty fields aren't flagged in the UI.
+  // the half that was filled in.
   const clientId = (values.clientId ?? '').trim();
   const clientSecret = (values.clientSecret ?? '').trim();
-  if (clientId !== '' && clientSecret === '') errors.clientId = 'A client secret is also needed for a custom client.';
-  if (clientSecret !== '' && clientId === '') errors.clientSecret = 'A client ID is also needed for a custom client.';
+  if (clientId !== '' && clientSecret === '') errors.clientId = 'Enter a client secret to use a custom client.';
+  if (clientSecret !== '' && clientId === '') errors.clientSecret = 'Enter a client ID to use a custom client.';
 
   return { errors, valid: Object.keys(errors).length === 0 };
 }
