@@ -6,7 +6,7 @@
   "main": ".vite/build/main.cjs",
   "private": true,
   "scripts": {
-    "prepare": "node packages/node/src/build-info.ts",
+    "prepare": "tsx packages/node/src/build-info.ts",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -52,6 +52,7 @@
     "eslint-plugin-import": "^2.32.0",
     "prettier": "^3.9.10",
     "sharp": "^0.35.5",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "unplugin-icons": "^24.0.0",
     "vite": "^8.0.10",
@@ -75,6 +76,7 @@
   ],
   "desktopName": "alto.desktop",
   "allowScripts": {
-    "electron": true
+    "electron": true,
+    "esbuild": true
   }
 }
