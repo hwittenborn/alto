@@ -26,6 +26,15 @@ jobs:
       - run: npm ci
       - name: Build the .deb, .rpm and AppImage
         run: npx electron-forge make --targets deb,rpm,AppImage
+      # Wraps the app Forge just packaged (out/Alto-linux-x64) as a snap
+      # (snap/snapcraft.yaml). Snapcraft sets up LXD itself.
+      - name: Build the snap
+        run: |
+          sudo snap install snapcraft --classic
+          # Docker on the runner drops forwarded traffic, which cuts LXD's
+          # build container off from the network.
+          sudo iptables -P FORWARD ACCEPT
+          sudo snapcraft pack --verbose
       # Each package is its own artifact, uploaded as is (not zipped), so it
       # downloads as the package itself. Its name is the file's.
       - uses: actions/upload-artifact@v7
@@ -43,3 +52,28 @@ jobs:
           path: out/make/AppImage/x64/*.AppImage
           archive: false
           if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          path: '*.snap'
+          archive: false
+          if-no-files-found: error
+
+  # Pushes to main publish their snap to edge, and releases to stable.
+  publish-snap:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: snap-store
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*.snap'
+          path: snap
+          merge-multiple: true
+      - name: Publish the snap
+        run: |
+          sudo snap install snapcraft --classic
+          snapcraft upload snap/*.snap --release="${CHANNEL}"
+        env:
+          CHANNEL: ${{ inputs.release && 'stable' || 'edge' }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

@@ -1,7 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Alto
-GenericName=File Synchronizer
 Comment=Keep folders in sync with Google Drive, Dropbox, Proton Drive, Nextcloud and more
 Exec=alto %U
 Icon=alto
