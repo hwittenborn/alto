@@ -165,6 +165,14 @@ export class Alto implements AltoClient {
     for (const login of this.logins.values()) login.abort.abort();
   }
 
+  suspendSync(): void {
+    this.engine.suspend();
+  }
+
+  resumeSync(): void {
+    this.engine.resume();
+  }
+
   private async saveConfig(): Promise<void> {
     await this.storage.saveConfig(this.config);
   }
@@ -538,6 +546,11 @@ export class Alto implements AltoClient {
 
   async dismissIssue(folderId: string, issueId: string): Promise<void> {
     this.engine.get(folderId)?.dismissIssue(issueId);
+    this.notify();
+  }
+
+  async dismissErrors(folderId: string): Promise<void> {
+    this.engine.get(folderId)?.dismissErrors();
     this.notify();
   }
 

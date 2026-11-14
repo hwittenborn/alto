@@ -113,6 +113,7 @@ export interface AltoApi {
   getExclusions(id: string): Promise<string[]>;
   setExclusions(id: string, patterns: string[]): Promise<void>;
   dismissIssue(folderId: string, issueId: string): Promise<void>;
+  dismissErrors(folderId: string): Promise<void>;
   inspectConflict(folderId: string, path: string): Promise<{ local: ItemState | null; remote: ItemState | null }>;
   resolveConflict(folderId: string, path: string, choice: ConflictChoice): Promise<ActionResult<ConflictResolution>>;
   resolveMassDeletion(folderId: string, side: Side, choice: 'delete' | 'restore'): Promise<void>;
@@ -135,6 +136,7 @@ export const ALTO_API_METHODS = [
   'getExclusions',
   'setExclusions',
   'dismissIssue',
+  'dismissErrors',
   'inspectConflict',
   'resolveConflict',
   'resolveMassDeletion',

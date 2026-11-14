@@ -25,6 +25,8 @@ export interface SyncEngineOptions {
 const MAX_IMMEDIATE_RERUNS = 3;
 /** More changed paths than this are synced with a full cycle. */
 const MAX_CHANGED_PATHS = 200;
+/** Give the network time to reconnect after the operating system wakes up. */
+const RESUME_DELAY = 10_000;
 
 /**
  * Why a cycle is scheduled: `now` for a full cycle on request, `poll` for the
@@ -61,6 +63,8 @@ export class SyncEngine {
   private readonly queue: PQueue;
   private readonly remoteInfo = new Map<string, Promise<RemoteFsInfo>>();
   private running = false;
+  private suspended = false;
+  private resumeTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(options: SyncEngineOptions) {
     const defined = Object.fromEntries(Object.entries(options).filter(([, v]) => v !== undefined)) as SyncEngineOptions;
@@ -110,6 +114,7 @@ export class SyncEngine {
   /** Stop syncing, resolving once running cycles have wound down. */
   async stop(): Promise<void> {
     this.running = false;
+    clearTimeout(this.resumeTimer);
     this.queue.clear();
     const stopping = [...this.folders.values()].map((s) => {
       if (s.timer) clearTimeout(s.timer);
@@ -117,6 +122,25 @@ export class SyncEngine {
       return s.folder.cancel();
     });
     await Promise.all(stopping);
+  }
+
+  suspend(): void {
+    this.suspended = true;
+    clearTimeout(this.resumeTimer);
+    for (const s of this.folders.values()) {
+      if (s.timer) clearTimeout(s.timer);
+      s.timer = null;
+      void s.folder.cancel();
+    }
+  }
+
+  resume(): void {
+    if (!this.suspended) return;
+    clearTimeout(this.resumeTimer);
+    this.resumeTimer = setTimeout(() => {
+      this.suspended = false;
+      this.syncAll();
+    }, RESUME_DELAY);
   }
 
   add(record: FolderRecord): SyncFolder {
@@ -181,7 +205,7 @@ export class SyncEngine {
   }
 
   private schedule(s: Scheduled, delay: number, reason: Reason): void {
-    if (!this.running) return;
+    if (!this.running || this.suspended) return;
     if (reason === 'now') s.full = true;
     if (s.folder.busy) {
       // Picked up once the running cycle ends.
@@ -220,7 +244,7 @@ export class SyncEngine {
     s.queued = true;
     void this.queue.add(async () => {
       s.queued = false;
-      if (!this.folders.has(s.folder.id) || !this.running) return;
+      if (!this.folders.has(s.folder.id) || !this.running || this.suspended) return;
       s.dirtyWhileRunning = false;
       const full = s.full || s.changed.size === 0 || s.changed.size > MAX_CHANGED_PATHS;
       const paths = [...s.changed];

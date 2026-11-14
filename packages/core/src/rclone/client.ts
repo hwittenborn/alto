@@ -206,8 +206,12 @@ export class RcloneClient {
     options.signal?.addEventListener('abort', onAbort, { once: true });
 
     try {
+      if (options.signal?.aborted) {
+        onAbort();
+        options.signal.throwIfAborted();
+      }
       for (;;) {
-        const status = await this.call<RcloneJobStatus>('job/status', { jobid });
+        const status = await this.call<RcloneJobStatus>('job/status', { jobid }, { signal: options.signal });
         options.onPoll?.(status);
         if (status.finished) {
           if (!status.success) {
@@ -338,7 +342,11 @@ export class RcloneClient {
     opt: RcloneListOptions = {},
     options: CallOptions = {},
   ): Promise<RcloneListItem[]> {
-    const res = await this.call<{ list: RcloneListItem[] }>('operations/list', { fs, remote, opt }, options);
+    const params = { fs, remote, opt };
+    // A large recursive listing can outlast the HTTP client's headers timeout.
+    const res = opt.recurse
+      ? await this.callAsync<{ list: RcloneListItem[] }>('operations/list', params, options)
+      : await this.call<{ list: RcloneListItem[] }>('operations/list', params, options);
     return res.list ?? [];
   }
 
