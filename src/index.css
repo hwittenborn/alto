@@ -110,8 +110,7 @@ body,
  * screens, fractional scaling), Chromium places Cantarell's baseline 13px down an
  * 11pt line, where Pango uses its hhea ascent and descent (14.42px and 3.18px; at
  * 1x Chromium agrees with Pango). So every label's text sits about 1–2px higher
- * than in native GTK, and icons beside text,
- * like an expander's arrow, look low. Declaring Cantarell's own hhea metrics puts
+ * than in native GTK, and icons beside text, like an expander's arrow, look low. Declaring Cantarell's own hhea metrics puts
  * the text where Pango does. It only changes Cantarell (all its weights share
  * these metrics), so other fonts and themes are unaffected; where the static
  * Cantarell faces aren't installed, the faces fail to load and Cantarell is used
