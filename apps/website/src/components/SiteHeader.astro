@@ -5,7 +5,7 @@
  * floating frosted pill, and spreads out again back at the top.
  */
 import github from '~icons/simple-icons/github?raw';
-import DownloadIcon from './DownloadIcon.astro';
+import download from '~icons/ph/download-simple-bold?raw';
 import { appIconUrl } from '../lib/app-icon';
 import { LINKS } from '../lib/providers';
 ---
@@ -20,7 +20,7 @@ import { LINKS } from '../lib/providers';
         <span class="label">GitHub</span>
       </a>
       <a class="button primary small get" href={LINKS.install}>
-        <DownloadIcon />
+        <Fragment set:html={download} />
         Install Alto
       </a>
     </nav>

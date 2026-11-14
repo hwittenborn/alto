@@ -22,7 +22,7 @@ import snapcraft from '~icons/simple-icons/snapcraft?raw';
 import ubuntu from '~icons/simple-icons/ubuntu?raw';
 import windows from '~icons/simple-icons/windows?raw';
 import rootPackage from '../../../../package.json';
-import DownloadIcon from '../components/DownloadIcon.astro';
+import download from '~icons/ph/download-simple-bold?raw';
 import Base from '../layouts/Base.astro';
 import { LINKS } from '../lib/providers';
 
@@ -187,7 +187,7 @@ const packages: Package[] = [
               </div>
               {p.action && (
                 <a class="button primary small get" href={p.action.href} download={p.action.download ? '' : undefined}>
-                  <DownloadIcon />
+                  <Fragment set:html={download} />
                   {p.action.label}
                 </a>
               )}

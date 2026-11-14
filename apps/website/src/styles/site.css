@@ -151,6 +151,11 @@ h1 {
   font-size: 0.92rem;
 }
 
+/* An icon in a button (Phosphor, sized 1em), before its words. */
+.button > svg {
+  flex: none;
+}
+
 button.button {
   font: inherit;
   font-weight: 500;

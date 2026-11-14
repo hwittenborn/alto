@@ -5,7 +5,7 @@
  * The header and footer come from the shared layout (Base).
  */
 import DemoStage from '../components/DemoStage.astro';
-import DownloadIcon from '../components/DownloadIcon.astro';
+import download from '~icons/ph/download-simple-bold?raw';
 import Base from '../layouts/Base.astro';
 import { LINKS } from '../lib/providers';
 ---
@@ -23,7 +23,7 @@ import { LINKS } from '../lib/providers';
           Nextcloud and more.
         </p>
         <div class="cta" data-enter-fade style="--i: 1">
-          <a class="button primary" href={LINKS.install}><DownloadIcon /> Install Alto</a>
+          <a class="button primary" href={LINKS.install}><Fragment set:html={download} /> Install Alto</a>
         </div>
       </div>
       <div class="pedestal">
