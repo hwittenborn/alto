@@ -6,38 +6,7 @@
   /* The window's shadow is drawn inside its box (allocateShadow), so no clipping here. */
 }
 
-/* GNOME's interface font, Adwaita Sans (OFL-1.1), in the weights GTK's theme
-   uses. Cut down to Latin and common punctuation from @fontsource/adwaita-sans
-   5.3.0 (its latin-<weight>-normal.woff2), with subset-font: a quarter of the
-   size. */
-@font-face {
-  font-family: 'Adwaita Sans';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../assets/fonts/adwaita-sans-400.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Adwaita Sans';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../assets/fonts/adwaita-sans-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Adwaita Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../assets/fonts/adwaita-sans-700.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Adwaita Sans';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('../assets/fonts/adwaita-sans-800.woff2') format('woff2');
-}
+/* GNOME's interface font, Adwaita Sans (imported by AltoDemo). */
 [data-gtk-provider] {
   --gtk-font-family: 'Adwaita Sans', sans-serif;
 }

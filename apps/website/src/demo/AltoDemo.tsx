@@ -22,6 +22,11 @@ import { createPortal } from 'react-dom';
 import { AVATAR_SIZE } from '../lib/providers';
 import DemoApp from './DemoApp';
 import { FakeAlto } from './fake-alto';
+// GNOME's interface font, in the weights GTK's theme uses.
+import '@fontsource/adwaita-sans/400.css';
+import '@fontsource/adwaita-sans/600.css';
+import '@fontsource/adwaita-sans/700.css';
+import '@fontsource/adwaita-sans/800.css';
 import './demo.css';
 
 declare global {

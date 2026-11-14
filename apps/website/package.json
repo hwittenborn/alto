@@ -15,6 +15,7 @@
     "@alto/react": "0.1.0",
     "@astrojs/react": "^7.1.9",
     "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource/adwaita-sans": "^5.3.0",
     "@gtk-js/adwaita": "^0.1.11",
     "@gtk-js/gtk4": "^0.1.11",
     "@gtk-js/icon-helpers": "^0.1.6",
