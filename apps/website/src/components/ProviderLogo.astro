@@ -1,0 +1,107 @@
+---
+/**
+ * A provider's avatar, floating on the page: just to look at. Once the demo
+ * has loaded, it's the window's own (ProviderAvatar, an AdwAvatar, rendered
+ * by AltoDemo into the `.avatar-slot`); until then, markup that looks the
+ * same. Start Demo moves it into the window's sidebar (src/lib/slide-in.ts).
+ */
+import { AVATAR_SIZE, type SiteProvider } from '../lib/providers';
+
+interface Props {
+  provider: SiteProvider;
+  /** Diameter in px. */
+  size?: number;
+  /** Bob gently up and down. */
+  float?: boolean;
+  class?: string;
+  style?: string;
+}
+
+const { provider, size = 64, float = false, class: className, style } = Astro.props;
+---
+
+<span
+  role="img"
+  class:list={['provider-logo', className]}
+  data-alto-provider={provider.id}
+  data-alto-label={provider.label}
+  data-float={float ? '' : undefined}
+  style={`--float-size:${size}px;--float-scale:${size / AVATAR_SIZE};--avatar:${AVATAR_SIZE}px;--brand:${provider.color};${style ?? ''}`}
+  aria-label={provider.label}
+>
+  <span class="avatar-slot">
+    <span class="disc" class:list={{ light: !provider.onColor }}>
+      <span class="glyph" set:html={provider.logo} />
+    </span>
+  </span>
+</span>
+
+<style>
+  .provider-logo {
+    /* Its size, and its avatar's scale to it, unless the page sets others
+       (DemoStage, on phones). The flight home reads --scale. */
+    --size: var(--float-size);
+    --scale: var(--float-scale);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Keeps its place while its avatar is away in the window. */
+    min-width: var(--size);
+    min-height: var(--size);
+    transition: opacity 400ms ease;
+  }
+  /* Slid into the window, it's an account there now: its place stays, empty. */
+  .provider-logo[data-connected] {
+    opacity: 0;
+  }
+  /* A slow, slight bob, each out of step with the others (--float-delay). */
+  .provider-logo[data-float] {
+    animation: alto-float 4.2s ease-in-out var(--float-delay, 0s) infinite;
+  }
+  @keyframes alto-float {
+    0%,
+    100% {
+      translate: 0 -6px;
+    }
+    50% {
+      translate: 0 6px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .provider-logo[data-float] {
+      animation: none;
+    }
+  }
+  /* The sidebar's avatar, scaled up to --size while it floats. */
+  .avatar-slot {
+    display: block;
+    flex: none;
+    width: var(--avatar);
+    height: var(--avatar);
+    margin: calc((var(--size) - var(--avatar)) / 2);
+    border-radius: 50%;
+    scale: var(--scale);
+    /* Lifted off the page while it floats; the flight drops the shadow as it lands. */
+    filter: drop-shadow(0 6px 8px rgb(0 0 0 / 22%)) drop-shadow(0 1px 1.5px rgb(0 0 0 / 12%));
+  }
+  /* Until the live avatar replaces it: ProviderAvatar's look at 36px (src/renderer/providers.tsx). */
+  .disc {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--brand);
+    color: #fff;
+  }
+  .disc.light {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+  }
+  .glyph {
+    display: flex;
+    font-size: 22px;
+  }
+  .glyph :global(svg) {
+    display: block;
+  }
+</style>

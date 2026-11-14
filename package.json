@@ -72,7 +72,8 @@
     "zustand": "^5.0.8"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "desktopName": "alto.desktop",
   "allowScripts": {

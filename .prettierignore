@@ -3,3 +3,5 @@ out/
 .vite/
 *.md
 .rclone/
+apps/website/dist/
+apps/website/.astro/

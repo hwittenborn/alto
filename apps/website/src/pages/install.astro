@@ -1,0 +1,433 @@
+---
+/**
+ * Installing Alto, by operating system (marked in their logos, dimmed; the
+ * packages in their own brand colors): Linux (the Snap Store, a .deb, an
+ * .rpm or an AppImage), then Windows, macOS, Android and iOS, coming soon.
+ *
+ * The packages' names and links follow the version in the repository's
+ * package.json (release-please sets it at each release), so the page stays
+ * current with the latest release.
+ */
+import android from '~icons/simple-icons/android?raw';
+import apple from '~icons/simple-icons/apple?raw';
+import appimage from '~icons/simple-icons/appimage?raw';
+import debian from '~icons/simple-icons/debian?raw';
+import fedora from '~icons/simple-icons/fedora?raw';
+import flathub from '~icons/simple-icons/flathub?raw';
+import linux from '~icons/simple-icons/linux?raw';
+import linuxmint from '~icons/simple-icons/linuxmint?raw';
+import opensuse from '~icons/simple-icons/opensuse?raw';
+import redhat from '~icons/simple-icons/redhat?raw';
+import snapcraft from '~icons/simple-icons/snapcraft?raw';
+import ubuntu from '~icons/simple-icons/ubuntu?raw';
+import windows from '~icons/simple-icons/windows?raw';
+import rootPackage from '../../../../package.json';
+import DownloadIcon from '../components/DownloadIcon.astro';
+import Base from '../layouts/Base.astro';
+import { LINKS } from '../lib/providers';
+
+const { version } = rootPackage;
+const download = (file: string) => `${LINKS.github}/releases/download/v${version}/${file}`;
+const files = {
+  deb: `alto_${version}_amd64.deb`,
+  rpm: `alto-${version}-1.x86_64.rpm`,
+  appimage: `Alto-${version}-x64.AppImage`,
+};
+
+/** A distribution, with its mark in its brand color. */
+interface Distro {
+  name: string;
+  icon: string;
+  color: string;
+}
+
+interface Package {
+  id: string;
+  name: string;
+  /** The name is a file type (.deb), set as code. */
+  code?: boolean;
+  /** Where it fits. */
+  note?: string;
+  /** The distributions it's for, each with its mark: "For Debian, Ubuntu and others." */
+  distros?: Distro[];
+  icon: string;
+  /** The brand color behind its mark. */
+  color: string;
+  /** The main action, or none yet (coming soon). */
+  action?: { label: string; href: string; download?: boolean };
+  /** Somewhere else to get it, mentioned after the note. */
+  also?: { label: string; href: string };
+  recommended?: boolean;
+}
+
+/** Where Alto is coming next: a row of desktops, then a row of phones. */
+const soon = [
+  [
+    { id: 'windows', name: 'Windows', icon: windows },
+    { id: 'macos', name: 'macOS', icon: apple },
+  ],
+  [
+    { id: 'android', name: 'Android', icon: android },
+    // Apple's mark: there's no separate one for iOS.
+    { id: 'ios', name: 'iOS', icon: apple },
+  ],
+];
+
+const packages: Package[] = [
+  {
+    id: 'snap',
+    name: 'Snap Store',
+    note: 'Any distribution with snaps. Keeps itself up to date.',
+    icon: snapcraft,
+    color: '#E95420',
+    action: { label: 'Open in Snap Store', href: LINKS.snapApp },
+    also: { label: 'snapcraft.io', href: LINKS.snap },
+    recommended: true,
+  },
+  {
+    id: 'deb',
+    name: '.deb',
+    code: true,
+    distros: [
+      { name: 'Debian', icon: debian, color: '#A81D33' },
+      { name: 'Ubuntu', icon: ubuntu, color: '#E95420' },
+      { name: 'Linux Mint', icon: linuxmint, color: '#87CF3E' },
+    ],
+    icon: debian,
+    color: '#A81D33',
+    action: { label: 'Download .deb', href: download(files.deb), download: true },
+  },
+  {
+    id: 'rpm',
+    name: '.rpm',
+    code: true,
+    distros: [
+      { name: 'Fedora', icon: fedora, color: '#51A2DA' },
+      { name: 'Red Hat', icon: redhat, color: '#EE0000' },
+      { name: 'openSUSE', icon: opensuse, color: '#73BA25' },
+    ],
+    icon: fedora,
+    color: '#51A2DA',
+    action: { label: 'Download .rpm', href: download(files.rpm), download: true },
+  },
+  {
+    id: 'appimage',
+    name: 'AppImage',
+    note: 'One file that runs on most distributions.',
+    icon: appimage,
+    color: '#5C8FCB',
+    action: { label: 'Download AppImage', href: download(files.appimage), download: true },
+  },
+  {
+    id: 'flathub',
+    name: 'Flathub',
+    note: 'Any distribution with Flatpak.',
+    icon: flathub,
+    // Flathub's mark is black: the page's text color, so it shows at night too.
+    color: 'var(--fg)',
+  },
+];
+---
+
+<Base title="Install Alto" description="Install Alto on Linux from the Snap Store, or as a .deb, .rpm or AppImage. macOS, Windows, Android and iOS are coming soon.">
+  <main class="install wrap">
+    <header class="intro">
+      <h1><span class="enter-line"><span>Install Alto</span></span></h1>
+      <p class="lede" data-enter-fade>Free and open source, under the GPL.</p>
+      <a class="version-chip" href={LINKS.changelog} data-enter-fade style="--i: 1">
+        <span class="version">v{version}</span>
+        See what's new
+      </a>
+    </header>
+
+    <section class="os glass-panel" aria-labelledby="linux" data-enter-fade style="--i: 1">
+      <div class="os-head">
+        <span class="os-icon" aria-hidden="true" set:html={linux} />
+        <div>
+          <h2 id="linux">Linux</h2>
+          <p>For 64-bit Intel and AMD computers.</p>
+        </div>
+      </div>
+
+      <ul class="packages">
+        {
+          packages.map((p) => (
+            <li class:list={['package', { recommended: p.recommended, upcoming: !p.action }]} id={p.id}>
+              <span class="tile" style={`--brand:${p.color}`} aria-hidden="true" set:html={p.icon} />
+              <div class="what">
+                <h3>
+                  {p.code ? <code>{p.name}</code> : p.name}
+                  {p.recommended && <span class="chip">Recommended</span>}
+                  {!p.action && <span class="chip">Coming soon</span>}
+                </h3>
+                <p class="note">
+                  {p.distros && (
+                    <>
+                      For{' '}
+                      {p.distros.map((d, i) => (
+                        <>
+                          <span class="distro" style={`--brand:${d.color}`}>
+                            <span class="distro-mark" aria-hidden="true" set:html={d.icon} />
+                            {d.name}
+                          </span>
+                          {i < p.distros!.length - 1 ? ', ' : ' '}
+                        </>
+                      ))}
+                      and others.
+                    </>
+                  )}
+                  {p.note}
+                  {p.also && (
+                    <>
+                      {' '}
+                      Also on <a href={p.also.href}>{p.also.label}</a>.
+                    </>
+                  )}
+                </p>
+              </div>
+              {p.action && (
+                <a class="button primary small get" href={p.action.href} download={p.action.download ? '' : undefined}>
+                  <DownloadIcon />
+                  {p.action.label}
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      soon.map((row, i) => (
+        <div class="soon" data-enter-fade style={`--i: ${2 + i}`}>
+          {row.map((os) => (
+            <section class="os os-soon glass-panel" aria-labelledby={os.id}>
+              <span class="os-icon" aria-hidden="true" set:html={os.icon} />
+              <h2 id={os.id}>{os.name}</h2>
+              <span class="chip">Coming soon</span>
+            </section>
+          ))}
+        </div>
+      ))
+    }
+
+    <p class="source" data-enter-fade style="--i: 4">
+      Every release, with its packages, is <a href={`${LINKS.github}/releases`}>on GitHub</a>. Or <a href={`${LINKS.github}/blob/main/CONTRIBUTING.md`}>build it from source</a>.
+    </p>
+  </main>
+</Base>
+
+<style>
+  .install {
+    padding: 48px 0 40px;
+  }
+  .intro {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 5.4vw, 3.8rem);
+    line-height: 1.04;
+  }
+  .lede {
+    font-size: 1.1rem;
+    margin: 16px 0 0;
+  }
+
+  /* An operating system: a frosted panel, its mark and name at the top. */
+  .os {
+    border-radius: 24px;
+  }
+  .os-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 26px 28px 0;
+  }
+  /* The platforms' marks, quiet beside their names. */
+  .os-icon {
+    display: flex;
+    /* Never squeezed by the text beside it. */
+    flex: none;
+    font-size: 1.875em;
+    color: var(--fg);
+    opacity: 0.55;
+  }
+  .os-icon :global(svg) {
+    display: block;
+  }
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  /* Under the description: the latest version, and a way to its changes. */
+  .version-chip {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px 5px 5px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--accent-ink);
+    background: color-mix(in srgb, var(--accent-ink) 10%, transparent);
+    white-space: nowrap;
+    transition: background-color 150ms ease-out;
+  }
+  .version-chip:hover,
+  .version-chip:focus-visible {
+    background: color-mix(in srgb, var(--accent-ink) 16%, transparent);
+  }
+  .version {
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--fg);
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+  .os-head p {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin: 2px 0 0;
+  }
+
+  /* Linux's ways in: one list, a row each, every button in the same place. */
+  .packages {
+    list-style: none;
+    margin: 0;
+    padding: 12px 28px 14px;
+  }
+  .package {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 196px;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 0;
+  }
+  .package + .package {
+    border-top: 1px solid var(--line);
+  }
+  .tile {
+    display: grid;
+    place-items: center;
+    /* 36px at the tile's own 19.2px: em here is the tile's font size. */
+    width: 1.875em;
+    height: 1.875em;
+    border-radius: 10px;
+    font-size: 1.2em;
+    color: var(--brand);
+    background: color-mix(in srgb, var(--brand) 14%, transparent);
+  }
+  .tile :global(svg) {
+    display: block;
+  }
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0;
+  }
+  h3 code {
+    font-size: 0.92em;
+    padding: 1px 7px;
+    border-radius: 6px;
+    background: var(--bg);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .note {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    margin: 3px 0 0;
+  }
+  /* Not out yet: its mark dimmed, as the systems coming soon. */
+  .package.upcoming .tile {
+    opacity: 0.55;
+  }
+  /* A distribution's name, its mark before it. */
+  .distro {
+    white-space: nowrap;
+  }
+  .distro-mark {
+    display: inline-block;
+    vertical-align: -0.15em;
+    margin: 0 0.3em 0 0.25em;
+    color: var(--brand);
+  }
+  .distro-mark :global(svg) {
+    display: block;
+    width: 1em;
+    height: 1em;
+  }
+  /* Every row's button the same size, in the same place. */
+  .get {
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  /* Windows and macOS, then Android and iOS: a quiet tile each, two to a row
+     (one on phones). */
+  .soon {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .os-soon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 22px;
+  }
+  .os-soon .chip {
+    margin-left: auto;
+    flex: none;
+  }
+  .os-soon .os-icon {
+    font-size: 1.625em;
+  }
+  .os-soon h2 {
+    font-size: 1.25rem;
+    color: var(--muted);
+  }
+
+  .source {
+    color: var(--muted);
+    text-align: center;
+    font-size: 0.92rem;
+    margin: 36px 0 0;
+  }
+
+  /* On phones: each row stacks, its name, then its button. */
+  @media (max-width: 560px) {
+    .package {
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 12px 14px;
+    }
+    .get {
+      grid-column: 1 / -1;
+    }
+    .soon {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 720px) {
+    .os-head {
+      padding: 22px 16px 0;
+    }
+    .packages {
+      padding: 8px 16px 10px;
+    }
+    .os-soon {
+      padding: 18px 16px;
+    }
+  }
+</style>

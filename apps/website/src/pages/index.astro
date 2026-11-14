@@ -1,0 +1,226 @@
+---
+/**
+ * The homepage: the words centered over Alto, live in the page, which stands
+ * in a soft pastel glow; then three reasons for Alto, and the install band.
+ * The header and footer come from the shared layout (Base).
+ */
+import DemoStage from '../components/DemoStage.astro';
+import DownloadIcon from '../components/DownloadIcon.astro';
+import Base from '../layouts/Base.astro';
+import { LINKS } from '../lib/providers';
+---
+
+<Base waitForDemo>
+  <main>
+    <section class="hero wrap">
+      <div class="words">
+        <h1>
+          <span class="enter-line" style="--i: 0"><span>All of your cloud storage,</span></span>
+          <span class="enter-line" style="--i: 1"><span>synced to your computer</span></span>
+        </h1>
+        <p class="lede" data-enter-fade style="--i: 0">
+          Alto keeps folders on your computer in two-way sync with Google Drive, Dropbox, OneDrive, Proton Drive,
+          Nextcloud and more.
+        </p>
+        <div class="cta" data-enter-fade style="--i: 1">
+          <a class="button primary" href={LINKS.install}><DownloadIcon /> Install Alto</a>
+        </div>
+      </div>
+      <div class="pedestal">
+        <DemoStage height="min(620px, 72vh)" />
+      </div>
+    </section>
+
+    <section class="points wrap" aria-labelledby="points-title">
+      <h2 id="points-title" class="visually-hidden">Why Alto</h2>
+      <ul class="glass-panel">
+        <li>
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 16 16"><path d="M3 2.75h10c.69 0 1.25.56 1.25 1.25v8c0 .69-.56 1.25-1.25 1.25H3c-.69 0-1.25-.56-1.25-1.25V4c0-.69.56-1.25 1.25-1.25zM1.75 6h12.5" /></svg>
+          </span>
+          <h3>Native on your desktop</h3>
+          <p>Made to look and feel at home on your desktop.</p>
+        </li>
+        <li>
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 16 16"><path d="M8 1.75 2.75 3.75v4c0 3.1 2.2 5.5 5.25 6.5 3.05-1 5.25-3.4 5.25-6.5v-4zM5.75 8l1.6 1.6 2.9-3.1" /></svg>
+          </span>
+          <h3>No tracking</h3>
+          <p>There's no Alto account to make, and nothing about you is collected. Your sign-ins stay on your computer.</p>
+        </li>
+        <li>
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 16 16"><path d="M5.25 4.5 1.75 8l3.5 3.5M10.75 4.5 14.25 8l-3.5 3.5" /></svg>
+          </span>
+          <h3>Open source</h3>
+          <p>Free under the GPL, with every line public. Find it <a href={LINKS.github}>on GitHub</a>.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="close wrap">
+      <div class="band">
+        <h2>Get Alto</h2>
+        <p>Free and open source. Out now for Linux, with more platforms on the way.</p>
+        <a class="button primary" href={LINKS.install}>Install Alto</a>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  h2 {
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    margin: 0;
+  }
+
+  .hero {
+    min-height: calc(100svh - 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px 0 48px;
+  }
+  .words {
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+    line-height: 1.03;
+  }
+  .lede {
+    font-size: 1.15rem;
+    line-height: 1.55;
+    margin: 20px auto 0;
+    max-width: 36rem;
+  }
+  .cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+  }
+  /* The window stands in a soft pastel glow. */
+  .pedestal {
+    position: relative;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 0 8px;
+  }
+  .pedestal::before {
+    content: '';
+    position: absolute;
+    inset: -40px -20px;
+    z-index: 0;
+    background:
+      radial-gradient(closest-side at 35% 50%, var(--glow-blue), transparent),
+      radial-gradient(closest-side at 70% 55%, var(--glow-mint), transparent);
+    pointer-events: none;
+  }
+  .pedestal > :global(.stage) {
+    position: relative;
+    z-index: 1;
+    --stage-gutter: 56px;
+  }
+
+  /* Three short reasons, right under the demo: one frosted strip. */
+  .points ul {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-radius: 22px;
+  }
+  .points li {
+    padding: 26px 28px;
+  }
+  .points li + li {
+    border-left: 1px solid var(--line);
+  }
+  .mark {
+    display: grid;
+    place-items: center;
+    width: 2.25em;
+    height: 2.25em;
+    border-radius: 0.65em;
+    color: var(--accent-ink);
+    background: color-mix(in srgb, var(--accent-ink) 12%, transparent);
+    margin-bottom: 14px;
+  }
+  .mark svg {
+    width: 1.2em;
+    height: 1.2em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .points p,
+  .band p {
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* The close: a short band, not a screen. */
+  .close {
+    padding: 96px 0 72px;
+  }
+  .band {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    padding: clamp(36px, 5vw, 64px);
+    text-align: center;
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(closest-side at 30% 40%, var(--glow-blue), transparent),
+      radial-gradient(closest-side at 72% 60%, var(--glow-peach), transparent);
+    pointer-events: none;
+  }
+  .band > * {
+    position: relative;
+  }
+  .band h2 {
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    line-height: 1.08;
+  }
+  .band p {
+    font-size: 1.15rem;
+  }
+  @media (max-width: 760px) {
+    .points ul {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .points li + li {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .points li {
+      padding: 22px;
+    }
+  }
+</style>
