@@ -4,6 +4,7 @@ import { replaceIDs } from '@iconify/utils';
 import { useMemo } from 'react';
 import dropbox from '~icons/selfhst/dropbox-light?raw';
 import googleDrive from '~icons/selfhst/google-drive?raw';
+import oneDrive from '~icons/selfhst/microsoft-onedrive?raw';
 import nextcloud from '~icons/simple-icons/nextcloud?raw';
 import owncloud from '~icons/selfhst/owncloud-light?raw';
 import protonDrive from '~icons/selfhst/proton-drive?raw';
@@ -17,6 +18,7 @@ import protonDrive from '~icons/selfhst/proton-drive?raw';
 const LOGOS: Record<string, string> = {
   'dropbox-light': dropbox,
   'google-drive': googleDrive,
+  'microsoft-onedrive': oneDrive,
   nextcloud,
   'owncloud-light': owncloud,
   'proton-drive': protonDrive,

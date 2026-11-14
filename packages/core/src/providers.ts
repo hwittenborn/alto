@@ -3,7 +3,7 @@
  * rclone backend configuration.
  */
 
-export type ProviderId = 'gdrive' | 'dropbox' | 'protondrive' | 'nextcloud' | 'owncloud' | 'webdav';
+export type ProviderId = 'gdrive' | 'dropbox' | 'onedrive' | 'protondrive' | 'nextcloud' | 'owncloud' | 'webdav';
 
 export type ProviderFieldId = 'url' | 'username' | 'password' | 'totp' | 'clientId' | 'clientSecret';
 
@@ -85,6 +85,12 @@ const DROPBOX_OAUTH: ProviderOAuth = {
   clientSecret: 'o4cpx8trcnneq7a',
   customClientHelpUrl: 'https://rclone.org/dropbox/#get-your-own-dropbox-app-id',
 };
+// Alto's own Azure app.
+const ONEDRIVE_OAUTH: ProviderOAuth = {
+  clientId: 'c8b7f60d-f36f-46f7-b003-cf9814592623',
+  clientSecret: 'jVd8Q~PZvqes4tHQPMLOPmuLfQvlLfMtEdjhVbDh',
+  customClientHelpUrl: 'https://rclone.org/onedrive/#getting-your-own-client-id-and-key',
+};
 
 export const PROVIDERS: readonly ProviderDefinition[] = [
   {
@@ -108,6 +114,17 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
     iconSlug: 'dropbox-light',
     fallbackIcon: 'folder-remote-symbolic',
     oauth: DROPBOX_OAUTH,
+  },
+  {
+    id: 'onedrive',
+    label: 'OneDrive',
+    rcloneType: 'onedrive',
+    auth: 'oauth',
+    fields: oauthClientFields,
+    color: 'FFFFFF',
+    iconSlug: 'microsoft-onedrive',
+    fallbackIcon: 'folder-remote-symbolic',
+    oauth: ONEDRIVE_OAUTH,
   },
   {
     id: 'protondrive',
@@ -171,7 +188,8 @@ export function buildRemoteConfig(id: ProviderId, values: ProviderValues): Rclon
 
   switch (id) {
     case 'dropbox':
-    case 'gdrive': {
+    case 'gdrive':
+    case 'onedrive': {
       // A custom client is used only when both halves of it are given (validation requires that).
       const custom = v('clientId') !== '' && v('clientSecret') !== '';
       const parameters: Record<string, string | boolean> = {
@@ -181,6 +199,11 @@ export function buildRemoteConfig(id: ProviderId, values: ProviderValues): Rclon
         config_auth_no_browser: 'true',
       };
       if (id === 'gdrive') parameters.scope = 'drive';
+      // Alto only syncs the account's own drive, so it doesn't ask to browse
+      // SharePoint sites (Sites.Read.All): one less permission for an
+      // organization to approve. Without a form to pick from, rclone chooses
+      // "OneDrive Personal or Business" and the account's drive.
+      if (id === 'onedrive') parameters.disable_site_permission = 'true';
       return { type: provider.rcloneType, parameters, obscure: true };
     }
     case 'nextcloud':
@@ -224,6 +247,8 @@ export function detectProvider(config: Record<string, string>): ProviderId | nul
       return 'dropbox';
     case 'drive':
       return 'gdrive';
+    case 'onedrive':
+      return 'onedrive';
     case 'protondrive':
       return 'protondrive';
     case 'webdav':
