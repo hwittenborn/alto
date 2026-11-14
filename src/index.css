@@ -103,6 +103,13 @@ body,
   pointer-events: none;
 }
 
+/* The login form's Advanced expander: a little more room between its arrow and label than
+   GtkExpander's (none, past the arrow icon's own padding). Only a margin, which themes
+   leave alone, and in em so it grows with the text (Large Text, a bigger font). */
+.alto-advanced-label {
+  margin-inline-start: 0.25em;
+}
+
 /*
  * TODO: Remove once gtk-js lays out Cantarell like Pango does (gtk-js/gtk-js PR to come).
  *

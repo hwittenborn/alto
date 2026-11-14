@@ -252,7 +252,7 @@ function LoginFlow({
                   {/* Only the toggle: the fields go below it, so it can be centered over them. */}
                   <GtkExpander
                     halign="center"
-                    labelWidget={<GtkLabel className="dim-label" label="Advanced" />}
+                    labelWidget={<GtkLabel className="dim-label alto-advanced-label" label="Advanced" />}
                     expanded={showAdvanced}
                     onExpandedChanged={setShowAdvanced}
                     data-action="advanced"
