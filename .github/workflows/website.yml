@@ -1,20 +1,8 @@
 name: Website
 on:
-  # Only when something the site is built from changes: its own files, the
-  # packages its demo runs on, the changelog and version it shows, and its
-  # dependencies.
   pull_request:
-    paths: &paths
-      - apps/website/**
-      - packages/core/**
-      - packages/react/**
-      - CHANGELOG.md
-      - package.json
-      - package-lock.json
-      - .github/workflows/website.yml
   push:
     branches: [main]
-    paths: *paths
   workflow_dispatch:
 
 concurrency:
