@@ -106,10 +106,11 @@ body,
 /*
  * TODO: Remove once gtk-js lays out Cantarell like Pango does (gtk-js/gtk-js PR to come).
  *
- * gtk-js's default font is Cantarell. Chromium places Cantarell's baseline by its
- * OS/2 typo metrics (the line gap split above and below), 13px down an 11pt line,
- * where Pango uses its hhea ascent and descent (14.42px and 3.18px). So every
- * label's text sits about 2px higher than in native GTK, and icons beside text,
+ * gtk-js's default font is Cantarell. At a device scale factor above 1 (HiDPI
+ * screens, fractional scaling), Chromium places Cantarell's baseline 13px down an
+ * 11pt line, where Pango uses its hhea ascent and descent (14.42px and 3.18px; at
+ * 1x Chromium agrees with Pango). So every label's text sits about 1–2px higher
+ * than in native GTK, and icons beside text,
  * like an expander's arrow, look low. Declaring Cantarell's own hhea metrics puts
  * the text where Pango does. It only changes Cantarell (all its weights share
  * these metrics), so other fonts and themes are unaffected; where the static
