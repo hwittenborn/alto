@@ -257,19 +257,35 @@ function LoginFlow({
                     onExpandedChanged={setShowAdvanced}
                     data-action="advanced"
                   />
-                  {showAdvanced && (
-                    <AdwPreferencesGroup>
-                      {advancedRows}
-                      {provider.oauth && (
-                        <AdwActionRow
-                          title="Making Your Own Client"
-                          activatable
-                          onActivated={() => void host.openUrl(provider.oauth!.customClientHelpUrl)}
-                          suffixWidget={<GtkImage iconName="AdwExternalLink" />}
-                        />
-                      )}
-                    </AdwPreferencesGroup>
-                  )}
+                  {showAdvanced &&
+                    (provider.oauth ? (
+                      /*
+                        TODO: Use AdwPreferencesGroup's own title and description once gtk-js
+                        renders links in the description, as libadwaita does (gtk-js parses it as
+                        plain Pango markup, which has no <a>, and shows nothing). Until then, the
+                        header is drawn here: libadwaita's header is these two labels, 6px apart
+                        and 12px above the rows.
+                      */
+                      <GtkBox orientation="vertical" spacing={12}>
+                        <GtkBox orientation="vertical" spacing={6}>
+                          <GtkLabel className="heading" xalign={0} wrap label="Custom Client" />
+                          <GtkLabel
+                            className="body dimmed"
+                            xalign={0}
+                            wrap
+                            useMarkup
+                            label={`Use your own OAuth client instead of Alto’s. <a href="${provider.oauth.customClientHelpUrl}">How to make one</a>`}
+                            onActivateLink={(uri) => {
+                              void host.openUrl(uri);
+                              return true;
+                            }}
+                          />
+                        </GtkBox>
+                        <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
+                      </GtkBox>
+                    ) : (
+                      <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
+                    ))}
                 </GtkBox>
               )}
               {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
