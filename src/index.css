@@ -110,6 +110,12 @@ body,
   margin-inline-start: 0.25em;
 }
 
+/* The gap between the Advanced expander and its fields, inside the revealer that slides
+   them in, so the closed form has no gap left under the expander. */
+.alto-advanced-content {
+  margin-top: 12px;
+}
+
 /*
  * TODO: Remove once gtk-js lays out Cantarell like Pango does (gtk-js/gtk-js PR to come).
  *

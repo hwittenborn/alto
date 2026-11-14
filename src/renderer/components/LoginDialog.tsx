@@ -27,6 +27,7 @@ import {
   GtkImage,
   GtkLabel,
   GtkMenuButton,
+  GtkRevealer,
   type GtkMenuModel,
   GtkScrolledWindow,
   GtkSpinner,
@@ -248,7 +249,7 @@ function LoginFlow({
                 {fieldRows(false)}
               </AdwPreferencesGroup>
               {advancedRows.length > 0 && (
-                <GtkBox orientation="vertical" spacing={12}>
+                <GtkBox orientation="vertical">
                   {/* Only the toggle: the fields go below it, so it can be centered over them. */}
                   <GtkExpander
                     halign="center"
@@ -257,35 +258,39 @@ function LoginFlow({
                     onExpandedChanged={setShowAdvanced}
                     data-action="advanced"
                   />
-                  {showAdvanced &&
-                    (provider.oauth ? (
-                      /*
-                        TODO: Use AdwPreferencesGroup's own title and description once gtk-js
-                        renders links in the description, as libadwaita does (gtk-js parses it as
-                        plain Pango markup, which has no <a>, and shows nothing). Until then, the
-                        header is drawn here: libadwaita's header is these two labels, 6px apart
-                        and 12px above the rows.
-                      */
-                      <GtkBox orientation="vertical" spacing={12}>
-                        <GtkBox orientation="vertical" spacing={6}>
-                          <GtkLabel className="heading" xalign={0} wrap label="Custom Client" />
-                          <GtkLabel
-                            className="body dimmed"
-                            xalign={0}
-                            wrap
-                            useMarkup
-                            label={`Use your own OAuth client instead of Alto’s. <a href="${provider.oauth.customClientHelpUrl}">How to make one</a>`}
-                            onActivateLink={(uri) => {
-                              void host.openUrl(uri);
-                              return true;
-                            }}
-                          />
+                  {/* GtkExpander shows its child at once; a revealer slides the fields in and out. */}
+                  <GtkRevealer revealChild={showAdvanced}>
+                    <GtkBox orientation="vertical" className="alto-advanced-content">
+                      {provider.oauth ? (
+                        /*
+                          TODO: Use AdwPreferencesGroup's own title and description once gtk-js
+                          renders links in the description, as libadwaita does (gtk-js parses it as
+                          plain Pango markup, which has no <a>, and shows nothing). Until then, the
+                          header is drawn here: libadwaita's header is these two labels, 6px apart
+                          and 12px above the rows.
+                        */
+                        <GtkBox orientation="vertical" spacing={12}>
+                          <GtkBox orientation="vertical" spacing={6}>
+                            <GtkLabel className="heading" xalign={0} wrap label="Custom Client" />
+                            <GtkLabel
+                              className="body dimmed"
+                              xalign={0}
+                              wrap
+                              useMarkup
+                              label={`Use your own OAuth client instead of Alto’s. <a href="${provider.oauth.customClientHelpUrl}">Learn how to make one</a>.`}
+                              onActivateLink={(uri) => {
+                                void host.openUrl(uri);
+                                return true;
+                              }}
+                            />
+                          </GtkBox>
+                          <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
                         </GtkBox>
+                      ) : (
                         <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
-                      </GtkBox>
-                    ) : (
-                      <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
-                    ))}
+                      )}
+                    </GtkBox>
+                  </GtkRevealer>
                 </GtkBox>
               )}
               {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
