@@ -13,6 +13,7 @@ import {
   type AddFolderInput,
   type AltoApi,
   type AltoState,
+  type BrowserLoginInput,
   type CreateRemoteInput,
   type FolderView,
   initialState,
@@ -263,7 +264,7 @@ export class Alto implements AltoClient {
   async createRemote(input: CreateRemoteInput): Promise<ActionResult<{ name: string }>> {
     const provider = getProvider(input.provider);
     if (provider.auth === 'oauth') {
-      return this.loginWithBrowser({ provider: input.provider, name: input.name });
+      return this.loginWithBrowser(input);
     }
     const name = input.name.trim();
     const validation = validateLoginForm(input.provider, name, input.values, this.existingRemoteNames());
@@ -291,12 +292,14 @@ export class Alto implements AltoClient {
     return { ok: true, value: { name } };
   }
 
-  async loginWithBrowser(input: { provider: ProviderId; name: string }): Promise<ActionResult<{ name: string }>> {
+  async loginWithBrowser(input: BrowserLoginInput): Promise<ActionResult<{ name: string }>> {
     const provider = getProvider(input.provider);
     const name = input.name.trim();
-    const validation = validateLoginForm(input.provider, name, {}, this.existingRemoteNames());
+    const values = input.values ?? {};
+    const validation = validateLoginForm(input.provider, name, values, this.existingRemoteNames());
     if (!validation.valid) {
-      return fail('invalid', 'Unable to log in', { body: validation.errors.name });
+      const first = Object.values(validation.errors)[0] ?? '';
+      return fail('invalid', 'Unable to log in', { body: first });
     }
     if (
       [...this.logins.values()].some(
@@ -322,7 +325,7 @@ export class Alto implements AltoClient {
     };
     set({});
 
-    const cfg = buildRemoteConfig(input.provider, {});
+    const cfg = buildRemoteConfig(input.provider, values);
     let finished = false;
     const job = this.rclone
       .createRemoteAsync(name, cfg.type, cfg.parameters, { obscure: cfg.obscure }, { signal: abort.signal })
