@@ -151,9 +151,14 @@ h1 {
   font-size: 0.92rem;
 }
 
-/* An icon in a button (Phosphor, sized 1em), before its words. */
-.button > svg {
+/* An icon from an icon set (Icon.tsx: SVG sized 1em), inline with its text. */
+.icon {
+  display: inline-flex;
   flex: none;
+}
+
+.icon > svg {
+  display: block;
 }
 
 button.button {

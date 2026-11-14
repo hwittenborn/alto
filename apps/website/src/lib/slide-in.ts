@@ -135,8 +135,12 @@ async function foldRow(row: HTMLElement, avatar: HTMLElement): Promise<void> {
     .finished.catch(() => undefined);
 }
 
+let setUp = false;
+
+/** Start listening for Start Demo and Restart, once the demo is drawn (once per page). */
 export function setupSlideIn(): void {
-  // The demo is a client-only island: it isn't in the page until it has loaded.
+  if (setUp) return;
+  setUp = true;
   void demoReady().then(start);
 }
 

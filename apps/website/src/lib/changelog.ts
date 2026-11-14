@@ -23,6 +23,8 @@ export interface Release {
   groups: Array<{ title: string; changes: Change[] }>;
 }
 
+import { isExternal } from './providers';
+
 const escape = (text: string) =>
   text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
@@ -30,7 +32,11 @@ const escape = (text: string) =>
 function inline(text: string): string {
   return escape(text)
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+    .replace(
+      /\[([^\]]+)\]\(([^)\s]+)\)/g,
+      (_, text: string, href: string) =>
+        `<a href="${href}"${isExternal(href) ? ' target="_blank" rel="noopener"' : ''}>${text}</a>`,
+    );
 }
 
 /** A change, with its trailing "([#306](url)) ([56a2992](url))" links taken apart from it. */

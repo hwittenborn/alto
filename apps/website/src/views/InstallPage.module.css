@@ -1,0 +1,223 @@
+.install {
+  padding: 48px 0 40px;
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: clamp(2.4rem, 5.4vw, 3.8rem);
+  line-height: 1.04;
+}
+
+.lede {
+  font-size: 1.1rem;
+  margin: 16px 0 0;
+}
+
+/* Under the description: the latest version, and a way to its changes. */
+.versionChip {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--accent-ink);
+  background: color-mix(in srgb, var(--accent-ink) 10%, transparent);
+  white-space: nowrap;
+  transition: background-color 150ms ease-out;
+}
+
+.versionChip:hover,
+.versionChip:focus-visible {
+  background: color-mix(in srgb, var(--accent-ink) 16%, transparent);
+}
+
+.version {
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--fg);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+/* An operating system: a frosted panel, its mark and name at the top. */
+.os {
+  border-radius: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.osHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 26px 28px 0;
+}
+
+.osHead p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 2px 0 0;
+}
+
+/* The platforms' marks, quiet beside their names. */
+.os .osIcon {
+  font-size: 1.875em;
+  color: var(--fg);
+  opacity: 0.55;
+}
+
+.osName {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+/* Linux's ways in: one list, a row each, every button in the same place. */
+.packages {
+  list-style: none;
+  margin: 0;
+  padding: 12px 28px 14px;
+}
+
+.package {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 196px;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 0;
+}
+
+.package + .package {
+  border-top: 1px solid var(--line);
+}
+
+.package .tile {
+  display: grid;
+  place-items: center;
+  /* 36px at the tile's own 19.2px: em here is the tile's font size. */
+  width: 1.875em;
+  height: 1.875em;
+  border-radius: 10px;
+  font-size: 1.2em;
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+}
+
+/* Not out yet: its mark dimmed, as the systems coming soon. */
+.upcoming .tile {
+  opacity: 0.55;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.name code {
+  font-size: 0.92em;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin: 3px 0 0;
+}
+
+/* A distribution's name, its mark before it. */
+.distro {
+  white-space: nowrap;
+}
+
+.distro .distroMark {
+  vertical-align: -0.15em;
+  margin: 0 0.3em 0 0.25em;
+  color: var(--brand);
+}
+
+/* Every row's button the same size, in the same place. */
+.get {
+  width: 100%;
+  white-space: nowrap;
+}
+
+/* Windows and macOS, then Android and iOS: a quiet tile each, two to a row
+   (one on phones). */
+.soon {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.osSoon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 22px;
+}
+
+.osSoon :global(.chip) {
+  margin-left: auto;
+  flex: none;
+}
+
+.osSoon .osIcon {
+  font-size: 1.625em;
+}
+
+.osSoon .osName {
+  font-size: 1.25rem;
+  color: var(--muted);
+}
+
+.source {
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.92rem;
+  margin: 36px 0 0;
+}
+
+/* On phones: each row stacks, its name, then its button. */
+@media (max-width: 560px) {
+  .package {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 12px 14px;
+  }
+  .get {
+    grid-column: 1 / -1;
+  }
+  .soon {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .osHead {
+    padding: 22px 16px 0;
+  }
+  .packages {
+    padding: 8px 16px 10px;
+  }
+  .osSoon {
+    padding: 18px 16px;
+  }
+}

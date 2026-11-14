@@ -1,7 +1,7 @@
 ---
 import '@fontsource-variable/geist';
-import SiteFooter from '../components/SiteFooter.astro';
-import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter';
+import SiteHeader from '../components/SiteHeader';
 import { appIconUrl } from '../lib/app-icon';
 import '../styles/site.css';
 
@@ -63,21 +63,10 @@ const {
   </head>
   <body>
     <div class="page">
-      <SiteHeader />
+      <SiteHeader client:load />
       <slot />
       <SiteFooter />
     </div>
-    <script is:inline>
-      // Links to other sites open in a new tab. Not downloads (they'd leave an
-      // empty one) or app links like snap:// (they open an app, not a page).
-      for (const a of document.querySelectorAll('a[href]:not([download])')) {
-        const url = new URL(a.href, location.href);
-        if (url.protocol.startsWith('http') && url.origin !== location.origin) {
-          a.target = '_blank';
-          a.rel = 'noopener';
-        }
-      }
-    </script>
   </body>
 </html>
 

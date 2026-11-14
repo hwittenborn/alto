@@ -2,8 +2,7 @@
  * The providers the website shows, with their brand logos as SVG markup: from
  * selfh.st/icons (CC BY 4.0) and Nextcloud's from Simple Icons (CC0), as in the app.
  */
-import { getProvider, type ProviderDefinition, type ProviderId } from '@alto/core';
-import { replaceIDs } from '@iconify/utils';
+import type { ProviderDefinition, ProviderId } from '@alto/core';
 import dropbox from '~icons/selfhst/dropbox-light?raw';
 import googleDrive from '~icons/selfhst/google-drive?raw';
 import nextcloud from '~icons/simple-icons/nextcloud?raw';
@@ -17,7 +16,7 @@ export const AVATAR_SIZE = 36;
 export const isLightTile = (def: Pick<ProviderDefinition, 'color'>) => def.color.toUpperCase() === 'FFFFFF';
 
 /** The providers the site shows, in this order. */
-const SITE_PROVIDERS: ProviderId[] = ['gdrive', 'dropbox', 'onedrive', 'protondrive', 'nextcloud'];
+export const SITE_PROVIDERS: ProviderId[] = ['gdrive', 'dropbox', 'onedrive', 'protondrive', 'nextcloud'];
 
 /** The white ones (`-light`, Nextcloud's) are for the brand color behind them; the others are full color, on white. */
 const LOGOS: Partial<Record<ProviderId, string>> = {
@@ -33,27 +32,8 @@ export function providerLogo(id: ProviderId): string {
   return LOGOS[id] ?? '';
 }
 
-export interface SiteProvider {
-  id: ProviderId;
-  label: string;
-  /** Brand color behind the logo, as CSS. */
-  color: string;
-  /** Logo markup, sized 1em square. */
-  logo: string;
-  /** Whether the logo is white, for the brand color behind it. */
-  onColor: boolean;
-}
-
-export function siteProviders(): SiteProvider[] {
-  return SITE_PROVIDERS.map(getProvider).map((p) => ({
-    id: p.id,
-    label: p.label,
-    color: `#${p.color}`,
-    // Each copy its own gradient IDs: with shared ones, a copy goes blank when the first is hidden.
-    logo: replaceIDs(LOGOS[p.id] ?? ''),
-    onColor: !isLightTile(p),
-  }));
-}
+/** Whether `href` is a page on another site (which opens in a new tab: Link.tsx). */
+export const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 export const LINKS = {
   snap: 'https://snapcraft.io/alto',

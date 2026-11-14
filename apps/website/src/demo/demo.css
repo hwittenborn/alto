@@ -3,6 +3,7 @@
 .alto-demo {
   position: relative;
   width: 100%;
+  height: 100%;
   /* The window's shadow is drawn inside its box (allocateShadow), so no clipping here. */
 }
 
