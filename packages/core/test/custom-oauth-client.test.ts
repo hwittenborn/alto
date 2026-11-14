@@ -22,3 +22,18 @@ describe('custom OAuth clients', () => {
     expect(validate({ clientSecret: 'secret' }).errors).toHaveProperty('clientSecret');
   });
 });
+
+describe('OneDrive', () => {
+  it("uses Alto's own client by default, without SharePoint site access", () => {
+    const { type, parameters } = buildRemoteConfig('onedrive', {});
+    expect(type).toBe('onedrive');
+    expect(parameters.client_id).toBe(getProvider('onedrive').oauth!.clientId);
+    expect(parameters.client_secret).toBe(getProvider('onedrive').oauth!.clientSecret);
+    expect(parameters.disable_site_permission).toBe('true');
+  });
+
+  it('uses the client given in the form', () => {
+    const { parameters } = buildRemoteConfig('onedrive', { clientId: 'my-id', clientSecret: 'my-secret' });
+    expect(parameters).toMatchObject({ client_id: 'my-id', client_secret: 'my-secret' });
+  });
+});

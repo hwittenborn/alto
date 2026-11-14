@@ -8,7 +8,7 @@
   <br />
 </div>
 
-Alto keeps folders on your computer in sync with your cloud storage, such as Google Drive, Dropbox, Proton Drive and
+Alto keeps folders on your computer in sync with your cloud storage, such as Google Drive, Dropbox, OneDrive, Proton Drive and
 [more](#supported-providers). It's built to look and feel native on your desktop, with current support for Linux
 (GNOME specifically, with apps for macOS, Windows, and Android in the works).
 
@@ -32,6 +32,7 @@ Alto keeps folders on your computer in sync with your cloud storage, such as Goo
 
 - Google Drive
 - Dropbox
+- OneDrive
 - Proton Drive
 - Nextcloud
 - ownCloud
