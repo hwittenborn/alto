@@ -48,9 +48,9 @@ import {
 } from '@gtk-js/adwaita';
 import { createGtkIconFromSvg } from '@gtk-js/icon-helpers';
 import * as adwaitaIcons from '@gtk-js/icons-adwaita';
+import { appIconSvg } from '../lib/app-icon';
 import { FolderStatusIcon } from './FolderStatusIcon';
 import { ProviderAvatar } from './ProviderAvatar';
-import appIconSvg from '../assets/app-icon.svg?raw';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 
 const icons = {

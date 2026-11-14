@@ -6,12 +6,13 @@
  */
 import github from '~icons/simple-icons/github?raw';
 import DownloadIcon from './DownloadIcon.astro';
+import { appIconUrl } from '../lib/app-icon';
 import { LINKS } from '../lib/providers';
 ---
 
 <header class="top">
   <div class="pill">
-    <a class="mark" href="/"><img src="/favicon.svg" alt="" width="32" height="32" /> Alto</a>
+    <a class="mark" href="/"><img src={appIconUrl} alt="" width="32" height="32" /> Alto</a>
     <nav>
       <a class="quiet-link" href={LINKS.changelog}>Changelog</a>
       <a class="quiet-link github" href={LINKS.github} aria-label="Alto on GitHub">
