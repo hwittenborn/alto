@@ -4,7 +4,7 @@
  * install band.
  */
 import type { Metadata } from 'next';
-import DemoStage from '../demo/DemoStage';
+import DemoStage from '../demo/DemoStageLoader';
 import { appIconSvg } from '../lib/app-icon';
 import { Icon } from '../components/Icon';
 import { Link } from '../components/Link';

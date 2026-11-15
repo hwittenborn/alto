@@ -4,9 +4,9 @@
  * Alto, live in the page: the website's copy of its window (DemoApp) on a
  * pretend backend (FakeAlto), with the providers' avatars floating around it,
  * and its Start Demo button (Restart once it's going). Start Demo sends the
- * avatars into the window's sidebar one after another (src/lib/slide-in.ts);
- * Restart sends them home. One per page, drawn in the browser only (not to
- * HTML when the site is built: it needs the page).
+ * avatars into the window's sidebar one after another (slide-in.ts);
+ * Restart sends them home. One per page, loaded in the browser only
+ * (DemoStageLoader).
  *
  * The floating avatars are the app's own ProviderAvatar, at the sidebar's
  * size, scaled up: what slides into the window is the very avatar its row
@@ -29,10 +29,10 @@ import { type DemoAssets, DemoAssetsContext } from './assets';
 import DemoApp from './DemoApp';
 import { FakeAlto } from './fake-alto';
 import { ProviderAvatar } from './ProviderAvatar';
+import { DemoPending } from './DemoPending';
 import { ProviderLogo } from './ProviderLogo';
 import { setupSlideIn } from './slide-in';
 import styles from './DemoStage.module.css';
-import { useMounted } from './use-mounted';
 // GNOME's interface font, in the weights GTK's theme uses (400, 700, 800).
 import '@fontsource/adwaita-sans/400.css';
 import '@fontsource/adwaita-sans/700.css';
@@ -63,14 +63,7 @@ interface Props {
   assets: DemoAssets;
 }
 
-/**
- * Marks the page as waiting for the demo, until it's drawn (site.css holds the
- * homepage hidden meanwhile, for up to 4 seconds).
- */
-const pending = <div data-demo-pending="" hidden />;
-
 export default function DemoStage({ height, assets }: Props) {
-  const mounted = useMounted();
   const [demo] = useState(() => {
     const alto = new FakeAlto();
     return { alto, client: createAltoClient(alto.transport) };
@@ -112,10 +105,9 @@ export default function DemoStage({ height, assets }: Props) {
     setStarted(!started);
   };
 
-  if (!mounted) return pending;
   return (
     <DemoAssetsContext value={assets}>
-      {!ready && pending}
+      {!ready && <DemoPending />}
       <section
         className={styles.stage}
         id="try"
