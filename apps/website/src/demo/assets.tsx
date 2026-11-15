@@ -11,6 +11,10 @@ export interface DemoAssets {
   appIcon: string;
 }
 
-export const DemoAssetsContext = createContext<DemoAssets>({ logos: {}, appIcon: '' });
+export const DemoAssetsContext = createContext<DemoAssets | null>(null);
 
-export const useDemoAssets = () => useContext(DemoAssetsContext);
+export function useDemoAssets(): DemoAssets {
+  const assets = useContext(DemoAssetsContext);
+  if (!assets) throw new Error('useDemoAssets() outside DemoStage');
+  return assets;
+}

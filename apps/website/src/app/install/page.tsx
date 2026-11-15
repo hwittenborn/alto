@@ -10,42 +10,27 @@
  */
 import rootPackage from '../../../../../package.json';
 import type { Metadata } from 'next';
-import type { CSSProperties } from 'react';
 import { Icon } from '../../components/Icon';
 import { Link } from '../../components/Link';
-import { icon } from '../../lib/icons';
-import { LINKS } from '../../lib/providers';
+import { cssVars } from '../../lib/css';
+import { downloadIcon, icon } from '../../lib/icons';
+import { LINKS } from '../../lib/site';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'Install Alto',
+  title: { absolute: 'Install Alto' },
   description:
     'Install Alto on Linux from the Snap Store, or as a .deb, .rpm or AppImage. Flathub, Windows, macOS, Android and iOS are coming soon.',
   alternates: { canonical: '/install' },
 };
 
-const android = icon('simple-icons:android');
+/** Marks used more than once. */
 const apple = icon('simple-icons:apple');
-const appimage = icon('simple-icons:appimage');
 const debian = icon('simple-icons:debian');
 const fedora = icon('simple-icons:fedora');
-const flathub = icon('simple-icons:flathub');
-const linux = icon('simple-icons:linux');
-const linuxmint = icon('simple-icons:linuxmint');
-const opensuse = icon('simple-icons:opensuse');
-const redhat = icon('simple-icons:redhat');
-const snapcraft = icon('simple-icons:snapcraft');
-const ubuntu = icon('simple-icons:ubuntu');
-const windows = icon('simple-icons:windows');
-const downloadIcon = icon('ph:download-simple-bold');
 
 const { version } = rootPackage;
 const releaseFile = (file: string) => `${LINKS.github}/releases/download/v${version}/${file}`;
-const files = {
-  deb: `alto_${version}_amd64.deb`,
-  rpm: `alto-${version}-1.x86_64.rpm`,
-  appimage: `Alto-${version}-x64.AppImage`,
-};
 
 /** A distribution, with its mark in its brand color. */
 interface Distro {
@@ -76,11 +61,11 @@ interface Package {
 /** Where Alto is coming next: a row of desktops, then a row of phones. */
 const soon = [
   [
-    { id: 'windows', name: 'Windows', icon: windows },
+    { id: 'windows', name: 'Windows', icon: icon('simple-icons:windows') },
     { id: 'macos', name: 'macOS', icon: apple },
   ],
   [
-    { id: 'android', name: 'Android', icon: android },
+    { id: 'android', name: 'Android', icon: icon('simple-icons:android') },
     // Apple's mark: there's no separate one for iOS.
     { id: 'ios', name: 'iOS', icon: apple },
   ],
@@ -91,7 +76,7 @@ const packages: Package[] = [
     id: 'snap',
     name: 'Snap Store',
     note: 'Any distribution with snaps. Keeps itself up to date.',
-    icon: snapcraft,
+    icon: icon('simple-icons:snapcraft'),
     color: '#E95420',
     action: { label: 'Open in Snap Store', href: LINKS.snapApp },
     also: { label: 'snapcraft.io', href: LINKS.snap },
@@ -103,12 +88,12 @@ const packages: Package[] = [
     code: true,
     distros: [
       { name: 'Debian', icon: debian, color: '#A81D33' },
-      { name: 'Ubuntu', icon: ubuntu, color: '#E95420' },
-      { name: 'Linux Mint', icon: linuxmint, color: '#87CF3E' },
+      { name: 'Ubuntu', icon: icon('simple-icons:ubuntu'), color: '#E95420' },
+      { name: 'Linux Mint', icon: icon('simple-icons:linuxmint'), color: '#87CF3E' },
     ],
     icon: debian,
     color: '#A81D33',
-    action: { label: 'Download .deb', href: releaseFile(files.deb), download: true },
+    action: { label: 'Download .deb', href: releaseFile(`alto_${version}_amd64.deb`), download: true },
   },
   {
     id: 'rpm',
@@ -116,38 +101,35 @@ const packages: Package[] = [
     code: true,
     distros: [
       { name: 'Fedora', icon: fedora, color: '#51A2DA' },
-      { name: 'Red Hat', icon: redhat, color: '#EE0000' },
-      { name: 'openSUSE', icon: opensuse, color: '#73BA25' },
+      { name: 'Red Hat', icon: icon('simple-icons:redhat'), color: '#EE0000' },
+      { name: 'openSUSE', icon: icon('simple-icons:opensuse'), color: '#73BA25' },
     ],
     icon: fedora,
     color: '#51A2DA',
-    action: { label: 'Download .rpm', href: releaseFile(files.rpm), download: true },
+    action: { label: 'Download .rpm', href: releaseFile(`alto-${version}-1.x86_64.rpm`), download: true },
   },
   {
     id: 'appimage',
     name: 'AppImage',
     note: 'One file that runs on most distributions.',
-    icon: appimage,
+    icon: icon('simple-icons:appimage'),
     color: '#5C8FCB',
-    action: { label: 'Download AppImage', href: releaseFile(files.appimage), download: true },
+    action: { label: 'Download AppImage', href: releaseFile(`Alto-${version}-x64.AppImage`), download: true },
   },
   {
     id: 'flathub',
     name: 'Flathub',
     note: 'Any distribution with Flatpak.',
-    icon: flathub,
+    icon: icon('simple-icons:flathub'),
     // Flathub's mark is black: the page's text color, so it shows at night too.
     color: 'var(--fg)',
   },
 ];
 
-/** A CSS custom property's value, for `style`. */
-const vars = (values: Record<string, string | number>) => values as CSSProperties;
-
 function PackageRow({ p }: { p: Package }) {
   return (
     <li className={`${styles.package} ${p.action ? '' : styles.upcoming}`} id={p.id}>
-      <Icon svg={p.icon} className={styles.tile} style={vars({ '--brand': p.color })} />
+      <Icon svg={p.icon} className={styles.tile} style={cssVars({ '--brand': p.color })} />
       <div>
         <h3 className={styles.name}>
           {p.code ? <code>{p.name}</code> : p.name}
@@ -160,7 +142,7 @@ function PackageRow({ p }: { p: Package }) {
               For{' '}
               {p.distros.map((d, i) => (
                 <span key={d.name}>
-                  <span className={styles.distro} style={vars({ '--brand': d.color })}>
+                  <span className={styles.distro} style={cssVars({ '--brand': d.color })}>
                     <Icon svg={d.icon} className={styles.distroMark} />
                     {d.name}
                   </span>
@@ -185,7 +167,7 @@ function PackageRow({ p }: { p: Package }) {
           href={p.action.href}
           download={p.action.download ? '' : undefined}
         >
-          <Icon svg={downloadIcon} />
+          <Icon svg={downloadIcon()} />
           {p.action.label}
         </a>
       )}
@@ -205,7 +187,7 @@ export default function InstallPage() {
         <p className={`lede ${styles.lede}`} data-enter-fade="">
           Free and open source, under the GPL.
         </p>
-        <a className={styles.versionChip} href={LINKS.changelog} data-enter-fade="" style={vars({ '--i': 1 })}>
+        <a className={styles.versionChip} href={LINKS.changelog} data-enter-fade="" style={cssVars({ '--i': 1 })}>
           <span className={styles.version}>v{version}</span>
           See what's new
         </a>
@@ -215,10 +197,10 @@ export default function InstallPage() {
         className={`glass-panel ${styles.os}`}
         aria-labelledby="linux"
         data-enter-fade=""
-        style={vars({ '--i': 1 })}
+        style={cssVars({ '--i': 1 })}
       >
         <div className={styles.osHead}>
-          <Icon svg={linux} className={styles.osIcon} />
+          <Icon svg={icon('simple-icons:linux')} className={styles.osIcon} />
           <div>
             <h2 id="linux" className={styles.osName}>
               Linux
@@ -234,7 +216,7 @@ export default function InstallPage() {
       </section>
 
       {soon.map((row, i) => (
-        <div key={i} className={styles.soon} data-enter-fade="" style={vars({ '--i': 2 + i })}>
+        <div key={i} className={styles.soon} data-enter-fade="" style={cssVars({ '--i': 2 + i })}>
           {row.map((os) => (
             <section key={os.id} className={`glass-panel ${styles.os} ${styles.osSoon}`} aria-labelledby={os.id}>
               <Icon svg={os.icon} className={styles.osIcon} />
@@ -247,7 +229,7 @@ export default function InstallPage() {
         </div>
       ))}
 
-      <p className={styles.source} data-enter-fade="" style={vars({ '--i': 4 })}>
+      <p className={styles.source} data-enter-fade="" style={cssVars({ '--i': 4 })}>
         Every release, with its packages, is <Link href={`${LINKS.github}/releases`}>on GitHub</Link>. Or{' '}
         <Link href={`${LINKS.github}/blob/main/CONTRIBUTING.md`}>build it from source</Link>.
       </p>

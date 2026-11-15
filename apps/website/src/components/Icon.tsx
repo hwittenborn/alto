@@ -1,6 +1,6 @@
 /**
- * An icon from an icon set (`~icons/<set>/<name>?raw`, SVG markup sized 1em
- * square), inline with the text around it, in its color.
+ * An icon: SVG markup sized 1em square (icon() in src/lib/icons.ts), inline
+ * with the text around it, in its color.
  */
 import type { CSSProperties } from 'react';
 

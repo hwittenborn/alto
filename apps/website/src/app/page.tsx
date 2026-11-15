@@ -4,20 +4,18 @@
  * install band.
  */
 import type { Metadata } from 'next';
-import type { CSSProperties } from 'react';
 import DemoStage from '../demo/DemoStage';
 import { appIconSvg } from '../lib/app-icon';
 import { Icon } from '../components/Icon';
 import { Link } from '../components/Link';
-import { icon, providerLogos } from '../lib/icons';
-import { LINKS } from '../lib/providers';
+import { cssVars } from '../lib/css';
+import { downloadIcon, providerLogos } from '../lib/icons';
+import { LINKS } from '../lib/site';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { alternates: { canonical: '/' } };
 
-const downloadIcon = icon('ph:download-simple-bold');
-
-const order = (i: number) => ({ '--i': i }) as CSSProperties;
+const order = (i: number) => cssVars({ '--i': i });
 
 /** A reason's mark: a line drawing, in the accent color. */
 function Mark({ path }: { path: string }) {
@@ -49,16 +47,16 @@ export default function HomePage() {
           </p>
           <div className={styles.cta} data-enter-fade="" style={order(1)}>
             <a className="button primary" href={LINKS.install}>
-              <Icon svg={downloadIcon} /> Install Alto
+              <Icon svg={downloadIcon()} /> Install Alto
             </a>
           </div>
         </div>
         <div className={styles.pedestal}>
-          <DemoStage height="min(620px, 72vh)" logos={providerLogos()} appIcon={appIconSvg()} />
+          <DemoStage height="min(620px, 72vh)" assets={{ logos: providerLogos(), appIcon: appIconSvg() }} />
         </div>
       </section>
 
-      <section className={`wrap ${styles.points}`} aria-labelledby="points-title">
+      <section className="wrap" aria-labelledby="points-title">
         <h2 id="points-title" className="visually-hidden">
           Why Alto
         </h2>

@@ -6,10 +6,12 @@ import { getProvider, type ProviderId } from '@alto/core';
 import { AdwAvatar } from '@gtk-js/adwaita';
 import { replaceIDs } from '@iconify/utils';
 import { useMemo } from 'react';
+import { Icon } from '../components/Icon';
 import { AVATAR_SIZE, isLightTile } from '../lib/providers';
 import { useDemoAssets } from './assets';
 
-export function ProviderAvatar({ provider, size = AVATAR_SIZE }: { provider: ProviderId; size?: number }) {
+/** At the sidebar's size (AVATAR_SIZE), which the floating avatars are scaled up from. */
+export function ProviderAvatar({ provider }: { provider: ProviderId }) {
   const def = getProvider(provider);
   // Each avatar gets its own gradient IDs: with shared ones, a logo goes blank
   // when the first copy in the page is hidden.
@@ -19,8 +21,8 @@ export function ProviderAvatar({ provider, size = AVATAR_SIZE }: { provider: Pro
     <div
       className="alto-provider-avatar"
       style={{
-        width: size,
-        height: size,
+        width: AVATAR_SIZE,
+        height: AVATAR_SIZE,
         background: `#${def.color}`,
         display: 'flex',
         alignItems: 'center',
@@ -31,13 +33,8 @@ export function ProviderAvatar({ provider, size = AVATAR_SIZE }: { provider: Pro
         boxShadow: isLightTile(def) ? 'inset 0 0 0 1px rgb(0 0 0 / 12%)' : undefined,
       }}
     >
-      {/* The SVG is sized 1em square. */}
-      <span
-        aria-hidden="true"
-        style={{ display: 'flex', fontSize: Math.round(size * 0.6) }}
-        dangerouslySetInnerHTML={{ __html: logo }}
-      />
+      <Icon svg={logo} style={{ fontSize: Math.round(AVATAR_SIZE * 0.6) }} />
     </div>
   );
-  return <AdwAvatar size={size} text={def.label} customImage={image} />;
+  return <AdwAvatar size={AVATAR_SIZE} text={def.label} customImage={image} />;
 }

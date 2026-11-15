@@ -3,25 +3,40 @@
  * so the page is current with every release. Each release: its version, the
  * date under it (and a link to its release on GitHub), then its changes.
  */
-import fs from 'node:fs';
-import path from 'node:path';
 import type { Metadata } from 'next';
 import DocPage from '../../components/DocPage';
 import { Icon } from '../../components/Icon';
 import { Link } from '../../components/Link';
-import { formatDate, parseChangelog } from '../../lib/changelog';
+import { type Inline, parseChangelog } from '../../lib/changelog';
+import { formatDate } from '../../lib/dates';
 import { icon } from '../../lib/icons';
-import { LINKS } from '../../lib/providers';
+import { repoFile } from '../../lib/repo';
+import { LINKS } from '../../lib/site';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'Changelog · Alto',
+  title: 'Changelog',
   description: 'What changed in each release of Alto.',
   alternates: { canonical: '/changelog' },
 };
 
-const releases = parseChangelog(fs.readFileSync(path.resolve(process.cwd(), '../../CHANGELOG.md'), 'utf8'));
+const releases = parseChangelog(repoFile('CHANGELOG.md'));
 const linkIcon = icon('ph:arrow-square-out');
+
+/** A line of Markdown: its text, code and links. */
+function Text({ pieces }: { pieces: Inline[] }) {
+  return pieces.map((piece, i) =>
+    piece.href ? (
+      <Link key={i} href={piece.href}>
+        {piece.text}
+      </Link>
+    ) : piece.code ? (
+      <code key={i}>{piece.text}</code>
+    ) : (
+      piece.text
+    ),
+  );
+}
 
 export default function ChangelogPage() {
   return (
@@ -46,7 +61,9 @@ export default function ChangelogPage() {
             )}
           </header>
           {r.intro.map((p, i) => (
-            <p key={i} dangerouslySetInnerHTML={{ __html: p }} />
+            <p key={i}>
+              <Text pieces={p} />
+            </p>
           ))}
           {r.groups.map((g) => (
             <div key={g.title}>
@@ -54,9 +71,11 @@ export default function ChangelogPage() {
               <ul>
                 {g.changes.map((c, i) => (
                   <li key={i}>
-                    <span dangerouslySetInnerHTML={{ __html: c.html }} />
+                    <Text pieces={c.text} />
                     {c.refs.length > 0 && (
-                      <span className={styles.refs} dangerouslySetInnerHTML={{ __html: c.refs.join(' ') }} />
+                      <span className={styles.refs}>
+                        <Text pieces={c.refs} />
+                      </span>
                     )}
                   </li>
                 ))}

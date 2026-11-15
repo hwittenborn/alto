@@ -238,6 +238,10 @@ button.button {
 
 /* The hero arrives once, when the page shows: its headline rises line by line
    out of masks, then what follows it fades up 12px; the window settles in.
+   The homepage shows once its live Alto window is drawn (DemoStage marks the
+   page `[data-demo-pending]` until then), so it shows all at once: not
+   without the window, nor with what's around it out of place. Not for more
+   than 4 seconds, whatever happens, and not at all without scripts.
    Filled backwards only, so nothing keeps a transform once it has arrived: a
    transform left on the live window would misplace its tooltips and popovers,
    which are positioned against the screen. */
@@ -253,28 +257,65 @@ button.button {
   display: block;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html:not([data-entered]) .enter-line > span {
-    transform: translateY(110%);
-  }
-  html:not([data-entered]) [data-enter-fade] {
+@media (scripting: enabled) {
+  html:has([data-demo-pending]) body {
     opacity: 0;
-    transform: translateY(12px);
+    animation: shown 0s 4s forwards;
   }
-  html:not([data-entered]) [data-enter-settle] {
-    transform: scale(0.98);
-  }
+}
 
-  html[data-entered] .enter-line > span {
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  /* Held where the entrance starts, while the page waits. */
+  html:has([data-demo-pending]) .enter-line > span {
+    animation: held-rise 4s;
+  }
+  html:has([data-demo-pending]) [data-enter-fade] {
+    animation: held-fade 4s;
+  }
+  html:has([data-demo-pending]) [data-enter-settle] {
+    animation: held-settle 4s;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(:has([data-demo-pending])) .enter-line > span {
     animation: enter-rise 700ms var(--ease-enter) backwards;
     animation-delay: calc(var(--i, 0) * 80ms);
   }
-  html[data-entered] [data-enter-fade] {
+  html:not(:has([data-demo-pending])) [data-enter-fade] {
     animation: enter-fade 520ms var(--ease-enter) backwards;
     animation-delay: calc(350ms + var(--i, 0) * 60ms);
   }
-  html[data-entered] [data-enter-settle] {
+  html:not(:has([data-demo-pending])) [data-enter-settle] {
     animation: enter-settle 900ms var(--ease-enter) backwards;
+  }
+}
+
+@keyframes shown {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes held-rise {
+  from,
+  to {
+    transform: translateY(110%);
+  }
+}
+
+@keyframes held-fade {
+  from,
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes held-settle {
+  from,
+  to {
+    transform: scale(0.98);
   }
 }
 
@@ -321,11 +362,6 @@ button.button {
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-/* The homepage, until its demo is drawn (app/layout.tsx). */
-html[data-waiting] body {
-  opacity: 0;
 }
 
 img,

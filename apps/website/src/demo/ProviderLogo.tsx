@@ -7,6 +7,7 @@
  */
 import { getProvider, type ProviderId } from '@alto/core';
 import type { CSSProperties, Ref } from 'react';
+import { cssVars } from '../lib/css';
 import { AVATAR_SIZE } from '../lib/providers';
 import styles from './ProviderLogo.module.css';
 
@@ -29,14 +30,14 @@ export function ProviderLogo({ provider, size, className, style, slotRef }: Prop
       className={className ? `${styles.logo} ${className}` : styles.logo}
       data-alto-provider={provider}
       data-alto-label={label}
-      style={
-        {
+      style={{
+        ...cssVars({
           '--float-size': `${size}px`,
           '--float-scale': size / AVATAR_SIZE,
           '--avatar': `${AVATAR_SIZE}px`,
-          ...style,
-        } as CSSProperties
-      }
+        }),
+        ...style,
+      }}
     >
       <span ref={slotRef} className={`avatar-slot ${styles.slot}`} />
     </span>

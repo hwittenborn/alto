@@ -10,12 +10,12 @@ import path from 'node:path';
 import type { Metadata } from 'next';
 import DocPage from '../../components/DocPage';
 import { Link } from '../../components/Link';
-import { formatDate } from '../../lib/changelog';
-import { LINKS, SITE } from '../../lib/providers';
+import { formatDate } from '../../lib/dates';
+import { LINKS, SITE } from '../../lib/site';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'Privacy policy · Alto',
+  title: 'Privacy policy',
   description:
     'What Alto, the cloud sync app, and its website do with your data: it stays between your computer and your cloud provider.',
   alternates: { canonical: '/privacy' },

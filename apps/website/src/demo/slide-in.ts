@@ -1,16 +1,16 @@
 /**
- * The homepage's providers sliding into the live Alto window (AltoDemo): all
+ * The homepage's providers sliding into the live Alto window (DemoStage): all
  * of them, one after another, on Start Demo (`alto-demo:start`).
  *
- * A floating avatar (src/demo/ProviderLogo.tsx) is the sidebar's own 36px avatar,
- * scaled up. When it sets off, its account is added and its row laid out,
+ * A floating avatar (ProviderLogo) is the sidebar's own 36px avatar, scaled
+ * up. When it sets off, its account is added and its row laid out,
  * hidden, so where it's going is known exactly: it flies there, shrinking
  * back to its own size, and lands on its row's avatar, which is identical.
  * The row is shown and the avatar steps aside (nothing visibly changes),
  * then the row's pill and name slide out from behind it.
  */
 import type { ProviderId } from '@alto/core';
-import { AVATAR_SIZE } from './providers';
+import { AVATAR_SIZE } from '../lib/providers';
 
 /** Google Drive first, the rest this long after it (ms)... */
 const FIRST_INTERVAL = 600;

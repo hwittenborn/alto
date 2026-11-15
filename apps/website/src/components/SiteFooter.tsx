@@ -1,4 +1,4 @@
-import { LINKS } from '../lib/providers';
+import { LINKS } from '../lib/site';
 import { Link } from './Link';
 import styles from './SiteFooter.module.css';
 

@@ -10,6 +10,5 @@ export default {
   // Published as TypeScript source.
   transpilePackages: ['@alto/core', '@alto/react', '@gtk-js/icons-adwaita', '@gtk-js/icons-gtk4'],
   turbopack: { root },
-  outputFileTracingRoot: root,
   devIndicators: false,
 } satisfies NextConfig;

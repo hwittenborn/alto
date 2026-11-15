@@ -11,26 +11,24 @@ import {
   getProvider,
   initialState,
   overallStatus,
-  type ProviderId,
   type RemoteView,
 } from '@alto/core';
+import type { SiteProviderId } from '../lib/providers';
 
 const HOME = '/home/you';
 const GiB = 1024 ** 3;
 
 /** What each provider's pretend account looks like. */
-const ACCOUNTS: Record<ProviderId, { account: string; used: number; total: number }> = {
+const ACCOUNTS: Record<SiteProviderId, { account: string; used: number; total: number }> = {
   gdrive: { account: 'you@gmail.com', used: 9.4 * GiB, total: 15 * GiB },
   dropbox: { account: 'you@example.com', used: 1.2 * GiB, total: 2 * GiB },
   onedrive: { account: 'you@outlook.com', used: 3.8 * GiB, total: 5 * GiB },
   protondrive: { account: 'you@protonmail.com', used: 2.7 * GiB, total: 5 * GiB },
   nextcloud: { account: 'you@cloud.example.com', used: 41 * GiB, total: 100 * GiB },
-  owncloud: { account: 'you@files.example.com', used: 12 * GiB, total: 50 * GiB },
-  webdav: { account: 'you@dav.example.com', used: 3 * GiB, total: 20 * GiB },
 };
 
 /** The folders each account syncs: a folder in the home folder, and where on the server. */
-const ACCOUNT_FOLDERS: Record<ProviderId, Array<[local: string, remote: string]>> = {
+const ACCOUNT_FOLDERS: Record<SiteProviderId, Array<[local: string, remote: string]>> = {
   gdrive: [
     ['Documents', 'Documents'],
     ['Pictures', 'Photos'],
@@ -52,8 +50,6 @@ const ACCOUNT_FOLDERS: Record<ProviderId, Array<[local: string, remote: string]>
     ['Music', 'Music'],
     ['Recipes', 'Shared/Recipes'],
   ],
-  owncloud: [['Shared', 'Shared']],
-  webdav: [['Backups', 'Backups']],
 };
 
 /** File names a sync shows going past. */
@@ -105,7 +101,7 @@ export class FakeAlto {
    * start syncing. The first account's first folder has a big sync, to watch
    * while the others arrive.
    */
-  connect(provider: ProviderId): void {
+  connect(provider: SiteProviderId): void {
     const first = this.state.remotes.length === 0;
     const name = this.addRemoteNow(provider);
     const ids = ACCOUNT_FOLDERS[provider].map(([local, remote]) =>
@@ -187,7 +183,7 @@ export class FakeAlto {
 
   // ---- State ----
 
-  private addRemoteNow(provider: ProviderId): string {
+  private addRemoteNow(provider: SiteProviderId): string {
     const label = getProvider(provider).label;
     let unique = label;
     for (let n = 2; this.state.remotes.some((r) => r.name === unique); n++) unique = `${label} ${n}`;

@@ -4,8 +4,8 @@
  * floating frosted pill (ScrollPill), and spreads out again back at the top.
  */
 import { appIconUrl } from '../lib/app-icon';
-import { icon } from '../lib/icons';
-import { LINKS } from '../lib/providers';
+import { downloadIcon, icon } from '../lib/icons';
+import { LINKS } from '../lib/site';
 import { Icon } from './Icon';
 import { Link } from './Link';
 import { ScrollPill } from './ScrollPill';
@@ -27,7 +27,7 @@ export default function SiteHeader() {
             <span className={styles.label}>GitHub</span>
           </Link>
           <a className="button primary small" href={LINKS.install}>
-            <Icon svg={icon('ph:download-simple-bold')} />
+            <Icon svg={downloadIcon()} />
             Install Alto
           </a>
         </nav>

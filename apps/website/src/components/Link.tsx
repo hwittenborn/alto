@@ -3,7 +3,7 @@
  * an empty one) or an app link like snap:// (it opens an app, not a page).
  */
 import type { AnchorHTMLAttributes } from 'react';
-import { isExternal } from '../lib/providers';
+import { isExternal } from '../lib/site';
 
 export function Link({ href, ...props }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) {
   const newTab = isExternal(href) && props.download === undefined;

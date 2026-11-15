@@ -28,8 +28,16 @@ jobs:
       # Just the site's dependencies, not the desktop app's (Electron and its
       # packaging tools), and none of their install scripts.
       - run: npm ci --workspace @alto/website --include-workspace-root=false --ignore-scripts
+      # Next's build cache, so a build only redoes what changed.
+      - uses: actions/cache@v6
+        with:
+          path: apps/website/.next/cache
+          key: website-next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('apps/website/src/**', 'packages/core/src/**', 'packages/react/src/**') }}
+          restore-keys: website-next-${{ hashFiles('package-lock.json') }}-
       - run: npm run build --workspace @alto/website
-      - uses: actions/upload-pages-artifact@v5
+      # Only what's deployed: a PR's build just has to work.
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
         with:
           path: apps/website/out
 

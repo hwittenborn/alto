@@ -19,22 +19,22 @@
  * - `alto-demo:reset` removes them all.
  * It dispatches `alto-demo:ready` once it's drawn, floating avatars included.
  */
-import { createAltoClient, type ProviderId } from '@alto/core';
+import { createAltoClient } from '@alto/core';
 import { GtkProviderBoundary } from '@gtk-js/gtk4';
-import { type CSSProperties, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AVATAR_SIZE, SITE_PROVIDERS } from '../lib/providers';
-import { setupSlideIn } from '../lib/slide-in';
+import { cssVars } from '../lib/css';
+import { AVATAR_SIZE, SITE_PROVIDERS, type SiteProviderId } from '../lib/providers';
 import { type DemoAssets, DemoAssetsContext } from './assets';
 import DemoApp from './DemoApp';
 import { FakeAlto } from './fake-alto';
 import { ProviderAvatar } from './ProviderAvatar';
 import { ProviderLogo } from './ProviderLogo';
+import { setupSlideIn } from './slide-in';
 import styles from './DemoStage.module.css';
 import { useMounted } from './use-mounted';
-// GNOME's interface font, in the weights GTK's theme uses.
+// GNOME's interface font, in the weights GTK's theme uses (400, 700, 800).
 import '@fontsource/adwaita-sans/400.css';
-import '@fontsource/adwaita-sans/600.css';
 import '@fontsource/adwaita-sans/700.css';
 import '@fontsource/adwaita-sans/800.css';
 import './demo.css';
@@ -57,26 +57,34 @@ const SPOTS = [
 /** The avatars' size on phones, in a row above the window. */
 const PHONE_SIZE = 48;
 
-interface Props extends DemoAssets {
+interface Props {
   /** The window's height, as CSS. */
   height: string;
+  assets: DemoAssets;
 }
 
-export default function DemoStage({ height, logos, appIcon }: Props) {
+/**
+ * Marks the page as waiting for the demo, until it's drawn (site.css holds the
+ * homepage hidden meanwhile, for up to 4 seconds).
+ */
+const pending = <div data-demo-pending="" hidden />;
+
+export default function DemoStage({ height, assets }: Props) {
   const mounted = useMounted();
-  const [assets] = useState(() => ({ logos, appIcon }));
   const [demo] = useState(() => {
     const alto = new FakeAlto();
     return { alto, client: createAltoClient(alto.transport) };
   });
   /** Each floating avatar's slot, once it's in the page. */
-  const [slots, setSlots] = useState<Partial<Record<ProviderId, HTMLElement>>>({});
+  const [slots, setSlots] = useState<Partial<Record<SiteProviderId, HTMLElement>>>({});
   const drawn = SITE_PROVIDERS.every((id) => slots[id]);
+  /** Drawn, and shown (a frame on). */
+  const [ready, setReady] = useState(false);
   /** Whether the demo has been started (and not restarted since). */
   const [started, setStarted] = useState(false);
 
   useEffect(() => {
-    const onConnect = (e: Event) => demo.alto.connect((e as CustomEvent<ProviderId>).detail);
+    const onConnect = (e: Event) => demo.alto.connect((e as CustomEvent<SiteProviderId>).detail);
     const onReset = () => demo.alto.reset();
     window.addEventListener('alto-demo:connect', onConnect);
     window.addEventListener('alto-demo:reset', onReset);
@@ -91,6 +99,7 @@ export default function DemoStage({ height, logos, appIcon }: Props) {
   useEffect(() => {
     if (!drawn) return;
     const frame = requestAnimationFrame(() => {
+      setReady(true);
       window.altoDemoReady = true;
       window.dispatchEvent(new Event('alto-demo:ready'));
     });
@@ -103,14 +112,15 @@ export default function DemoStage({ height, logos, appIcon }: Props) {
     setStarted(!started);
   };
 
-  if (!mounted) return null;
+  if (!mounted) return pending;
   return (
     <DemoAssetsContext value={assets}>
+      {!ready && pending}
       <section
         className={styles.stage}
         id="try"
         aria-label="Alto, live"
-        style={{ '--phone-size': `${PHONE_SIZE}px`, '--phone-scale': PHONE_SIZE / AVATAR_SIZE } as CSSProperties}
+        style={cssVars({ '--phone-size': `${PHONE_SIZE}px`, '--phone-scale': PHONE_SIZE / AVATAR_SIZE })}
       >
         <div className={styles.logos}>
           {SITE_PROVIDERS.map((id, i) => {
@@ -121,7 +131,7 @@ export default function DemoStage({ height, logos, appIcon }: Props) {
                 provider={id}
                 size={spot.size}
                 className={styles.spot}
-                style={{ left: spot.left, top: spot.top, '--float-delay': `${-i * 1.3}s` } as CSSProperties}
+                style={{ left: spot.left, top: spot.top, ...cssVars({ '--float-delay': `${-i * 1.3}s` }) }}
                 slotRef={(el) => {
                   if (el) setSlots((current) => (current[id] === el ? current : { ...current, [id]: el }));
                 }}

@@ -2,7 +2,8 @@
  * A page of writing (the changelog, the privacy policy): its title and a line
  * under it, then the text, set for reading.
  */
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { cssVars } from '../lib/css';
 import styles from './DocPage.module.css';
 
 interface Props {
@@ -37,7 +38,7 @@ export default function DocPage({ title, lede, meta, still = false, children }: 
         )}
         {meta}
       </header>
-      <article className={styles.prose} {...fade} style={{ '--i': 1 } as CSSProperties}>
+      <article className={styles.prose} {...fade} style={cssVars({ '--i': 1 })}>
         {children}
       </article>
     </main>
