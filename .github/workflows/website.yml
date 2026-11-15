@@ -1,56 +1,13 @@
 name: Website
 on:
   pull_request:
-  push:
-    branches: [main]
-  workflow_dispatch:
 
 concurrency:
   group: website-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 jobs:
   # Builds apps/website on every PR, so a broken site never reaches main.
+  # (Vercel builds a preview of it too: apps/website/vercel.json.)
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          # The privacy policy's "Last updated" date is its file's last commit
-          # (apps/website/src/app/privacy/page.tsx), so the history is needed,
-          # though not the old versions of every file.
-          fetch-depth: 0
-          filter: blob:none
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-      # Just the site's dependencies, not the desktop app's (Electron and its
-      # packaging tools), and none of their install scripts.
-      - run: npm ci --workspace @alto/website --include-workspace-root=false --ignore-scripts
-      - run: npm run build --workspace @alto/website
-      # Only what's deployed: a PR's build just has to work.
-      - if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: apps/website/out
-
-  # Pushes to main publish the site to GitHub Pages (its custom domain is set in
-  # the repository's Pages settings). The install page links to the version in
-  # package.json, so a release's merge republishes it.
-  deploy:
-    needs: build
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    steps:
-      - uses: actions/deploy-pages@v5
-        id: deployment
+    uses: ./.github/workflows/website-build.yml

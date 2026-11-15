@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && npm ci --workspace @alto/website --include-workspace-root=false --ignore-scripts",
+  "git": { "deploymentEnabled": { "main": false } }
+}
