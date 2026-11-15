@@ -171,36 +171,6 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
     oauth: ONEDRIVE_OAUTH,
   },
   {
-    id: 'jottacloud',
-    label: 'Jottacloud',
-    rcloneType: 'jottacloud',
-    // Signs in with the browser, unless a personal login token is given (see
-    // `signsInWithBrowser`).
-    auth: 'oauth',
-    fields: [
-      {
-        id: 'service',
-        label: 'Service',
-        kind: 'select',
-        required: true,
-        defaultValue: 'jottacloud',
-        options: JOTTACLOUD_SERVICES.map(({ value, label }) => ({ value, label })),
-      },
-      { id: 'loginToken', label: 'Personal Login Token', kind: 'password', required: false, advanced: true },
-    ],
-    color: 'FFFFFF',
-    iconSlug: 'jottacloud',
-    fallbackIcon: 'folder-remote-symbolic',
-    advancedHelp: {
-      title: 'Login Token',
-      description:
-        'Sign in with a personal login token from your account’s security settings instead of your browser. ' +
-        'This lets you stay signed in to Jottacloud’s own apps on this computer too.',
-      url: 'https://www.jottacloud.com/web/secure',
-      linkLabel: 'Generate a token',
-    },
-  },
-  {
     id: 'protondrive',
     label: 'Proton Drive',
     rcloneType: 'protondrive',
@@ -229,6 +199,36 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
     color: '041E42',
     iconSlug: 'owncloud-light',
     fallbackIcon: 'folder-remote-symbolic',
+  },
+  {
+    id: 'jottacloud',
+    label: 'Jottacloud',
+    rcloneType: 'jottacloud',
+    // Signs in with the browser, unless a personal login token is given (see
+    // `signsInWithBrowser`).
+    auth: 'oauth',
+    fields: [
+      {
+        id: 'service',
+        label: 'Service',
+        kind: 'select',
+        required: true,
+        defaultValue: 'jottacloud',
+        options: JOTTACLOUD_SERVICES.map(({ value, label }) => ({ value, label })),
+      },
+      { id: 'loginToken', label: 'Personal Login Token', kind: 'password', required: false, advanced: true },
+    ],
+    color: 'FFFFFF',
+    iconSlug: 'jottacloud',
+    fallbackIcon: 'folder-remote-symbolic',
+    advancedHelp: {
+      title: 'Login Token',
+      description:
+        'Sign in with a personal login token from your account’s security settings instead of your browser. ' +
+        'This lets you stay signed in to Jottacloud’s own apps on this computer too.',
+      url: 'https://www.jottacloud.com/web/secure',
+      linkLabel: 'Generate a token',
+    },
   },
   {
     id: 'webdav',
