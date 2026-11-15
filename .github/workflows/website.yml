@@ -8,5 +8,5 @@ concurrency:
 
 jobs:
   # Builds apps/website on every PR, so a broken site never reaches main.
-  build:
+  website:
     uses: ./.github/workflows/website-build.yml
