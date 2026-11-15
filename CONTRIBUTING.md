@@ -89,7 +89,7 @@ a matter of describing how to log in to it. Everything lives in `packages/core/s
 Then, outside of `providers.ts`:
 
 - If its logo is in [selfh.st/icons](https://selfh.st/icons), set `iconSlug` (and `color: 'FFFFFF'`) and import it
-  into `LOGOS` in `src/renderer/providers.tsx`. If it isn't, add the logo to `assets/logos` as a white, 1em square
-  SVG for its brand color, and import that instead. Without one, the provider gets a generic folder icon.
+  into `LOGOS` in `src/renderer/providers.tsx`. If it isn't, add the logo to `assets/logos` as a 1em square SVG and
+  import that instead. Without one, the provider gets a generic folder icon.
 - If a field needs more than a required check, add the validation to `packages/core/src/validation.ts`.
 - Add the provider to the list in the README.

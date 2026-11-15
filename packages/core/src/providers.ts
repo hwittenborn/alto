@@ -188,7 +188,7 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
       },
       { id: 'loginToken', label: 'Personal Login Token', kind: 'password', required: false, advanced: true },
     ],
-    color: '7D5FE6',
+    color: 'FFFFFF',
     iconSlug: 'jottacloud',
     fallbackIcon: 'folder-remote-symbolic',
     advancedHelp: {

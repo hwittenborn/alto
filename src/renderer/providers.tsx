@@ -13,9 +13,9 @@ import protonDrive from '~icons/selfhst/proton-drive?raw';
 /**
  * Brand logos as SVG markup, by `iconSlug`: from selfh.st/icons (CC BY 4.0),
  * Nextcloud's from Simple Icons (CC0), whose selfh.st logos are all app
- * tiles, and Jottacloud's (in neither) in `assets/logos`. The `-light` ones,
- * Nextcloud's and Jottacloud's are white, for the brand color behind them.
- * The others are full color, on white.
+ * tiles, and Jottacloud's (in neither) in `assets/logos`. The `-light` ones
+ * and Nextcloud's are white, for the brand color behind them. The others are
+ * full color, on white.
  */
 const LOGOS: Record<string, string> = {
   'dropbox-light': dropbox,
