@@ -1,0 +1,38 @@
+/* The website's Alto window (DemoApp): what it takes from the app's own styles (src/index.css). */
+
+.alto-demo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* The window's shadow is drawn inside its box (allocateShadow), so no clipping here. */
+}
+
+/* GNOME's interface font, Adwaita Sans (imported by AltoDemo). */
+[data-gtk-provider] {
+  --gtk-font-family: 'Adwaita Sans', sans-serif;
+}
+
+/* Sidebar rows (Fractal's account switcher style). */
+.alto-remote-row {
+  padding: 6px 2px;
+  min-height: 40px;
+}
+
+.alto-remote-name {
+  font-weight: bold;
+}
+
+.alto-status-icon {
+  min-width: 16px;
+  min-height: 16px;
+}
+
+.alto-progress {
+  min-width: 120px;
+}
+
+/* An account's row is laid out from when its avatar sets off (so the avatar
+   knows where it's going), and shown once it lands (src/lib/slide-in.ts). */
+.alto-demo .navigation-sidebar > .gtk-row[data-remote]:not([data-arrived]) {
+  visibility: hidden;
+}

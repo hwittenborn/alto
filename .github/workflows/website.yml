@@ -1,0 +1,12 @@
+name: Website
+on:
+  pull_request:
+
+concurrency:
+  group: website-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Builds apps/website on every PR, so a broken site never reaches main.
+  website:
+    uses: ./.github/workflows/website-build.yml
