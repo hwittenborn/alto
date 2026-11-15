@@ -33,6 +33,7 @@ Alto keeps folders on your computer in sync with your cloud storage, such as Goo
 - Google Drive
 - Dropbox
 - OneDrive
+- Jottacloud (and the services built on it, like Telia Cloud, Tele2 Cloud and Elgiganten Cloud)
 - Proton Drive
 - Nextcloud
 - ownCloud
