@@ -1,6 +1,14 @@
 # Alto
 
-Alto keeps folders on your computer in sync with your cloud storage, such as Google Drive, Dropbox, Proton Drive and
+<div>
+  <a href="https://snapcraft.io/alto">
+     <img width="150" alt="Get it from the Snap Store" src=https://snapcraft.io/en/dark/install.svg />
+  </a>
+  <br />
+  <br />
+</div>
+
+Alto keeps folders on your computer in sync with your cloud storage, such as Google Drive, Dropbox, OneDrive, Proton Drive and
 [more](#supported-providers). It's built to look and feel native on your desktop, with current support for Linux
 (GNOME specifically, with apps for macOS, Windows, and Android in the works).
 
@@ -24,6 +32,7 @@ Alto keeps folders on your computer in sync with your cloud storage, such as Goo
 
 - Google Drive
 - Dropbox
+- OneDrive
 - Proton Drive
 - Nextcloud
 - ownCloud

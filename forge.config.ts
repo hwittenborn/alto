@@ -20,7 +20,7 @@ const linuxOptions = {
   productName: 'Alto',
   description: 'Bidirectional file sync for GNOME, powered by rclone',
   productDescription:
-    'Alto keeps folders on your computer in sync with cloud storage: Google Drive, Dropbox, Proton Drive, ' +
+    'Alto keeps folders on your computer in sync with cloud storage: Google Drive, Dropbox, OneDrive, Proton Drive, ' +
     'Nextcloud, ownCloud and WebDAV. Changes on both sides are merged, conflicts are ' +
     'never overwritten silently, and exclusion patterns are shared between all your devices.',
   homepage: 'https://github.com/hwittenborn/alto',

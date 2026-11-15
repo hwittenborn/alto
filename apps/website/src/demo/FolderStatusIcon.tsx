@@ -1,0 +1,19 @@
+/** The status indicator in front of a synced folder, as the app has it. */
+import { type FolderView, folderStatusIcon, type StatusIcon } from '@alto/core';
+import { GtkImage, GtkSpinner } from '@gtk-js/adwaita';
+
+const ICONS: Record<Exclude<StatusIcon, 'syncing'>, { icon: string; className: string }> = {
+  awaiting: { icon: 'ContentLoading', className: 'dim-label' },
+  synced: { icon: 'ObjectSelect', className: 'success' },
+  warning: { icon: 'DialogWarning', className: 'warning' },
+  offline: { icon: 'NetworkOffline', className: 'dim-label' },
+  error: { icon: 'DialogError', className: 'error' },
+  paused: { icon: 'MediaPlaybackPause', className: 'dim-label' },
+};
+
+export function FolderStatusIcon({ folder }: { folder: FolderView }) {
+  const status = folderStatusIcon(folder);
+  if (status === 'syncing') return <GtkSpinner spinning className="alto-status-icon" />;
+  const { icon, className } = ICONS[status];
+  return <GtkImage iconName={icon} className={`alto-status-icon ${className}`} />;
+}

@@ -1,0 +1,31 @@
+name: Deploy the website
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    uses: ./.github/workflows/website-build.yml
+    with:
+      upload: true
+
+  # Publishes the site to GitHub Pages (its custom domain is set in the
+  # repository's Pages settings). The install page links to the version in
+  # package.json, so a release's merge republishes it.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deployment

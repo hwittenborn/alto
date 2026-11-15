@@ -3,3 +3,8 @@ out/
 .vite/
 *.md
 .rclone/
+apps/website/out/
+apps/website/.next/
+apps/website/next-env.d.ts
+# Prettier only understands MDX 1, and would break MDX 3 syntax.
+*.mdx

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Alto
-Comment=Keep folders in sync with Google Drive, Dropbox, Proton Drive, Nextcloud and more
+Comment=Keep folders in sync with Google Drive, Dropbox, OneDrive, Proton Drive, Nextcloud and more
 Exec=alto %U
 Icon=alto
 Terminal=false

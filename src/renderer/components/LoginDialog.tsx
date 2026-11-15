@@ -23,9 +23,11 @@ import {
   AdwToolbarView,
   GtkBox,
   GtkButton,
+  GtkExpander,
   GtkImage,
   GtkLabel,
   GtkMenuButton,
+  GtkRevealer,
   type GtkMenuModel,
   GtkScrolledWindow,
   GtkSpinner,
@@ -142,6 +144,7 @@ function LoginFlow({
   const [name, setName] = useState('');
   const [values, setValues] = useState<ProviderValues>({});
   const [busy, setBusy] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   // The accounts there were when the form opened: the one it adds mustn't count against its own name.
   const [takenNames, setTakenNames] = useState<string[]>([]);
 
@@ -169,6 +172,7 @@ function LoginFlow({
     setTakenNames(remoteNames);
     setName(uniqueName(def.label, remoteNames));
     setValues(Object.fromEntries(def.fields.filter((f) => f.defaultValue).map((f) => [f.id, f.defaultValue])));
+    setShowAdvanced(false);
     setStack(['providers', 'form']);
   };
 
@@ -178,7 +182,7 @@ function LoginFlow({
     if (provider.auth === 'oauth') setStack(['providers', 'form', 'browser']);
     const result =
       provider.auth === 'oauth'
-        ? await alto.loginWithBrowser({ provider: providerId, name: name.trim() })
+        ? await alto.loginWithBrowser({ provider: providerId, name: name.trim(), values })
         : await alto.createRemote({ provider: providerId, name: name.trim(), values });
     setBusy(false);
     if (result.ok) {
@@ -194,8 +198,22 @@ function LoginFlow({
   // Fields aren't flagged until they're filled in; the first problem is also
   // spelled out below them.
   const nameError = name !== '' ? validation.errors.name : undefined;
-  const fieldErrors = provider.fields.map((f) => ((values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined));
+  // Advanced fields (a custom OAuth client) aren't flagged: their only problem
+  // is a missing half, which isn't the filled-in half's fault. It's explained
+  // when hovering the login button instead.
+  const fieldErrors = provider.fields.map((f) =>
+    !f.advanced && (values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined,
+  );
   const shownError = [nameError, ...fieldErrors].find(Boolean);
+  const advancedError = provider.fields.map((f) => (f.advanced ? validation.errors[f.id] : undefined)).find(Boolean);
+  const rows = provider.fields.map((field, i) => ({ field, error: fieldErrors[i] }));
+  const fieldRows = (advanced: boolean) =>
+    rows
+      .filter(({ field }) => !!field.advanced === advanced)
+      .map(({ field, error }) =>
+        fieldRow(field, values, (id, v) => setValues((current) => ({ ...current, [id]: v })), error, submit),
+      );
+  const advancedRows = fieldRows(true);
 
   const formPage = (
     <AdwToolbarView
@@ -228,21 +246,59 @@ function LoginFlow({
                   onChanged={setName}
                   onEntryActivated={submit}
                 />
-                {provider.fields.map((field, i) =>
-                  fieldRow(
-                    field,
-                    values,
-                    (id, v) => setValues((current) => ({ ...current, [id]: v })),
-                    fieldErrors[i],
-                    submit,
-                  ),
-                )}
+                {fieldRows(false)}
               </AdwPreferencesGroup>
+              {advancedRows.length > 0 && (
+                <GtkBox orientation="vertical">
+                  {/* Only the toggle: the fields go below it, so it can be centered over them. */}
+                  <GtkExpander
+                    halign="center"
+                    labelWidget={<GtkLabel className="dim-label alto-advanced-label" label="Advanced" />}
+                    expanded={showAdvanced}
+                    onExpandedChanged={setShowAdvanced}
+                    data-action="advanced"
+                  />
+                  {/* GtkExpander shows its child at once; a revealer slides the fields in and out. */}
+                  <GtkRevealer revealChild={showAdvanced}>
+                    <GtkBox orientation="vertical" className="alto-advanced-content">
+                      {provider.oauth ? (
+                        /*
+                          TODO: Use AdwPreferencesGroup's own title and description once gtk-js
+                          renders links in the description, as libadwaita does (gtk-js parses it as
+                          plain Pango markup, which has no <a>, and shows nothing). Until then, the
+                          header is drawn here: libadwaita's header is these two labels, 6px apart
+                          and 12px above the rows.
+                        */
+                        <GtkBox orientation="vertical" spacing={12}>
+                          <GtkBox orientation="vertical" spacing={6}>
+                            <GtkLabel className="heading" xalign={0} wrap label="Custom Client" />
+                            <GtkLabel
+                              className="body dimmed"
+                              xalign={0}
+                              wrap
+                              useMarkup
+                              label={`Use your own OAuth client instead of Alto’s. <a href="${provider.oauth.customClientHelpUrl}">Learn how to make one</a>.`}
+                              onActivateLink={(uri) => {
+                                void host.openUrl(uri);
+                                return true;
+                              }}
+                            />
+                          </GtkBox>
+                          <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
+                        </GtkBox>
+                      ) : (
+                        <AdwPreferencesGroup>{advancedRows}</AdwPreferencesGroup>
+                      )}
+                    </GtkBox>
+                  </GtkRevealer>
+                </GtkBox>
+              )}
               {shownError && <GtkLabel className="caption error" wrap xalign={0} label={shownError} />}
               <GtkButton
                 className={google ? 'pill' : 'pill suggested-action'}
                 halign="center"
                 disabled={!validation.valid || busy}
+                tooltipText={advancedError}
                 onClicked={submit}
                 data-action="login"
               >
