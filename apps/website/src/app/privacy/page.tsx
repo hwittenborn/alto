@@ -80,11 +80,8 @@ export default function PrivacyPage() {
           nothing you do in it is sent anywhere.
         </li>
         <li>
-          The site is hosted on GitHub Pages. Like any web host, GitHub may log technical details of visits, such as IP
-          addresses, as described in the{' '}
-          <Link href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">
-            GitHub General Privacy Statement
-          </Link>
+          The site is hosted on Vercel. Like any web host, Vercel may log technical details of visits, such as IP
+          addresses, as described in <Link href="https://vercel.com/legal/privacy-policy">Vercel's privacy policy</Link>
           .
         </li>
       </ul>

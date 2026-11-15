@@ -5,7 +5,7 @@ import type { NextConfig } from 'next';
 const root = path.resolve(import.meta.dirname, '../..');
 
 export default {
-  // A static site, for GitHub Pages: every page is built to HTML (into out/).
+  // A static site: every page is built to HTML (into out/), which Vercel serves.
   output: 'export',
   // Published as TypeScript source.
   transpilePackages: ['@alto/core', '@alto/react', '@gtk-js/icons-adwaita', '@gtk-js/icons-gtk4'],
