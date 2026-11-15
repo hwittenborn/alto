@@ -32,7 +32,6 @@ import { ProviderAvatar } from './ProviderAvatar';
 import { DemoPending } from './DemoPending';
 import { ProviderLogo } from './ProviderLogo';
 import { setupSlideIn } from './slide-in';
-import styles from './DemoStage.module.css';
 // GNOME's interface font, in the weights GTK's theme uses (400, 700, 800).
 import '@fontsource/adwaita-sans/400.css';
 import '@fontsource/adwaita-sans/700.css';
@@ -109,12 +108,12 @@ export default function DemoStage({ height, assets }: Props) {
     <DemoAssetsContext value={assets}>
       {!ready && <DemoPending />}
       <section
-        className={styles.stage}
+        className="relative px-[var(--stage-gutter,44px)] max-[720px]:px-0"
         id="try"
         aria-label="Alto, live"
         style={cssVars({ '--phone-size': `${PHONE_SIZE}px`, '--phone-scale': PHONE_SIZE / AVATAR_SIZE })}
       >
-        <div className={styles.logos}>
+        <div className="max-[720px]:flex max-[720px]:justify-center max-[720px]:flex-wrap max-[720px]:gap-3.5 max-[720px]:mb-[22px]">
           {SITE_PROVIDERS.map((id, i) => {
             const spot = SPOTS[i]!;
             return (
@@ -122,7 +121,7 @@ export default function DemoStage({ height, assets }: Props) {
                 key={id}
                 provider={id}
                 size={spot.size}
-                className={styles.spot}
+                className="absolute z-5 m-[calc(var(--size)/-2)_0_0_calc(var(--size)/-2)] max-[720px]:static max-[720px]:m-0 max-[720px]:[--size:var(--phone-size)] max-[720px]:[--scale:var(--phone-scale)]"
                 style={{ left: spot.left, top: spot.top, ...cssVars({ '--float-delay': `${-i * 1.3}s` }) }}
                 slotRef={(el) => {
                   if (el) setSlots((current) => (current[id] === el ? current : { ...current, [id]: el }));
@@ -131,7 +130,7 @@ export default function DemoStage({ height, assets }: Props) {
             );
           })}
         </div>
-        <div className={styles.window} data-enter-settle="" style={{ height }}>
+        <div className="relative z-1 origin-[50%_40%]" data-enter-settle="" style={{ height }}>
           <div className="alto-demo">
             <DemoApp client={demo.client}>
               {SITE_PROVIDERS.map((id) => {
@@ -150,7 +149,7 @@ export default function DemoStage({ height, assets }: Props) {
             </DemoApp>
           </div>
         </div>
-        <div className={styles.controls}>
+        <div className="flex justify-center mt-[18px]">
           <button type="button" className="button primary" onClick={toggle}>
             {started ? 'Restart' : 'Start Demo'}
           </button>

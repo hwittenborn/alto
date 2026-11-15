@@ -9,6 +9,10 @@ export default {
   output: 'export',
   // Published as TypeScript source.
   transpilePackages: ['@alto/core', '@alto/react', '@gtk-js/icons-adwaita', '@gtk-js/icons-gtk4'],
-  turbopack: { root },
+  turbopack: {
+    root,
+    // Tailwind, as create-next-app sets it up.
+    rules: { '*.css': { loaders: ['@tailwindcss/turbopack'], as: '*.css' } },
+  },
   devIndicators: false,
 } satisfies NextConfig;

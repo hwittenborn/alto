@@ -15,7 +15,6 @@ import { Link } from '../../components/Link';
 import { cssVars } from '../../lib/css';
 import { downloadIcon, icon } from '../../lib/icons';
 import { LINKS } from '../../lib/site';
-import styles from './page.module.css';
 
 export const metadata: Metadata = {
   title: { absolute: 'Install Alto' },
@@ -128,22 +127,29 @@ const packages: Package[] = [
 
 function PackageRow({ p }: { p: Package }) {
   return (
-    <li className={`${styles.package} ${p.action ? '' : styles.upcoming}`} id={p.id}>
-      <Icon svg={p.icon} className={styles.tile} style={cssVars({ '--brand': p.color })} />
+    <li
+      className={`grid grid-cols-[36px_minmax(0,1fr)_196px] items-center gap-[18px] py-4 [&+&]:[border-top:1px_solid_var(--line)] max-[560px]:grid-cols-[36px_minmax(0,1fr)] max-[560px]:gap-x-3.5 max-[560px]:gap-y-3 ${p.action ? '' : '[&_.tile]:opacity-55'}`}
+      id={p.id}
+    >
+      <Icon
+        svg={p.icon}
+        className="tile grid place-items-center size-[1.875em] rounded-[10px] text-[1.2em] text-(--brand) bg-[color-mix(in_srgb,var(--brand)_14%,transparent)]"
+        style={cssVars({ '--brand': p.color })}
+      />
       <div>
-        <h3 className={styles.name}>
+        <h3 className="flex items-center gap-2 text-[1.05rem] font-medium m-0 [&_code]:text-[0.92em] [&_code]:py-px [&_code]:px-[7px] [&_code]:rounded-md [&_code]:bg-bg [&_code]:shadow-[inset_0_0_0_1px_var(--line)]">
           {p.code ? <code>{p.name}</code> : p.name}
           {p.recommended && <span className="chip">Recommended</span>}
           {!p.action && <span className="chip">Coming soon</span>}
         </h3>
-        <p className={styles.note}>
+        <p className="text-muted text-[0.9rem] leading-[1.45] mt-[3px] mb-0 mx-0">
           {p.distros && (
             <>
               For{' '}
               {p.distros.map((d, i) => (
                 <span key={d.name}>
-                  <span className={styles.distro} style={cssVars({ '--brand': d.color })}>
-                    <Icon svg={d.icon} className={styles.distroMark} />
+                  <span className="whitespace-nowrap" style={cssVars({ '--brand': d.color })}>
+                    <Icon svg={d.icon} className="align-[-0.15em] mr-[0.3em] ml-[0.25em] text-(--brand)" />
                     {d.name}
                   </span>
                   {i < p.distros!.length - 1 ? ', ' : ' '}
@@ -163,7 +169,7 @@ function PackageRow({ p }: { p: Package }) {
       </div>
       {p.action && (
         <a
-          className={`button primary small ${styles.get}`}
+          className={`button primary small w-full whitespace-nowrap max-[560px]:col-span-full`}
           href={p.action.href}
           download={p.action.download ? '' : undefined}
         >
@@ -177,38 +183,45 @@ function PackageRow({ p }: { p: Package }) {
 
 export default function InstallPage() {
   return (
-    <main className={`wrap ${styles.install}`}>
-      <header className={styles.intro}>
-        <h1 className={styles.title}>
+    <main className={`wrap pt-12 pb-10`}>
+      <header className="text-center mb-12">
+        <h1 className="text-[clamp(2.4rem,5.4vw,3.8rem)] leading-[1.04]">
           <span className="enter-line">
             <span>Install Alto</span>
           </span>
         </h1>
-        <p className={`lede ${styles.lede}`} data-enter-fade="">
+        <p className={`lede text-[1.1rem] mt-4 mb-0 mx-0`} data-enter-fade="">
           Free and open source, under the GPL.
         </p>
-        <a className={styles.versionChip} href={LINKS.changelog} data-enter-fade="" style={cssVars({ '--i': 1 })}>
-          <span className={styles.version}>v{version}</span>
+        <a
+          className="mt-[18px] inline-flex items-center gap-2 py-[5px] pr-3 pl-[5px] rounded-full text-[0.85rem] font-medium no-underline text-accent bg-[color-mix(in_srgb,var(--accent-ink)_10%,transparent)] whitespace-nowrap transition-[background-color] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--accent-ink)_16%,transparent)] focus-visible:bg-[color-mix(in_srgb,var(--accent-ink)_16%,transparent)]"
+          href={LINKS.changelog}
+          data-enter-fade=""
+          style={cssVars({ '--i': 1 })}
+        >
+          <span className="px-2 py-0.5 rounded-full text-fg bg-card shadow-[inset_0_0_0_1px_var(--line)] tabular-nums">
+            v{version}
+          </span>
           See what's new
         </a>
       </header>
 
       <section
-        className={`glass-panel ${styles.os}`}
+        className={`glass-panel rounded-3xl tabular-nums`}
         aria-labelledby="linux"
         data-enter-fade=""
         style={cssVars({ '--i': 1 })}
       >
-        <div className={styles.osHead}>
-          <Icon svg={icon('simple-icons:linux')} className={styles.osIcon} />
+        <div className="flex flex-wrap items-center gap-3.5 pt-[26px] px-7 pb-0 max-[720px]:pt-[22px] max-[720px]:px-4 [&_p]:text-muted [&_p]:text-[0.92rem] [&_p]:mt-0.5 [&_p]:mb-0 [&_p]:mx-0">
+          <Icon svg={icon('simple-icons:linux')} className="text-[1.875em] text-fg opacity-55" />
           <div>
-            <h2 id="linux" className={styles.osName}>
+            <h2 id="linux" className="text-[1.5rem] font-medium tracking-[-0.03em] m-0">
               Linux
             </h2>
             <p>For 64-bit Intel and AMD computers.</p>
           </div>
         </div>
-        <ul className={styles.packages}>
+        <ul className="list-none m-0 pt-3 px-7 pb-3.5 max-[720px]:pt-2 max-[720px]:px-4 max-[720px]:pb-2.5">
           {packages.map((p) => (
             <PackageRow key={p.id} p={p} />
           ))}
@@ -216,11 +229,20 @@ export default function InstallPage() {
       </section>
 
       {soon.map((row, i) => (
-        <div key={i} className={styles.soon} data-enter-fade="" style={cssVars({ '--i': 2 + i })}>
+        <div
+          key={i}
+          className="grid grid-cols-2 gap-3.5 mt-3.5 max-[560px]:grid-cols-1"
+          data-enter-fade=""
+          style={cssVars({ '--i': 2 + i })}
+        >
           {row.map((os) => (
-            <section key={os.id} className={`glass-panel ${styles.os} ${styles.osSoon}`} aria-labelledby={os.id}>
-              <Icon svg={os.icon} className={styles.osIcon} />
-              <h2 id={os.id} className={styles.osName}>
+            <section
+              key={os.id}
+              className={`glass-panel rounded-3xl tabular-nums flex items-center gap-3 py-5 px-[22px] max-[720px]:py-[18px] max-[720px]:px-4 [&_.chip]:ml-auto [&_.chip]:flex-none [&_.icon]:text-[1.625em] [&_h2]:text-[1.25rem] [&_h2]:text-muted`}
+              aria-labelledby={os.id}
+            >
+              <Icon svg={os.icon} className="text-[1.875em] text-fg opacity-55" />
+              <h2 id={os.id} className="text-[1.5rem] font-medium tracking-[-0.03em] m-0">
                 {os.name}
               </h2>
               <span className="chip">Coming soon</span>
@@ -229,7 +251,11 @@ export default function InstallPage() {
         </div>
       ))}
 
-      <p className={styles.source} data-enter-fade="" style={cssVars({ '--i': 4 })}>
+      <p
+        className="text-muted text-center text-[0.92rem] mt-9 mb-0 mx-0"
+        data-enter-fade=""
+        style={cssVars({ '--i': 4 })}
+      >
         Every release, with its packages, is <Link href={`${LINKS.github}/releases`}>on GitHub</Link>. Or{' '}
         <Link href={`${LINKS.github}/blob/main/CONTRIBUTING.md`}>build it from source</Link>.
       </p>

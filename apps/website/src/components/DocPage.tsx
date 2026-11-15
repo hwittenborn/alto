@@ -4,7 +4,6 @@
  */
 import type { ReactNode } from 'react';
 import { cssVars } from '../lib/css';
-import styles from './DocPage.module.css';
 
 interface Props {
   title: string;
@@ -20,9 +19,9 @@ interface Props {
 export default function DocPage({ title, lede, meta, still = false, children }: Props) {
   const fade = still ? {} : { 'data-enter-fade': '' };
   return (
-    <main className={styles.doc}>
+    <main className="max-w-[760px] mx-auto mt-14">
       <header>
-        <h1 className={styles.title}>
+        <h1 className="text-[clamp(2.4rem,5vw,3.6rem)] leading-[1.05]">
           {still ? (
             title
           ) : (
@@ -32,13 +31,13 @@ export default function DocPage({ title, lede, meta, still = false, children }: 
           )}
         </h1>
         {lede && (
-          <p className={`lede ${styles.lede}`} {...fade}>
+          <p className={`lede text-[1.15rem] leading-[1.6] mt-[18px] mb-0 mx-0`} {...fade}>
             {lede}
           </p>
         )}
         {meta}
       </header>
-      <article className={styles.prose} {...fade} style={cssVars({ '--i': 1 })}>
+      <article className="prose mt-12 leading-[1.7]" {...fade} style={cssVars({ '--i': 1 })}>
         {children}
       </article>
     </main>

@@ -12,7 +12,6 @@ import DocPage from '../../components/DocPage';
 import { Link } from '../../components/Link';
 import { formatDate } from '../../lib/dates';
 import { LINKS, SITE } from '../../lib/site';
-import styles from './page.module.css';
 
 export const metadata: Metadata = {
   title: 'Privacy policy',
@@ -44,11 +43,14 @@ export default function PrivacyPage() {
       title="Privacy policy"
       meta={
         <>
-          <p className={styles.updated}>
+          <p className="text-muted text-[0.9rem] mt-3.5 mb-0 mx-0">
             Last updated <time dateTime={updated.toISOString()}>{formatDate(updated)}</time>
           </p>
           {/* The policy in short, before the detail: the chip on its own line, the summary under it. */}
-          <aside className={`glass-panel ${styles.tldr}`} aria-label="In short">
+          <aside
+            className={`glass-panel flex flex-col items-start gap-2 mt-6 py-3.5 px-[18px] rounded-2xl [&_p]:m-0 [&_p]:leading-[1.5]`}
+            aria-label="In short"
+          >
             <span className="chip">TL;DR</span>
             <p>
               Alto is free and open source, and runs on your computer. Your files and sign-ins stay between you and your

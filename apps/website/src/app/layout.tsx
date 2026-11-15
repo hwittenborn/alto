@@ -8,7 +8,7 @@ import SiteFooter from '../components/SiteFooter';
 import SiteHeader from '../components/SiteHeader';
 import { appIconUrl } from '../lib/app-icon';
 import { SITE } from '../lib/site';
-import '../styles/site.css';
+import './globals.css';
 
 const description =
   'Alto keeps folders on your computer in two-way sync with Google Drive, Dropbox, OneDrive, Proton Drive, Nextcloud and more.';

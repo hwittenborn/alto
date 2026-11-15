@@ -1,15 +1,16 @@
 import { LINKS } from '../lib/site';
 import { Link } from './Link';
-import styles from './SiteFooter.module.css';
 
 /** This year, as of the build. */
 const year = new Date().getFullYear();
 
 export default function SiteFooter() {
   return (
-    <footer className={`wrap ${styles.footer}`}>
+    <footer
+      className={`wrap flex justify-between flex-wrap gap-3 pt-7 pb-[90px] [border-top:1px_solid_var(--line)] text-muted text-[0.9rem]`}
+    >
       <span>© {year} Hunter Wittenborn</span>
-      <nav className={styles.nav}>
+      <nav className="flex gap-[18px] flex-wrap">
         <a className="quiet-link" href={LINKS.privacy}>
           Privacy
         </a>
