@@ -8,26 +8,36 @@
  * package.json (release-please sets it at each release), so the page stays
  * current with the latest release.
  */
-import android from '~icons/simple-icons/android?raw';
-import apple from '~icons/simple-icons/apple?raw';
-import appimage from '~icons/simple-icons/appimage?raw';
-import debian from '~icons/simple-icons/debian?raw';
-import fedora from '~icons/simple-icons/fedora?raw';
-import flathub from '~icons/simple-icons/flathub?raw';
-import linux from '~icons/simple-icons/linux?raw';
-import linuxmint from '~icons/simple-icons/linuxmint?raw';
-import opensuse from '~icons/simple-icons/opensuse?raw';
-import redhat from '~icons/simple-icons/redhat?raw';
-import snapcraft from '~icons/simple-icons/snapcraft?raw';
-import ubuntu from '~icons/simple-icons/ubuntu?raw';
-import windows from '~icons/simple-icons/windows?raw';
-import rootPackage from '../../../../package.json';
-import downloadIcon from '~icons/ph/download-simple-bold?raw';
+import rootPackage from '../../../../../package.json';
+import type { Metadata } from 'next';
 import type { CSSProperties } from 'react';
-import { Icon } from '../components/Icon';
-import { Link } from '../components/Link';
-import { LINKS } from '../lib/providers';
-import styles from './InstallPage.module.css';
+import { Icon } from '../../components/Icon';
+import { Link } from '../../components/Link';
+import { icon } from '../../lib/icons';
+import { LINKS } from '../../lib/providers';
+import styles from './page.module.css';
+
+export const metadata: Metadata = {
+  title: 'Install Alto',
+  description:
+    'Install Alto on Linux from the Snap Store, or as a .deb, .rpm or AppImage. Flathub, Windows, macOS, Android and iOS are coming soon.',
+  alternates: { canonical: '/install' },
+};
+
+const android = icon('simple-icons:android');
+const apple = icon('simple-icons:apple');
+const appimage = icon('simple-icons:appimage');
+const debian = icon('simple-icons:debian');
+const fedora = icon('simple-icons:fedora');
+const flathub = icon('simple-icons:flathub');
+const linux = icon('simple-icons:linux');
+const linuxmint = icon('simple-icons:linuxmint');
+const opensuse = icon('simple-icons:opensuse');
+const redhat = icon('simple-icons:redhat');
+const snapcraft = icon('simple-icons:snapcraft');
+const ubuntu = icon('simple-icons:ubuntu');
+const windows = icon('simple-icons:windows');
+const downloadIcon = icon('ph:download-simple-bold');
 
 const { version } = rootPackage;
 const releaseFile = (file: string) => `${LINKS.github}/releases/download/v${version}/${file}`;

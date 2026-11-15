@@ -1,21 +1,43 @@
 /**
  * The privacy policy, for the Alto app and this website. Laid out after
  * rclone's (rclone.org/privacy), whose engine Alto runs on.
+ *
+ * "Last updated" is the date of the last commit that changed this file, read
+ * from git when the site is built (the build date before its first commit).
  */
-import DocPage from '../components/DocPage';
-import { Link } from '../components/Link';
-import { formatDate } from '../lib/changelog';
-import { LINKS } from '../lib/providers';
-import styles from './PrivacyPage.module.css';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+import type { Metadata } from 'next';
+import DocPage from '../../components/DocPage';
+import { Link } from '../../components/Link';
+import { formatDate } from '../../lib/changelog';
+import { LINKS, SITE } from '../../lib/providers';
+import styles from './page.module.css';
 
-interface Props {
-  /** When the policy last changed: ISO 8601. */
-  updated: string;
-  /** This website's host name. */
-  host: string;
+export const metadata: Metadata = {
+  title: 'Privacy policy · Alto',
+  description:
+    'What Alto, the cloud sync app, and its website do with your data: it stays between your computer and your cloud provider.',
+  alternates: { canonical: '/privacy' },
+};
+
+function lastUpdated(): Date {
+  try {
+    const file = path.resolve(process.cwd(), 'src/app/privacy/page.tsx');
+    const date = execFileSync('git', ['log', '-1', '--follow', '--format=%cI', '--', file], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (date) return new Date(date);
+  } catch {
+    // Not in a git checkout: the build date, then.
+  }
+  return new Date();
 }
 
-export default function PrivacyPage({ updated, host }: Props) {
+export default function PrivacyPage() {
+  const updated = lastUpdated();
+  const host = new URL(SITE).host;
   return (
     <DocPage
       still
@@ -23,7 +45,7 @@ export default function PrivacyPage({ updated, host }: Props) {
       meta={
         <>
           <p className={styles.updated}>
-            Last updated <time dateTime={updated}>{formatDate(new Date(updated))}</time>
+            Last updated <time dateTime={updated.toISOString()}>{formatDate(updated)}</time>
           </p>
           {/* The policy in short, before the detail: the chip on its own line, the summary under it. */}
           <aside className={`glass-panel ${styles.tldr}`} aria-label="In short">

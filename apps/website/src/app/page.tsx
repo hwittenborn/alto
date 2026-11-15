@@ -1,14 +1,21 @@
 /**
- * The homepage: the words centered over Alto, live in the page (`stage`: the
- * demo, an island the route passes in), which stands in a soft pastel glow;
- * then three reasons for Alto, and the install band.
+ * The homepage: the words centered over Alto, live in the page (DemoStage),
+ * which stands in a soft pastel glow; then three reasons for Alto, and the
+ * install band.
  */
-import downloadIcon from '~icons/ph/download-simple-bold?raw';
-import type { CSSProperties, ReactNode } from 'react';
+import type { Metadata } from 'next';
+import type { CSSProperties } from 'react';
+import DemoStage from '../demo/DemoStage';
+import { appIconSvg } from '../lib/app-icon';
 import { Icon } from '../components/Icon';
 import { Link } from '../components/Link';
+import { icon, providerLogos } from '../lib/icons';
 import { LINKS } from '../lib/providers';
-import styles from './HomePage.module.css';
+import styles from './page.module.css';
+
+export const metadata: Metadata = { alternates: { canonical: '/' } };
+
+const downloadIcon = icon('ph:download-simple-bold');
 
 const order = (i: number) => ({ '--i': i }) as CSSProperties;
 
@@ -23,7 +30,7 @@ function Mark({ path }: { path: string }) {
   );
 }
 
-export default function HomePage({ stage }: { stage: ReactNode }) {
+export default function HomePage() {
   return (
     <main>
       <section className={`wrap ${styles.hero}`}>
@@ -46,7 +53,9 @@ export default function HomePage({ stage }: { stage: ReactNode }) {
             </a>
           </div>
         </div>
-        <div className={styles.pedestal}>{stage}</div>
+        <div className={styles.pedestal}>
+          <DemoStage height="min(620px, 72vh)" logos={providerLogos()} appIcon={appIconSvg()} />
+        </div>
       </section>
 
       <section className={`wrap ${styles.points}`} aria-labelledby="points-title">

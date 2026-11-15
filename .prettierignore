@@ -3,5 +3,6 @@ out/
 .vite/
 *.md
 .rclone/
-apps/website/dist/
-apps/website/.astro/
+apps/website/out/
+apps/website/.next/
+apps/website/next-env.d.ts

@@ -1,10 +1,12 @@
+'use client';
+
 /**
  * Alto, live in the page: the website's copy of its window (DemoApp) on a
  * pretend backend (FakeAlto), with the providers' avatars floating around it,
  * and its Start Demo button (Restart once it's going). Start Demo sends the
  * avatars into the window's sidebar one after another (src/lib/slide-in.ts);
- * Restart sends them home. One per page, client-side only
- * (`client:only="react"`).
+ * Restart sends them home. One per page, drawn in the browser only (not to
+ * HTML when the site is built: it needs the page).
  *
  * The floating avatars are the app's own ProviderAvatar, at the sidebar's
  * size, scaled up: what slides into the window is the very avatar its row
@@ -23,11 +25,13 @@ import { type CSSProperties, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AVATAR_SIZE, SITE_PROVIDERS } from '../lib/providers';
 import { setupSlideIn } from '../lib/slide-in';
+import { type DemoAssets, DemoAssetsContext } from './assets';
 import DemoApp from './DemoApp';
 import { FakeAlto } from './fake-alto';
 import { ProviderAvatar } from './ProviderAvatar';
 import { ProviderLogo } from './ProviderLogo';
 import styles from './DemoStage.module.css';
+import { useMounted } from './use-mounted';
 // GNOME's interface font, in the weights GTK's theme uses.
 import '@fontsource/adwaita-sans/400.css';
 import '@fontsource/adwaita-sans/600.css';
@@ -53,7 +57,14 @@ const SPOTS = [
 /** The avatars' size on phones, in a row above the window. */
 const PHONE_SIZE = 48;
 
-export default function DemoStage({ height }: { height: string }) {
+interface Props extends DemoAssets {
+  /** The window's height, as CSS. */
+  height: string;
+}
+
+export default function DemoStage({ height, logos, appIcon }: Props) {
+  const mounted = useMounted();
+  const [assets] = useState(() => ({ logos, appIcon }));
   const [demo] = useState(() => {
     const alto = new FakeAlto();
     return { alto, client: createAltoClient(alto.transport) };
@@ -92,54 +103,57 @@ export default function DemoStage({ height }: { height: string }) {
     setStarted(!started);
   };
 
+  if (!mounted) return null;
   return (
-    <section
-      className={styles.stage}
-      id="try"
-      aria-label="Alto, live"
-      style={{ '--phone-size': `${PHONE_SIZE}px`, '--phone-scale': PHONE_SIZE / AVATAR_SIZE } as CSSProperties}
-    >
-      <div className={styles.logos}>
-        {SITE_PROVIDERS.map((id, i) => {
-          const spot = SPOTS[i]!;
-          return (
-            <ProviderLogo
-              key={id}
-              provider={id}
-              size={spot.size}
-              className={styles.spot}
-              style={{ left: spot.left, top: spot.top, '--float-delay': `${-i * 1.3}s` } as CSSProperties}
-              slotRef={(el) => {
-                if (el) setSlots((current) => (current[id] === el ? current : { ...current, [id]: el }));
-              }}
-            />
-          );
-        })}
-      </div>
-      <div className={styles.window} data-enter-settle="" style={{ height }}>
-        <div className="alto-demo">
-          <DemoApp client={demo.client}>
-            {SITE_PROVIDERS.map((id) => {
-              const slot = slots[id];
-              return (
-                slot &&
-                createPortal(
-                  <GtkProviderBoundary>
-                    <ProviderAvatar provider={id} />
-                  </GtkProviderBoundary>,
-                  slot,
-                  id,
-                )
-              );
-            })}
-          </DemoApp>
+    <DemoAssetsContext value={assets}>
+      <section
+        className={styles.stage}
+        id="try"
+        aria-label="Alto, live"
+        style={{ '--phone-size': `${PHONE_SIZE}px`, '--phone-scale': PHONE_SIZE / AVATAR_SIZE } as CSSProperties}
+      >
+        <div className={styles.logos}>
+          {SITE_PROVIDERS.map((id, i) => {
+            const spot = SPOTS[i]!;
+            return (
+              <ProviderLogo
+                key={id}
+                provider={id}
+                size={spot.size}
+                className={styles.spot}
+                style={{ left: spot.left, top: spot.top, '--float-delay': `${-i * 1.3}s` } as CSSProperties}
+                slotRef={(el) => {
+                  if (el) setSlots((current) => (current[id] === el ? current : { ...current, [id]: el }));
+                }}
+              />
+            );
+          })}
         </div>
-      </div>
-      <div className={styles.controls}>
-        <button type="button" className="button primary" onClick={toggle}>
-          {started ? 'Restart' : 'Start Demo'}
-        </button>
-      </div>
-    </section>
+        <div className={styles.window} data-enter-settle="" style={{ height }}>
+          <div className="alto-demo">
+            <DemoApp client={demo.client}>
+              {SITE_PROVIDERS.map((id) => {
+                const slot = slots[id];
+                return (
+                  slot &&
+                  createPortal(
+                    <GtkProviderBoundary>
+                      <ProviderAvatar provider={id} />
+                    </GtkProviderBoundary>,
+                    slot,
+                    id,
+                  )
+                );
+              })}
+            </DemoApp>
+          </div>
+        </div>
+        <div className={styles.controls}>
+          <button type="button" className="button primary" onClick={toggle}>
+            {started ? 'Restart' : 'Start Demo'}
+          </button>
+        </div>
+      </section>
+    </DemoAssetsContext>
   );
 }

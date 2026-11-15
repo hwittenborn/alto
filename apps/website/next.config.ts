@@ -1,0 +1,15 @@
+import path from 'node:path';
+import type { NextConfig } from 'next';
+
+/** The repository root: the packages the demo runs on, the changelog and the app's icon are there. */
+const root = path.resolve(import.meta.dirname, '../..');
+
+export default {
+  // A static site, for GitHub Pages: every page is built to HTML (into out/).
+  output: 'export',
+  // Published as TypeScript source.
+  transpilePackages: ['@alto/core', '@alto/react', '@gtk-js/icons-adwaita', '@gtk-js/icons-gtk4'],
+  turbopack: { root },
+  outputFileTracingRoot: root,
+  devIndicators: false,
+} satisfies NextConfig;

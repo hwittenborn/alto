@@ -31,7 +31,6 @@
   padding: 8px 8px 8px 18px;
   background: var(--glass);
   backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
   box-shadow:
     inset 0 0 0 1px var(--line),
     0 10px 30px -18px rgb(0 0 0 / 40%);

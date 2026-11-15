@@ -3,16 +3,25 @@
  * so the page is current with every release. Each release: its version, the
  * date under it (and a link to its release on GitHub), then its changes.
  */
-import linkIcon from '~icons/ph/arrow-square-out?raw';
-import changelog from '../../../../CHANGELOG.md?raw';
-import DocPage from '../components/DocPage';
-import { Icon } from '../components/Icon';
-import { Link } from '../components/Link';
-import { formatDate, parseChangelog } from '../lib/changelog';
-import { LINKS } from '../lib/providers';
-import styles from './ChangelogPage.module.css';
+import fs from 'node:fs';
+import path from 'node:path';
+import type { Metadata } from 'next';
+import DocPage from '../../components/DocPage';
+import { Icon } from '../../components/Icon';
+import { Link } from '../../components/Link';
+import { formatDate, parseChangelog } from '../../lib/changelog';
+import { icon } from '../../lib/icons';
+import { LINKS } from '../../lib/providers';
+import styles from './page.module.css';
 
-const releases = parseChangelog(changelog);
+export const metadata: Metadata = {
+  title: 'Changelog · Alto',
+  description: 'What changed in each release of Alto.',
+  alternates: { canonical: '/changelog' },
+};
+
+const releases = parseChangelog(fs.readFileSync(path.resolve(process.cwd(), '../../CHANGELOG.md'), 'utf8'));
+const linkIcon = icon('ph:arrow-square-out');
 
 export default function ChangelogPage() {
   return (

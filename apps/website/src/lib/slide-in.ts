@@ -2,7 +2,7 @@
  * The homepage's providers sliding into the live Alto window (AltoDemo): all
  * of them, one after another, on Start Demo (`alto-demo:start`).
  *
- * A floating avatar (ProviderLogo.astro) is the sidebar's own 36px avatar,
+ * A floating avatar (src/demo/ProviderLogo.tsx) is the sidebar's own 36px avatar,
  * scaled up. When it sets off, its account is added and its row laid out,
  * hidden, so where it's going is known exactly: it flies there, shrinking
  * back to its own size, and lands on its row's avatar, which is identical.

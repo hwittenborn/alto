@@ -6,13 +6,15 @@ import { getProvider, type ProviderId } from '@alto/core';
 import { AdwAvatar } from '@gtk-js/adwaita';
 import { replaceIDs } from '@iconify/utils';
 import { useMemo } from 'react';
-import { AVATAR_SIZE, isLightTile, providerLogo } from '../lib/providers';
+import { AVATAR_SIZE, isLightTile } from '../lib/providers';
+import { useDemoAssets } from './assets';
 
 export function ProviderAvatar({ provider, size = AVATAR_SIZE }: { provider: ProviderId; size?: number }) {
   const def = getProvider(provider);
   // Each avatar gets its own gradient IDs: with shared ones, a logo goes blank
   // when the first copy in the page is hidden.
-  const logo = useMemo(() => replaceIDs(providerLogo(provider)), [provider]);
+  const { logos } = useDemoAssets();
+  const logo = useMemo(() => replaceIDs(logos[provider] ?? ''), [logos, provider]);
   const image = (
     <div
       className="alto-provider-avatar"

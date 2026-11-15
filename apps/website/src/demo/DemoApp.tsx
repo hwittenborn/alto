@@ -48,15 +48,10 @@ import {
 } from '@gtk-js/adwaita';
 import { createGtkIconFromSvg } from '@gtk-js/icon-helpers';
 import * as adwaitaIcons from '@gtk-js/icons-adwaita';
-import { appIconSvg } from '../lib/app-icon';
+import { useDemoAssets } from './assets';
 import { FolderStatusIcon } from './FolderStatusIcon';
 import { ProviderAvatar } from './ProviderAvatar';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
-
-const icons = {
-  ...adwaitaIcons,
-  ComHunterwittenbornAlto: createGtkIconFromSvg('ComHunterwittenbornAlto', appIconSvg),
-};
 
 /** As the app: below this width the split view collapses into a single pane. */
 const COLLAPSE_WIDTH = 640;
@@ -379,6 +374,12 @@ function Shell() {
 
 /** The window, with `children` (the page's floating avatars) in its GTK scope. */
 export default function DemoApp({ client, children }: { client: AltoClient; children?: ReactNode }) {
+  const { appIcon } = useDemoAssets();
+  // Adwaita's icons, and Alto's own.
+  const icons = useMemo(
+    () => ({ ...adwaitaIcons, ComHunterwittenbornAlto: createGtkIconFromSvg('ComHunterwittenbornAlto', appIcon) }),
+    [appIcon],
+  );
   return (
     <AdwaitaProvider style={FILL} icons={icons}>
       <AltoProvider client={client}>
