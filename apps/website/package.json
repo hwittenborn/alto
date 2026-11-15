@@ -19,6 +19,9 @@
     "@gtk-js/icon-helpers": "^0.1.6",
     "@gtk-js/icons-adwaita": "^0.1.6",
     "@iconify/utils": "^3.1.7",
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.4.6",
     "next": "^16.4.6",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
@@ -28,6 +31,7 @@
     "@iconify-json/selfhst": "^1.2.26",
     "@iconify-json/simple-icons": "^1.2.101",
     "@tailwindcss/turbopack": "^4.3.5",
+    "@types/mdx": "^2.0.14",
     "@types/node": "^24.9.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

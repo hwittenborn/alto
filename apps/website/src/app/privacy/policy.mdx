@@ -1,0 +1,70 @@
+{/*
+  The privacy policy's text. The page around it (title, "Last updated", the
+  TL;DR) is page.tsx; "Last updated" is when this file last changed.
+*/}
+
+## What this policy covers
+
+This policy covers:
+
+- **Alto,** the desktop app that keeps folders on your computer in sync with your cloud storage.
+- **This website,** {props.host}.
+
+## This website
+
+- It sets no cookies, and runs no analytics, ads or trackers.
+- Its fonts, pictures and scripts are served by the site itself, not loaded from anyone else.
+- The live demo on the homepage runs entirely in your browser. The accounts and folders in it are made up, and nothing you do in it is sent anywhere.
+- The site is hosted on Vercel. Like any web host, Vercel may log technical details of visits, such as IP addresses, as described in [Vercel's privacy policy](https://vercel.com/legal/privacy-policy).
+
+## What the app accesses
+
+When you connect an account and choose folders to sync, Alto uses [rclone](https://rclone.org), on your computer, to access:
+
+- **Your files,** in the folders you choose to sync: their names, sizes, modification times and contents, on your computer and in your cloud.
+- **Your account's details:** its name or email address and how much storage it uses, to show you.
+- **Your sign-in:** depending on the provider, either the access token it gives Alto when you sign in with your browser, or the username and password you enter (and a two-factor code, if your account asks for one).
+
+## How it uses it
+
+Only to do what you ask: keep your folders in sync between your computer and your account, and show you how that's going. None of it is used for advertising, analytics, training AI models or anything else.
+
+## Where it's kept
+
+- Your sign-ins, Alto's settings and what it remembers about your last sync are kept on your computer, in Alto's folder in your home folder.
+- They can be read by your user account on that computer, so anyone who can use your account there could read them too.
+- Your files travel straight between your computer and your provider over the network, and are only held in memory while they do.
+
+## Who it's shared with
+
+No one. Alto only talks to your cloud provider (and its sign-in page, when you sign in). The people who make Alto never see your files, sign-ins or account details, and Alto sends no telemetry, analytics or crash reports.
+
+## Signing in with your browser
+
+When you sign in with your browser, Alto signs in through its own registered app with your provider, so the provider can show you who is asking for access before you allow it. That doesn't route anything through us: the access token comes back to Alto on your computer. You can sign in with your own app registration instead, under Advanced in Alto's sign-in form.
+
+## Google user data
+
+Google Drive asks for access to all of your Drive files, so Alto can sync any folder you pick, wherever it is in your Drive.
+
+Alto's use and transfer of information received from Google APIs adheres to the [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements.
+
+## Removing your data
+
+- Removing an account in Alto deletes its sign-in from Alto's configuration file. Your files stay where they are, on your computer and in your cloud.
+- To remove everything Alto has kept, delete its folder (above).
+- If you signed in with your browser, you can also take back Alto's access in your provider's account settings.
+
+## Other sites
+
+Links from Alto and this site can lead to other sites, which have their own privacy policies.
+
+Alto is built on rclone, which runs on your computer as part of Alto. For rclone's own project and website, see [rclone's privacy policy](https://rclone.org/privacy/).
+
+## Changes to this policy
+
+Changes are published on this page, with the date above, and every change is in this site's history [on GitHub](https://github.com/hwittenborn/alto).
+
+## Contact
+
+Questions about this policy or about Alto's handling of your data are welcome as an [issue on GitHub](https://github.com/hwittenborn/alto/issues).

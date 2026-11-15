@@ -1,10 +1,11 @@
 import path from 'node:path';
+import createMDX from '@next/mdx';
 import type { NextConfig } from 'next';
 
 /** The repository root: the packages the demo runs on, the changelog and the app's icon are there. */
 const root = path.resolve(import.meta.dirname, '../..');
 
-export default {
+const config: NextConfig = {
   // A static site: every page is built to HTML (into out/), which Vercel serves.
   output: 'export',
   // Published as TypeScript source.
@@ -15,4 +16,7 @@ export default {
     rules: { '*.css': { loaders: ['@tailwindcss/turbopack'], as: '*.css' } },
   },
   devIndicators: false,
-} satisfies NextConfig;
+};
+
+// Markdown (.mdx), e.g. the privacy policy's text.
+export default createMDX()(config);
