@@ -38,11 +38,7 @@ apps:
     command: opt/alto/alto --no-sandbox
     extensions: [gnome]
     desktop: usr/share/applications/alto.desktop
-    # The "start at login" switch writes alto.desktop to $XDG_CONFIG_HOME/autostart,
-    # which in the snap is ~/snap/alto/<rev>/.config/autostart. The session never
-    # reads that; snapd's userd does, but only launches it for an app declaring
-    # the file here. It runs this app with the Exec= line's arguments
-    # (`--background`), ignoring its binary path.
+    # Lets snapd launch the file "start at login" writes to the snap's ~/.config/autostart.
     autostart: alto.desktop
     environment:
       # Chromium writes the tray icon to a file under $TMPDIR and has the panel
