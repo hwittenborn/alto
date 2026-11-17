@@ -36,6 +36,7 @@ Alto keeps folders on your computer in sync with your cloud storage, such as Goo
 - Proton Drive
 - Nextcloud
 - ownCloud
+- Jottacloud (and the services built on it, like Telia Cloud, Tele2 Cloud and Elgiganten Cloud)
 - WebDAV
 
 More cloud providers are on the way. Want one that isn't listed?

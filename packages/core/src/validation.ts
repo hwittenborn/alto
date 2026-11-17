@@ -48,6 +48,26 @@ export function validateTotp(code: string): string | null {
   return null;
 }
 
+/**
+ * Validate a Jottacloud personal login token: base64url-encoded JSON naming
+ * the service to sign in to. Empty is allowed (the browser is used then).
+ */
+export function validateJottacloudLoginToken(text: string): string | null {
+  const token = text.replace(/\s+/g, '');
+  if (token === '') return null;
+  const invalid = 'This isn’t a personal login token. Copy the whole token, and try again.';
+  if (!/^[A-Za-z0-9_-]+$/.test(token)) return invalid;
+  try {
+    const padded = token.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (token.length % 4)) % 4);
+    const json: unknown = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(padded), (c) => c.charCodeAt(0))));
+    const fields = json as { well_known_link?: unknown; auth_token?: unknown } | null;
+    if (typeof fields?.well_known_link !== 'string' || typeof fields.auth_token !== 'string') return invalid;
+  } catch {
+    return invalid;
+  }
+  return null;
+}
+
 export interface LoginFormValidation {
   /** Per-field error messages (only fields with errors are present). */
   errors: Partial<Record<ProviderFieldId | 'name', string>>;
@@ -78,9 +98,13 @@ export function validateLoginForm(
       case 'totp':
         error = validateTotp(value);
         break;
+      case 'select':
+        if (!field.options?.some((o) => o.value === value)) error = 'Choose one of the options.';
+        break;
       default:
         if (field.required && value === '') error = 'This field is required.';
     }
+    if (!error && field.id === 'loginToken') error = validateJottacloudLoginToken(value);
     if (error) errors[field.id] = error;
   }
 

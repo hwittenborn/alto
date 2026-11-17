@@ -3,17 +3,27 @@
  * rclone backend configuration.
  */
 
-export type ProviderId = 'gdrive' | 'dropbox' | 'onedrive' | 'protondrive' | 'nextcloud' | 'owncloud' | 'webdav';
+export type ProviderId =
+  'gdrive' | 'dropbox' | 'onedrive' | 'jottacloud' | 'protondrive' | 'nextcloud' | 'owncloud' | 'webdav';
 
-export type ProviderFieldId = 'url' | 'username' | 'password' | 'totp' | 'clientId' | 'clientSecret';
+export type ProviderFieldId =
+  'url' | 'username' | 'password' | 'totp' | 'clientId' | 'clientSecret' | 'service' | 'loginToken';
+
+/** One of the choices of a `select` field. */
+export interface ProviderFieldOption {
+  value: string;
+  label: string;
+}
 
 export interface ProviderField {
   id: ProviderFieldId;
   /** Label shown in the UI. */
   label: string;
-  kind: 'text' | 'url' | 'password' | 'totp';
+  kind: 'text' | 'url' | 'password' | 'totp' | 'select';
   required: boolean;
   defaultValue?: string;
+  /** The choices of a `select` field. */
+  options?: readonly ProviderFieldOption[];
   /** Shown under the form's Advanced options, collapsed by default. */
   advanced?: boolean;
 }
@@ -41,6 +51,19 @@ export interface ProviderDefinition {
   /** Generic GTK icon name used when there is no brand icon. */
   fallbackIcon: string;
   oauth?: ProviderOAuth;
+  /**
+   * The heading of the form's Advanced options, when it isn't about a custom
+   * OAuth client (which `oauth` providers get by default).
+   */
+  advancedHelp?: ProviderAdvancedHelp;
+}
+
+export interface ProviderAdvancedHelp {
+  title: string;
+  /** Shown under the title, followed by a link to `url`. */
+  description: string;
+  url: string;
+  linkLabel: string;
 }
 
 /** The result of mapping form values onto an rclone remote. */
@@ -91,6 +114,27 @@ const ONEDRIVE_OAUTH: ProviderOAuth = {
   clientSecret: 'jVd8Q~PZvqes4tHQPMLOPmuLfQvlLfMtEdjhVbDh',
   customClientHelpUrl: 'https://rclone.org/onedrive/#getting-your-own-client-id-and-key',
 };
+
+/**
+ * Jottacloud and the services that run on it under another brand, by the key
+ * rclone knows each by (`getServices` in rclone's jottacloud backend). Each
+ * has its own sign-in page; the API behind them is the same.
+ */
+export const JOTTACLOUD_SERVICES: readonly (ProviderFieldOption & { authHost: string })[] = [
+  { value: 'jottacloud', label: 'Jottacloud', authHost: 'id.jottacloud.com' },
+  { value: 'elgiganten_dk', label: 'Elgiganten Cloud (Denmark)', authHost: 'cloud.elgiganten.dk' },
+  { value: 'elgiganten_se', label: 'Elgiganten Cloud (Sweden)', authHost: 'cloud.elgiganten.se' },
+  { value: 'elkjop', label: 'Elkjøp Cloud (Norway)', authHost: 'cloud.elkjop.no' },
+  { value: 'elko', label: 'ELKO Cloud (Iceland)', authHost: 'cloud.elko.is' },
+  { value: 'gigantti', label: 'Gigantti Cloud (Finland)', authHost: 'cloud.gigantti.fi' },
+  { value: 'letsgo', label: "Let's Go Cloud (Germany)", authHost: 'letsgo.jotta.cloud' },
+  { value: 'mediamarkt', label: 'MediaMarkt Cloud', authHost: 'mediamarkt.jottacloud.com' },
+  { value: 'onlime', label: 'Onlime (Denmark)', authHost: 'cloud-auth.onlime.dk' },
+  { value: 'phonero', label: 'Phonero Sky', authHost: 'sky.phonero.no' },
+  { value: 'tele2', label: 'Tele2 Cloud (Sweden)', authHost: 'mittcloud-auth.tele2.se' },
+  { value: 'telia_no', label: 'Telia Sky (Norway)', authHost: 'sky-auth.telia.no' },
+  { value: 'telia_se', label: 'Telia Cloud (Sweden)', authHost: 'cloud-auth.telia.se' },
+];
 
 export const PROVIDERS: readonly ProviderDefinition[] = [
   {
@@ -157,6 +201,36 @@ export const PROVIDERS: readonly ProviderDefinition[] = [
     fallbackIcon: 'folder-remote-symbolic',
   },
   {
+    id: 'jottacloud',
+    label: 'Jottacloud',
+    rcloneType: 'jottacloud',
+    // Signs in with the browser, unless a personal login token is given (see
+    // `signsInWithBrowser`).
+    auth: 'oauth',
+    fields: [
+      {
+        id: 'service',
+        label: 'Service',
+        kind: 'select',
+        required: true,
+        defaultValue: 'jottacloud',
+        options: JOTTACLOUD_SERVICES.map(({ value, label }) => ({ value, label })),
+      },
+      { id: 'loginToken', label: 'Personal Login Token', kind: 'password', required: false, advanced: true },
+    ],
+    color: 'FFFFFF',
+    iconSlug: 'jottacloud',
+    fallbackIcon: 'folder-remote-symbolic',
+    advancedHelp: {
+      title: 'Login Token',
+      description:
+        'Sign in with a personal login token from your account’s security settings instead of your browser. ' +
+        'This lets you stay signed in to Jottacloud’s own apps on this computer too.',
+      url: 'https://www.jottacloud.com/web/secure',
+      linkLabel: 'Generate a token',
+    },
+  },
+  {
     id: 'webdav',
     label: 'WebDAV',
     rcloneType: 'webdav',
@@ -181,6 +255,16 @@ export function isProviderId(id: string): id is ProviderId {
 
 export type ProviderValues = Partial<Record<ProviderFieldId, string>>;
 
+/**
+ * Whether logging in with these form values goes through the browser. A
+ * Jottacloud personal login token is traded in for the account's token
+ * directly, so it doesn't.
+ */
+export function signsInWithBrowser(id: ProviderId, values: ProviderValues = {}): boolean {
+  if (id === 'jottacloud' && (values.loginToken ?? '').trim() !== '') return false;
+  return getProvider(id).auth === 'oauth';
+}
+
 /** Turn the login form values into an rclone remote configuration. */
 export function buildRemoteConfig(id: ProviderId, values: ProviderValues): RcloneRemoteConfig {
   const v = (key: ProviderFieldId) => (values[key] ?? '').trim();
@@ -204,6 +288,26 @@ export function buildRemoteConfig(id: ProviderId, values: ProviderValues): Rclon
       // organization to approve. Without a form to pick from, rclone chooses
       // "OneDrive Personal or Business" and the account's drive.
       if (id === 'onedrive') parameters.disable_site_permission = 'true';
+      return { type: provider.rcloneType, parameters, obscure: true };
+    }
+    case 'jottacloud': {
+      // These answer the questions of rclone's jottacloud config: which kind
+      // of login ("standard" trades in a personal login token, "traditional"
+      // signs in with the browser), and whether to use another device and
+      // mountpoint than the standard Jotta/Archive (no: that's what
+      // Jottacloud's own apps show as the account's files). They aren't
+      // stored in the remote.
+      const token = v('loginToken').replace(/\s+/g, '');
+      const parameters: Record<string, string | boolean> = { config_non_standard: 'false' };
+      if (token !== '') {
+        parameters.config_type = 'standard';
+        parameters.config_login_token = token;
+      } else {
+        parameters.config_type = 'traditional';
+        parameters.config_traditional = v('service') || 'jottacloud';
+        // Let rclone open our callback flow instead of trying xdg-open itself.
+        parameters.config_auth_no_browser = 'true';
+      }
       return { type: provider.rcloneType, parameters, obscure: true };
     }
     case 'nextcloud':
@@ -249,6 +353,8 @@ export function detectProvider(config: Record<string, string>): ProviderId | nul
       return 'gdrive';
     case 'onedrive':
       return 'onedrive';
+    case 'jottacloud':
+      return 'jottacloud';
     case 'protondrive':
       return 'protondrive';
     case 'webdav':
@@ -278,6 +384,13 @@ export function describeAccount(config: Record<string, string>): string | null {
     }
     case 'protondrive':
       return config.username ?? null;
+    case 'jottacloud': {
+      // The token URL is on the service's own sign-in host: name the service
+      // when it's one of Jottacloud's partners.
+      const h = host(config.tokenURL);
+      const service = JOTTACLOUD_SERVICES.find((s) => s.authHost === h);
+      return service && service.value !== 'jottacloud' ? service.label : null;
+    }
     default:
       return null;
   }

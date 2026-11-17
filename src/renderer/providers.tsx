@@ -4,6 +4,7 @@ import { replaceIDs } from '@iconify/utils';
 import { useMemo } from 'react';
 import dropbox from '~icons/selfhst/dropbox-light?raw';
 import googleDrive from '~icons/selfhst/google-drive?raw';
+import jottacloud from '../../assets/logos/jottacloud.svg?raw';
 import oneDrive from '~icons/selfhst/microsoft-onedrive?raw';
 import nextcloud from '~icons/simple-icons/nextcloud?raw';
 import owncloud from '~icons/selfhst/owncloud-light?raw';
@@ -11,13 +12,15 @@ import protonDrive from '~icons/selfhst/proton-drive?raw';
 
 /**
  * Brand logos as SVG markup, by `iconSlug`: from selfh.st/icons (CC BY 4.0),
- * and Nextcloud's from Simple Icons (CC0), whose selfh.st logos are all app
- * tiles. The `-light` ones and Nextcloud's are white, for the brand color
- * behind them. The others are full color, on white.
+ * Nextcloud's from Simple Icons (CC0), whose selfh.st logos are all app
+ * tiles, and Jottacloud's (in neither) in `assets/logos`. The `-light` ones
+ * and Nextcloud's are white, for the brand color behind them. The others are
+ * full color, on white.
  */
 const LOGOS: Record<string, string> = {
   'dropbox-light': dropbox,
   'google-drive': googleDrive,
+  jottacloud,
   'microsoft-onedrive': oneDrive,
   nextcloud,
   'owncloud-light': owncloud,
