@@ -2,6 +2,7 @@
  * The changelog: CHANGELOG.md from the repository (release-please writes it),
  * so the page is current with every release. Each release: its version, the
  * date under it (and a link to its release on GitHub), then its changes.
+ * Above them, what's on main and not yet released (lib/unreleased.ts).
  */
 import type { Metadata } from 'next';
 import DocPage from '../../components/DocPage';
@@ -12,6 +13,7 @@ import { formatDate } from '../../lib/dates';
 import { icon } from '../../lib/icons';
 import { repoFile } from '../../lib/repo';
 import { LINKS } from '../../lib/site';
+import { unreleased } from '../../lib/unreleased';
 
 export const metadata: Metadata = {
   title: 'Changelog',
@@ -20,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 const releases = parseChangelog(repoFile('CHANGELOG.md'));
+const upcoming = unreleased();
 const linkIcon = icon('ph:arrow-square-out');
 
 /** A line of Markdown: its text, code and links. */
@@ -40,27 +43,36 @@ function Text({ pieces }: { pieces: Inline[] }) {
 export default function ChangelogPage() {
   return (
     <DocPage title="Changelog" lede="Here's what changed in each release of Alto.">
-      {releases.map((r) => (
+      {[...(upcoming ? [upcoming] : []), ...releases].map((r) => (
         <section
           key={r.version}
           className="[&+&]:mt-12 [&+&]:pt-10 [&+&]:[border-top:1px_solid_var(--line)]"
-          id={`v${r.version}`}
+          id={r === upcoming ? 'unreleased' : `v${r.version}`}
         >
           <header className="mb-[18px]">
-            <h2 className="text-[1.8rem] m-0 flex items-center gap-[0.35em]">
-              {r.version}
-              <Link
-                className="flex text-[0.6em] text-muted opacity-70 transition-opacity duration-150 ease-out hover:opacity-100 focus-visible:opacity-100"
-                href={`${LINKS.github}/releases/tag/v${r.version}`}
-                aria-label={`Alto ${r.version} on GitHub`}
-              >
-                <Icon svg={linkIcon} />
-              </Link>
-            </h2>
-            {r.date && (
-              <p className="text-muted text-[0.95rem] mt-1 mb-0 mx-0">
-                <time dateTime={r.date}>{formatDate(r.date)}</time>
-              </p>
+            {r === upcoming ? (
+              <>
+                <h2 className="text-[1.8rem] m-0">Unreleased</h2>
+                <p className="text-muted text-[0.95rem] mt-1 mb-0 mx-0">Coming in the next release.</p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-[1.8rem] m-0 flex items-center gap-[0.35em]">
+                  {r.version}
+                  <Link
+                    className="flex text-[0.6em] text-muted opacity-70 transition-opacity duration-150 ease-out hover:opacity-100 focus-visible:opacity-100"
+                    href={`${LINKS.github}/releases/tag/v${r.version}`}
+                    aria-label={`Alto ${r.version} on GitHub`}
+                  >
+                    <Icon svg={linkIcon} />
+                  </Link>
+                </h2>
+                {r.date && (
+                  <p className="text-muted text-[0.95rem] mt-1 mb-0 mx-0">
+                    <time dateTime={r.date}>{formatDate(r.date)}</time>
+                  </p>
+                )}
+              </>
             )}
           </header>
           {r.intro.map((p, i) => (
