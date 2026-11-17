@@ -7,8 +7,8 @@
  * hand-written entry in the same shape ("- change").
  */
 
-/** A piece of a line of Markdown: plain text, inline code, or a link. */
-export type Inline = { text: string; code?: true; href?: string };
+/** A piece of a line of Markdown: plain text, bold text, inline code, or a link. */
+export type Inline = { text: string; bold?: true; code?: true; href?: string };
 
 export interface Change {
   text: Inline[];
@@ -25,13 +25,19 @@ export interface Release {
   groups: Array<{ title: string; changes: Change[] }>;
 }
 
-/** Markdown's inline code and links, and the text between them. */
+/** Markdown's inline code, links and bold text, and the text between them. */
 function inline(text: string): Inline[] {
   const pieces: Inline[] = [];
   let last = 0;
-  for (const m of text.matchAll(/`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)/g)) {
+  for (const m of text.matchAll(/`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*/g)) {
     if (m.index > last) pieces.push({ text: text.slice(last, m.index) });
-    pieces.push(m[1] !== undefined ? { text: m[1], code: true } : { text: m[2]!, href: m[3]! });
+    pieces.push(
+      m[1] !== undefined
+        ? { text: m[1], code: true }
+        : m[4] !== undefined
+          ? { text: m[4], bold: true }
+          : { text: m[2]!, href: m[3]! },
+    );
     last = m.index + m[0].length;
   }
   if (last < text.length) pieces.push({ text: text.slice(last) });
@@ -50,7 +56,8 @@ function change(text: string): Change {
   }
   // Release-please writes changes from commit subjects, in lower case (those
   // are the ones with links after them); hand-written ones stay as written.
-  if (refs.length) rest = rest.charAt(0).toUpperCase() + rest.slice(1);
+  // A scope ("**snap:** declare ...") comes first, so it's the one capitalized.
+  if (refs.length) rest = rest.replace(/[a-z]/, (c) => c.toUpperCase());
   return { text: inline(rest), refs };
 }
 

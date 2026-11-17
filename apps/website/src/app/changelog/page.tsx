@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const releases = parseChangelog(repoFile('CHANGELOG.md'));
 const linkIcon = icon('ph:arrow-square-out');
 
-/** A line of Markdown: its text, code and links. */
+/** A line of Markdown: its text, bold text, code and links. */
 function Text({ pieces }: { pieces: Inline[] }) {
   return pieces.map((piece, i) =>
     piece.href ? (
@@ -31,6 +31,8 @@ function Text({ pieces }: { pieces: Inline[] }) {
       </Link>
     ) : piece.code ? (
       <code key={i}>{piece.text}</code>
+    ) : piece.bold ? (
+      <strong key={i}>{piece.text}</strong>
     ) : (
       piece.text
     ),
