@@ -36,6 +36,11 @@ export interface FolderProgress {
   speed: number;
 }
 
+interface ListingCount {
+  folders: number;
+  files: number;
+}
+
 export interface FolderRuntime {
   phase: FolderPhase;
   /** Detail for the `offline` and `error` phases. */
@@ -43,6 +48,12 @@ export interface FolderRuntime {
   /** When both sides were last compared in full (a completed sync cycle). */
   lastCheckedAt: number | null;
   progress: FolderProgress | null;
+  check?: {
+    startedAt: number;
+    stage: 'preparing' | 'changed-paths' | 'listing' | 'comparing';
+    local: ListingCount | null;
+    remote: ListingCount | null;
+  };
   issues: SyncIssue[];
 }
 
@@ -272,6 +283,13 @@ export class SyncFolder {
     this.update({});
   }
 
+  dismissErrors(): void {
+    for (const [id, issue] of this.issues) {
+      if (issue.kind === 'error') this.issues.delete(id);
+    }
+    this.update({});
+  }
+
   // --- listing -------------------------------------------------------------
 
   private async statSide(side: Side, path: string): Promise<ItemState | null> {
@@ -352,16 +370,18 @@ export class SyncFolder {
       await this.cycle(scope);
     } finally {
       this.cycleRunning = false;
+      this.update({ check: undefined });
     }
   }
 
   private async cycle(scope?: string[]): Promise<void> {
     this.needsResync = false;
     this.settling = [];
-    this.update({ phase: 'checking', message: null, progress: null });
+    const now = Date.now();
+    const check = { startedAt: now, local: null, remote: null };
+    this.update({ phase: 'checking', message: null, progress: null, check: { ...check, stage: 'preparing' } });
 
     const cycleIssues = new Map<string, SyncIssue>();
-    const now = Date.now();
     const pushError = (path: string, message: string) =>
       this.addIssue({ id: errorIssueId(path, message), kind: 'error', path, message, detectedAt: now }, cycleIssues);
 
@@ -382,6 +402,7 @@ export class SyncFolder {
       const synced = await this.loadBaseline();
 
       if (scope) {
+        this.update({ check: { ...check, stage: 'changed-paths' } });
         const narrowed = await this.planPaths(scope, synced, tolerance, info);
         if (narrowed) {
           await this.runNarrowCycle(scope, narrowed, info, now);
@@ -389,18 +410,31 @@ export class SyncFolder {
         }
       }
 
+      this.update({ check: { ...check, stage: 'listing' } });
+      const recordListing = (side: Side, listing: Listing): Listing => {
+        const current = this.runtime.check;
+        if (current?.startedAt === now && current.stage === 'listing' && this.runtime.phase === 'checking') {
+          let folders = 0;
+          for (const item of listing.values()) if (item.isDir) folders += 1;
+          this.update({ check: { ...current, [side]: { folders, files: listing.size - folders } } });
+        }
+        return listing;
+      };
       let remoteRootMissing = false;
       const [local, remote] = await Promise.all([
-        this.listSide('local'),
-        this.listSide('remote').catch((err) => {
-          if (err instanceof RcloneError && err.isDirNotFound) {
-            remoteRootMissing = true;
-            return new Map() as Listing;
-          }
-          throw err;
-        }),
+        this.listSide('local').then((listing) => recordListing('local', listing)),
+        this.listSide('remote')
+          .catch((err) => {
+            if (err instanceof RcloneError && err.isDirNotFound) {
+              remoteRootMissing = true;
+              return new Map() as Listing;
+            }
+            throw err;
+          })
+          .then((listing) => recordListing('remote', listing)),
       ]);
       this.checkCancelled();
+      if (this.runtime.check) this.update({ check: { ...this.runtime.check, stage: 'comparing' } });
       const baseline = this.holdBackSettling(local, remote, synced);
 
       // Sync the shared exclusion file first, so rules changed on another
@@ -688,17 +722,29 @@ export class SyncFolder {
         }
       }
 
-      // 2. Folders, parents first.
+      // 2. Folders, parents first. Independent directories can share the
+      // transfer queue once all shallower directories have been handled.
       const mkdirs = actions
         .filter((a): a is Extract<PlanAction, { type: 'mkdir' }> => a.type === 'mkdir')
         .sort((a, b) => depth(a.path) - depth(b.path));
+      let currentDepth = 0;
       for (const a of mkdirs) {
-        await guarded(a.path, a.side === 'local' ? 'mkdir-local' : 'mkdir-remote', async () => {
-          await this.deps.rclone.mkdir(this.fs(a.side), a.path, { signal });
-          const [l, r] = await Promise.all([this.statSide('local', a.path), this.statSide('remote', a.path)]);
-          if (l?.isDir && r?.isDir) this.setBaseline(a.path, baselineEntry(l, r));
-        });
+        const folderDepth = depth(a.path);
+        if (folderDepth !== currentDepth) {
+          await queue.onIdle();
+          this.checkCancelled();
+          currentDepth = folderDepth;
+        }
+        void queue.add(() =>
+          guarded(a.path, a.side === 'local' ? 'mkdir-local' : 'mkdir-remote', async () => {
+            await this.deps.rclone.mkdir(this.fs(a.side), a.path, { signal });
+            const [l, r] = await Promise.all([this.statSide('local', a.path), this.statSide('remote', a.path)]);
+            if (l?.isDir && r?.isDir) this.setBaseline(a.path, baselineEntry(l, r));
+          }),
+        );
       }
+      await queue.onIdle();
+      this.checkCancelled();
       // File replaced by a folder on the other side: swap before filling it.
       for (const a of actions) {
         if (a.type !== 'replace' || !a.source.isDir) continue;

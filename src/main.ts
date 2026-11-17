@@ -9,7 +9,7 @@ import {
   RcloneClient,
 } from '@alto/core';
 import { NodeLocalFs, RcloneDaemon, SqliteStorage } from '@alto/node';
-import { app, BrowserWindow, dialog, Notification, shell } from 'electron';
+import { app, BrowserWindow, dialog, Notification, powerMonitor, shell } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { copyFile, rm } from 'node:fs/promises';
 import { hostname } from 'node:os';
@@ -301,6 +301,8 @@ async function startAlto(binary: string, storage: AltoStorage): Promise<void> {
 app.on('second-instance', () => showWindow());
 
 app.on('ready', async () => {
+  powerMonitor.on('suspend', () => alto?.suspendSync());
+  powerMonitor.on('resume', () => alto?.resumeSync());
   registerIpc();
   tray = new AltoTray({ open: showWindow, syncNow: () => void alto?.syncNow(), quit });
   storage = new SqliteStorage(path.join(configDir(), 'alto.db'));
