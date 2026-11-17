@@ -56,8 +56,7 @@ function change(text: string): Change {
   }
   // Release-please writes changes from commit subjects, in lower case (those
   // are the ones with links after them); hand-written ones stay as written.
-  // A scope ("**snap:** declare ...") comes first, so it's the one capitalized.
-  if (refs.length) rest = rest.replace(/[a-z]/, (c) => c.toUpperCase());
+  if (refs.length) rest = rest.charAt(0).toUpperCase() + rest.slice(1);
   return { text: inline(rest), refs };
 }
 
