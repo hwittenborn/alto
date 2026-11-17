@@ -38,7 +38,6 @@ apps:
     command: opt/alto/alto --no-sandbox
     extensions: [gnome]
     desktop: usr/share/applications/alto.desktop
-    # Lets snapd launch the file "start at login" writes to the snap's ~/.config/autostart.
     autostart: alto.desktop
     environment:
       # Chromium writes the tray icon to a file under $TMPDIR and has the panel
