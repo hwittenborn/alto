@@ -5,7 +5,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { getIconData, iconToHTML, iconToSVG } from '@iconify/utils';
+import { convertParsedSVG, getIconData, iconToHTML, iconToSVG, parseSVGContent } from '@iconify/utils';
 import type { SiteProviderId } from './providers';
 import { REPO_ROOT } from './repo';
 
@@ -14,9 +14,30 @@ type IconSet = Parameters<typeof getIconData>[0];
 
 const sets = new Map<string, IconSet>();
 
-/** An installed set (@iconify-json/<name>), in the site's node_modules or the repository's. */
+/**
+ * The logos kept in the repository (assets/providers), as a set named `alto`:
+ * those no icon set has yet. The app has them as the same set
+ * (vite.renderer.config.ts).
+ */
+function altoSet(): IconSet {
+  const dir = path.join(REPO_ROOT, 'assets/providers');
+  const icons: IconSet['icons'] = {};
+  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.svg'))) {
+    const parsed = parseSVGContent(fs.readFileSync(path.join(dir, file), 'utf8'));
+    const icon = parsed && convertParsedSVG(parsed);
+    if (!icon) throw new Error(`Can't read assets/providers/${file}`);
+    icons[file.slice(0, -'.svg'.length)] = icon;
+  }
+  return { prefix: 'alto', icons };
+}
+
+/** An installed set (@iconify-json/<name>), in the site's node_modules or the repository's; or `alto` (altoSet). */
 function iconSet(name: string): IconSet {
   let set = sets.get(name);
+  if (!set && name === 'alto') {
+    set = altoSet();
+    sets.set(name, set);
+  }
   if (!set) {
     const file = [process.cwd(), REPO_ROOT]
       .map((dir) => path.join(dir, 'node_modules/@iconify-json', name, 'icons.json'))
@@ -41,13 +62,13 @@ export function icon(name: string): string {
 export const downloadIcon = () => icon('ph:download-simple-bold');
 
 /**
- * The providers' brand logos, from selfh.st/icons (CC BY 4.0) and Nextcloud's
- * from Simple Icons (CC0), as in the app. The white ones (`-light`,
- * Nextcloud's) are for the brand color behind them; the others are full
- * color, on white.
+ * The providers' brand logos, from selfh.st/icons (CC BY 4.0), Nextcloud's
+ * from Simple Icons (CC0) and Google Drive's current one from the repository
+ * (altoSet), as in the app. The white ones (`-light`, Nextcloud's) are for
+ * the brand color behind them; the others are full color, on white.
  */
 const LOGOS: Record<SiteProviderId, string> = {
-  gdrive: 'selfhst:google-drive',
+  gdrive: 'alto:google-drive',
   dropbox: 'selfhst:dropbox-light',
   onedrive: 'selfhst:microsoft-onedrive',
   protondrive: 'selfhst:proton-drive',

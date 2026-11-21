@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
+import { FileSystemIconLoader } from 'unplugin-icons/loaders';
 import icons from 'unplugin-icons/vite';
 import { watch } from 'chokidar';
 import { readFileSync } from 'node:fs';
@@ -55,8 +56,13 @@ export default defineConfig({
     // re-renders what its changes reach.
     babel({ presets: [reactCompilerPreset()] }),
     // Provider logos, imported as `~icons/<set>/<icon>?raw`. Only the icons
-    // imported are bundled, as SVG strings.
-    icons({ compiler: 'raw', scale: 1 }),
+    // imported are bundled, as SVG strings. The `alto` set is the logos kept
+    // in the repository (assets/providers), for those no icon set has yet.
+    icons({
+      compiler: 'raw',
+      scale: 1,
+      customCollections: { alto: FileSystemIconLoader(path.resolve(__dirname, 'assets/providers')) },
+    }),
     {
       // Regenerate the build information (packages/node/src/build-info.ts)
       // when the checked-out commit changes, so the dev server hot-reloads it.
