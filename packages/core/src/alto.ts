@@ -5,7 +5,14 @@ import { EXCLUSION_FILE_NAME, parseExclusionFile, serializeExclusionFile } from 
 
 import { baseName, formatLocalPath, isWithin, joinPath, normalizeLocalPath, normalizeRemotePath } from './paths.ts';
 import type { Platform } from './platform.ts';
-import { buildRemoteConfig, describeAccount, detectProvider, getProvider, type ProviderId } from './providers.ts';
+import {
+  buildRemoteConfig,
+  describeAccount,
+  detectProvider,
+  getProvider,
+  type ProviderId,
+  signsInWithBrowser,
+} from './providers.ts';
 import type { RcloneClient } from './rclone/client.ts';
 import {
   type ActionError,
@@ -262,8 +269,7 @@ export class Alto implements AltoClient {
   }
 
   async createRemote(input: CreateRemoteInput): Promise<ActionResult<{ name: string }>> {
-    const provider = getProvider(input.provider);
-    if (provider.auth === 'oauth') {
+    if (signsInWithBrowser(input.provider, input.values)) {
       return this.loginWithBrowser(input);
     }
     const name = input.name.trim();
@@ -285,6 +291,12 @@ export class Alto implements AltoClient {
       await this.rclone.deleteRemote(name).catch(() => {});
       await this.rclone.clearFsCache().catch(() => {});
       const error = loginError(err);
+      if (input.provider === 'jottacloud' && error.code === 'auth') {
+        // Each token is good for one login, so a token that was used before
+        // (or has expired) is turned down.
+        error.message =
+          'The personal login token wasn’t accepted. Tokens only work once, so generate a new one and try again.';
+      }
       return fail(error.code, 'Unable to log in', { body: error.message, detail: error.detail });
     }
 
