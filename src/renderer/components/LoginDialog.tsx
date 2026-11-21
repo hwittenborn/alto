@@ -6,12 +6,14 @@ import {
   type ProviderId,
   type ProviderValues,
   PROVIDERS,
+  signsInWithBrowser,
   validateLoginForm,
 } from '@alto/core';
 import { useAlto, useAltoState } from '@alto/react';
 import {
   AdwActionRow,
   AdwClamp,
+  AdwComboRow,
   AdwDialog,
   AdwEntryRow,
   AdwHeaderBar,
@@ -97,6 +99,24 @@ function fieldRow(
     'data-field': field.id,
   };
   switch (field.kind) {
+    case 'select': {
+      const options = field.options ?? [];
+      return (
+        <AdwComboRow
+          key={field.id}
+          {...common}
+          items={options.map((o) => o.label)}
+          selected={Math.max(
+            0,
+            options.findIndex((o) => o.value === value),
+          )}
+          onSelected={(i) => {
+            const option = options[i];
+            if (option) setValue(field.id, option.value);
+          }}
+        />
+      );
+    }
     case 'password':
       return (
         <AdwPasswordEntryRow
@@ -149,6 +169,11 @@ function LoginFlow({
   const [takenNames, setTakenNames] = useState<string[]>([]);
 
   const provider = getProvider(providerId);
+  const browser = signsInWithBrowser(providerId, values);
+  // Partners of Jottacloud sign in on their own page, under their own name.
+  const signInTo =
+    provider.fields.find((f) => f.id === 'service')?.options?.find((o) => o.value === values.service)?.label ??
+    provider.label;
   const google = providerId === 'gdrive';
   const validation = useMemo(
     () => validateLoginForm(providerId, name.trim(), values, takenNames),
@@ -179,17 +204,16 @@ function LoginFlow({
   const submit = async () => {
     if (!validation.valid || busy) return;
     setBusy(true);
-    if (provider.auth === 'oauth') setStack(['providers', 'form', 'browser']);
-    const result =
-      provider.auth === 'oauth'
-        ? await alto.loginWithBrowser({ provider: providerId, name: name.trim(), values })
-        : await alto.createRemote({ provider: providerId, name: name.trim(), values });
+    if (browser) setStack(['providers', 'form', 'browser']);
+    const result = browser
+      ? await alto.loginWithBrowser({ provider: providerId, name: name.trim(), values })
+      : await alto.createRemote({ provider: providerId, name: name.trim(), values });
     setBusy(false);
     if (result.ok) {
       onLoggedIn(result.value.name);
       return;
     }
-    if (provider.auth === 'oauth') setStack(['providers', 'form']);
+    if (browser) setStack(['providers', 'form']);
     if (result.error.code !== 'cancelled') {
       onFailed(result.error);
     }
@@ -198,14 +222,17 @@ function LoginFlow({
   // Fields aren't flagged until they're filled in; the first problem is also
   // spelled out below them.
   const nameError = name !== '' ? validation.errors.name : undefined;
-  // Advanced fields (a custom OAuth client) aren't flagged: their only problem
-  // is a missing half, which isn't the filled-in half's fault. It's explained
-  // when hovering the login button instead.
+  // A custom OAuth client's fields aren't flagged: their only problem is a
+  // missing half, which isn't the filled-in half's fault. It's explained when
+  // hovering the login button instead.
+  const clientField = (f: ProviderDefinition['fields'][number]) => f.id === 'clientId' || f.id === 'clientSecret';
   const fieldErrors = provider.fields.map((f) =>
-    !f.advanced && (values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined,
+    !clientField(f) && (values[f.id] ?? '') !== '' ? validation.errors[f.id] : undefined,
   );
   const shownError = [nameError, ...fieldErrors].find(Boolean);
-  const advancedError = provider.fields.map((f) => (f.advanced ? validation.errors[f.id] : undefined)).find(Boolean);
+  const advancedError = provider.fields
+    .map((f) => (clientField(f) ? validation.errors[f.id] : undefined))
+    .find(Boolean);
   const rows = provider.fields.map((field, i) => ({ field, error: fieldErrors[i] }));
   const fieldRows = (advanced: boolean) =>
     rows
@@ -214,6 +241,14 @@ function LoginFlow({
         fieldRow(field, values, (id, v) => setValues((current) => ({ ...current, [id]: v })), error, submit),
       );
   const advancedRows = fieldRows(true);
+  const advancedHelp =
+    provider.advancedHelp ??
+    (provider.oauth && {
+      title: 'Custom Client',
+      description: 'Use your own OAuth client instead of Alto’s.',
+      url: provider.oauth.customClientHelpUrl,
+      linkLabel: 'Learn how to make one',
+    });
 
   const formPage = (
     <AdwToolbarView
@@ -230,8 +265,8 @@ function LoginFlow({
                   wrap
                   justify="center"
                   label={
-                    provider.auth === 'oauth'
-                      ? `Alto will open your browser so you can sign in to ${provider.label}.`
+                    browser
+                      ? `Alto will open your browser so you can sign in to ${signInTo}.`
                       : `Enter the details of your ${provider.label} account.`
                   }
                 />
@@ -261,7 +296,7 @@ function LoginFlow({
                   {/* GtkExpander shows its child at once; a revealer slides the fields in and out. */}
                   <GtkRevealer revealChild={showAdvanced}>
                     <GtkBox orientation="vertical" className="alto-advanced-content">
-                      {provider.oauth ? (
+                      {advancedHelp ? (
                         /*
                           TODO: Use AdwPreferencesGroup's own title and description once gtk-js
                           renders links in the description, as libadwaita does (gtk-js parses it as
@@ -271,13 +306,13 @@ function LoginFlow({
                         */
                         <GtkBox orientation="vertical" spacing={12}>
                           <GtkBox orientation="vertical" spacing={6}>
-                            <GtkLabel className="heading" xalign={0} wrap label="Custom Client" />
+                            <GtkLabel className="heading" xalign={0} wrap label={advancedHelp.title} />
                             <GtkLabel
                               className="body dimmed"
                               xalign={0}
                               wrap
                               useMarkup
-                              label={`Use your own OAuth client instead of Alto’s. <a href="${provider.oauth.customClientHelpUrl}">Learn how to make one</a>.`}
+                              label={`${advancedHelp.description} <a href="${advancedHelp.url}">${advancedHelp.linkLabel}</a>.`}
                               onActivateLink={(uri) => {
                                 void host.openUrl(uri);
                                 return true;
@@ -320,7 +355,7 @@ function LoginFlow({
       topBars={<AdwHeaderBar showBackButton={false} titleWidget={<GtkWindowTitle title={provider.label} />} />}
       content={
         <AdwStatusPage
-          title={`Authenticating to ${provider.label}…`}
+          title={`Authenticating to ${signInTo}…`}
           description={
             login?.status === 'verifying'
               ? 'Checking the connection…'

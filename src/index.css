@@ -117,6 +117,26 @@ body,
 }
 
 /*
+ * TODO: Remove once gtk-js fixes it in AdwComboRow.
+ *
+ * A combo row's popover list is a plain .gtk-scrolledwindow, not a GtkScrolledWindow,
+ * so nothing sets the --gtk-scrolled-child-* sizes its viewport is laid out with. Inside
+ * a GtkScrolledWindow (the login form), it inherits that window's instead, and its
+ * viewport is 0px tall: the list is empty. These are what a GtkScrolledWindow sets for a
+ * list that scrolls vertically and shows at its natural size up to its max-height.
+ */
+.gtk-row.combo .gtk-popover .gtk-scrolledwindow {
+  --gtk-scrolled-child-width: auto;
+  --gtk-scrolled-child-min-width: 100%;
+  --gtk-scrolled-child-max-width: none;
+  --gtk-scrolled-child-height: auto;
+  --gtk-scrolled-child-min-height: 100%;
+  --gtk-scrolled-child-max-height: 400px;
+  --gtk-scrolled-overflow-x: hidden;
+  --gtk-scrolled-overflow-y: auto;
+}
+
+/*
  * TODO: Remove once gtk-js lays out Cantarell like Pango does (gtk-js/gtk-js PR to come).
  *
  * gtk-js's default font is Cantarell. At a device scale factor above 1 (HiDPI

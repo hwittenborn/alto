@@ -78,15 +78,18 @@ a matter of describing how to log in to it. Everything lives in `packages/core/s
 
 1. Add an ID to `ProviderId`.
 2. Add an entry to `PROVIDERS`: its name, its rclone backend type, whether it logs in through the browser (`oauth`)
-   or a form (`credentials`), the form's fields, and its brand color and icon.
+   or a form (`credentials`), the form's fields, and its brand color and icon. A field with a fixed set of choices
+   (like Jottacloud's service) is a `select` field with `options`, and shows as a dropdown.
 3. Add a case to `buildRemoteConfig`, which turns the login form into the rclone remote's parameters. TypeScript
-   reports the missing case until you do.
+   reports the missing case until you do. If the backend asks questions while it's set up (its `Config` function),
+   answer them with `config_*` parameters named after each question, which rclone doesn't store in the remote.
 4. Add a case to `detectProvider`, so existing rclone remotes of that kind are recognized.
 5. If the account has a useful short description (like `alice@cloud.example.com`), add it to `describeAccount`.
 
 Then, outside of `providers.ts`:
 
 - If its logo is in [selfh.st/icons](https://selfh.st/icons), set `iconSlug` (and `color: 'FFFFFF'`) and import it
-  into `LOGOS` in `src/renderer/providers.tsx`. Without one, the provider gets a generic folder icon.
+  into `LOGOS` in `src/renderer/providers.tsx`. If it isn't, add the logo to `assets/logos` as a 1em square SVG and
+  import that instead. Without one, the provider gets a generic folder icon.
 - If a field needs more than a required check, add the validation to `packages/core/src/validation.ts`.
 - Add the provider to the list in the README.
