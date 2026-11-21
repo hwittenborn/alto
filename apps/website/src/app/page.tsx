@@ -1,15 +1,16 @@
 /**
  * The homepage: the words centered over Alto, live in the page (DemoStage),
- * which stands in a soft pastel glow; then three reasons for Alto, and the
- * install band.
+ * which stands in a soft pastel glow; then three reasons for Alto, every
+ * provider Alto works with, and the install band.
  */
 import type { Metadata } from 'next';
 import DemoStage from '../demo/DemoStageLoader';
 import { appIconSvg } from '../lib/app-icon';
 import { Icon } from '../components/Icon';
 import { Link } from '../components/Link';
+import { ProvidersSection } from '../components/ProviderList';
 import { cssVars } from '../lib/css';
-import { downloadIcon, providerLogos } from '../lib/icons';
+import { allProviderLogos, downloadIcon, providerLogos } from '../lib/icons';
 import { LINKS } from '../lib/site';
 
 export const metadata: Metadata = { alternates: { canonical: '/' } };
@@ -90,6 +91,8 @@ export default function HomePage() {
           </li>
         </ul>
       </section>
+
+      <ProvidersSection logos={allProviderLogos()} />
 
       <section className={`wrap pt-24 pb-[72px]`}>
         <div className="relative overflow-hidden rounded-[28px] p-[clamp(36px,5vw,64px)] text-center bg-card shadow-[inset_0_0_0_1px_var(--line)] flex flex-col items-center gap-4 before:content-[''] before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none before:glow-band [&>*]:relative [&_p]:text-muted [&_p]:leading-[1.55] [&_p]:m-0 [&_p]:text-[1.15rem]">
