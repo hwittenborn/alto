@@ -15,17 +15,17 @@ type IconSet = Parameters<typeof getIconData>[0];
 const sets = new Map<string, IconSet>();
 
 /**
- * The logos kept in the repository (assets/providers), as a set named `alto`:
- * those no icon set has yet. The app has them as the same set
- * (vite.renderer.config.ts).
+ * The logos kept in the repository (assets/logos), as a set named `alto`:
+ * those no icon set has (yet). The app imports the same files
+ * (src/renderer/providers.tsx).
  */
 function altoSet(): IconSet {
-  const dir = path.join(REPO_ROOT, 'assets/providers');
+  const dir = path.join(REPO_ROOT, 'assets/logos');
   const icons: IconSet['icons'] = {};
   for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.svg'))) {
     const parsed = parseSVGContent(fs.readFileSync(path.join(dir, file), 'utf8'));
     const icon = parsed && convertParsedSVG(parsed);
-    if (!icon) throw new Error(`Can't read assets/providers/${file}`);
+    if (!icon) throw new Error(`Can't read assets/logos/${file}`);
     icons[file.slice(0, -'.svg'.length)] = icon;
   }
   return { prefix: 'alto', icons };
