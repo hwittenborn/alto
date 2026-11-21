@@ -3,7 +3,7 @@ import { AdwAvatar, GtkImage } from '@gtk-js/adwaita';
 import { replaceIDs } from '@iconify/utils';
 import { useMemo } from 'react';
 import dropbox from '~icons/selfhst/dropbox-light?raw';
-import googleDrive from '~icons/selfhst/google-drive?raw';
+import googleDrive from '../../assets/logos/google-drive.svg?raw';
 import jottacloud from '../../assets/logos/jottacloud.svg?raw';
 import oneDrive from '~icons/selfhst/microsoft-onedrive?raw';
 import nextcloud from '~icons/simple-icons/nextcloud?raw';
@@ -13,7 +13,8 @@ import protonDrive from '~icons/selfhst/proton-drive?raw';
 /**
  * Brand logos as SVG markup, by `iconSlug`: from selfh.st/icons (CC BY 4.0),
  * Nextcloud's from Simple Icons (CC0), whose selfh.st logos are all app
- * tiles, and Jottacloud's (in neither) in `assets/logos`. The `-light` ones
+ * tiles, and in `assets/logos` Jottacloud's (in neither) and Google Drive's
+ * current one (selfh.st has only its 2020 logo). The `-light` ones
  * and Nextcloud's are white, for the brand color behind them. The others are
  * full color, on white.
  */
