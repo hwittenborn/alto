@@ -35,13 +35,13 @@ export default function HomePage() {
   return (
     <main>
       <section className={`wrap min-h-[calc(100svh-80px)] flex flex-col justify-center gap-10 pt-10 pb-12`}>
-        <div className="text-center max-w-[820px] mx-auto">
+        <div className="text-center max-w-[880px] mx-auto">
           <h1 className="text-[clamp(2.4rem,5.4vw,4.2rem)] leading-[1.03]">
             <span className="enter-line" style={order(0)}>
-              <span>All of your cloud storage,</span>
+              <span>Sync all of your cloud storage</span>
             </span>
             <span className="enter-line" style={order(1)}>
-              <span>synced to your computer</span>
+              <span>in one place</span>
             </span>
           </h1>
           <p

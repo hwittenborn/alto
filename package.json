@@ -2,7 +2,7 @@
   "name": "alto",
   "productName": "Alto",
   "version": "0.13.0",
-  "description": "The best client for your cloud storage",
+  "description": "Sync all of your cloud storage in one place",
   "main": ".vite/build/main.cjs",
   "private": true,
   "scripts": {
