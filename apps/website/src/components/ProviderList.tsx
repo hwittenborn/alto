@@ -34,16 +34,13 @@ function Mark({ def, logo }: { def: ProviderDefinition; logo: string }) {
 export function ProvidersSection({ logos }: { logos: Record<ProviderId, string> }) {
   return (
     <section className="wrap pt-24" aria-labelledby="providers-title">
-      <div className="text-center max-w-[40rem] mx-auto mb-9">
+      <div className="text-center max-w-[40rem] mx-auto mb-8">
         <h2
           id="providers-title"
           className="text-[clamp(2rem,4vw,3.1rem)] font-medium tracking-[-0.045em] leading-[1.08] m-0"
         >
           Works with your cloud
         </h2>
-        <p className="lede text-[1.15rem] leading-[1.55] mt-4 mb-0">
-          Connect as many accounts as you like, from any of these, and sync folders from all of them at once.
-        </p>
       </div>
       <ul className="list-none m-0 p-0 flex flex-wrap justify-center gap-2.5">
         {PROVIDERS.map((def) => (
