@@ -48,14 +48,22 @@ export default function ChangelogPage() {
       {[...(upcoming ? [upcoming] : []), ...releases].map((r) => (
         <section
           key={r.version}
-          className="[&+&]:mt-12 [&+&]:pt-10 [&+&]:[border-top:1px_solid_var(--line)]"
+          className={
+            r === upcoming
+              ? // Not out yet, so set apart from the releases: a tinted card with a dashed edge.
+                'mb-12 rounded-2xl px-6 py-5 bg-[color-mix(in_srgb,var(--accent-ink)_5%,transparent)] [border:1px_dashed_color-mix(in_srgb,var(--accent-ink)_40%,transparent)]'
+              : '[&+&]:mt-12 [&+&]:pt-10 [&+&]:[border-top:1px_solid_var(--line)]'
+          }
           id={r === upcoming ? 'unreleased' : `v${r.version}`}
         >
           <header className="mb-[18px]">
             {r === upcoming ? (
               <>
-                <h2 className="text-[1.8rem] m-0">Unreleased</h2>
-                <p className="text-muted text-[0.95rem] mt-1 mb-0 mx-0">Coming in the next release.</p>
+                <h2 className="text-[1.8rem] m-0 flex items-center gap-3">
+                  Unreleased
+                  <span className="chip">In development</span>
+                </h2>
+                <p className="text-muted text-[0.95rem] mt-1 mb-0 mx-0">On main, and coming in the next release.</p>
               </>
             ) : (
               <>
