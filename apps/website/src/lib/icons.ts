@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { convertParsedSVG, getIconData, iconToHTML, iconToSVG, parseSVGContent } from '@iconify/utils';
+import { PROVIDERS, type ProviderId } from '@alto/core';
 import type { SiteProviderId } from './providers';
 import { REPO_ROOT } from './repo';
 
@@ -79,6 +80,25 @@ const LOGOS: Record<SiteProviderId, string> = {
 export function providerLogos(): Record<SiteProviderId, string> {
   return Object.fromEntries(Object.entries(LOGOS).map(([id, name]) => [id, icon(name)])) as Record<
     SiteProviderId,
+    string
+  >;
+}
+
+/**
+ * Every provider's logo, for the list of providers: the ones above, ownCloud's
+ * (white, for its brand color) and Jottacloud's (from the repository:
+ * altoSet). WebDAV, a protocol, has no logo of its own: it
+ * gets a plain cloud, white on its blue.
+ */
+export function allProviderLogos(): Record<ProviderId, string> {
+  const extra: Partial<Record<ProviderId, () => string>> = {
+    owncloud: () => icon('selfhst:owncloud-light'),
+    jottacloud: () => icon('alto:jottacloud'),
+    webdav: () => icon('ph:cloud-bold'),
+  };
+  const site = providerLogos() as Partial<Record<ProviderId, string>>;
+  return Object.fromEntries(PROVIDERS.map(({ id }) => [id, site[id] ?? extra[id]?.() ?? ''])) as Record<
+    ProviderId,
     string
   >;
 }
