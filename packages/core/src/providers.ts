@@ -118,22 +118,25 @@ const ONEDRIVE_OAUTH: ProviderOAuth = {
 /**
  * Jottacloud and the services that run on it under another brand, by the key
  * rclone knows each by (`getServices` in rclone's jottacloud backend). Each
- * has its own sign-in page; the API behind them is the same.
+ * has its own sign-in page; the API behind them is the same. Labels are the
+ * brand and country, without the product name ("Telia Sky", "Elgiganten
+ * Cloud"): the service dropdown (AdwComboRow) ellipsizes items over 20
+ * characters, as libadwaita's does.
  */
 export const JOTTACLOUD_SERVICES: readonly (ProviderFieldOption & { authHost: string })[] = [
   { value: 'jottacloud', label: 'Jottacloud', authHost: 'id.jottacloud.com' },
-  { value: 'elgiganten_dk', label: 'Elgiganten Cloud (Denmark)', authHost: 'cloud.elgiganten.dk' },
-  { value: 'elgiganten_se', label: 'Elgiganten Cloud (Sweden)', authHost: 'cloud.elgiganten.se' },
-  { value: 'elkjop', label: 'Elkjøp Cloud (Norway)', authHost: 'cloud.elkjop.no' },
-  { value: 'elko', label: 'ELKO Cloud (Iceland)', authHost: 'cloud.elko.is' },
-  { value: 'gigantti', label: 'Gigantti Cloud (Finland)', authHost: 'cloud.gigantti.fi' },
-  { value: 'letsgo', label: "Let's Go Cloud (Germany)", authHost: 'letsgo.jotta.cloud' },
-  { value: 'mediamarkt', label: 'MediaMarkt Cloud', authHost: 'mediamarkt.jottacloud.com' },
+  { value: 'elgiganten_dk', label: 'Elgiganten (Denmark)', authHost: 'cloud.elgiganten.dk' },
+  { value: 'elgiganten_se', label: 'Elgiganten (Sweden)', authHost: 'cloud.elgiganten.se' },
+  { value: 'elkjop', label: 'Elkjøp (Norway)', authHost: 'cloud.elkjop.no' },
+  { value: 'elko', label: 'ELKO (Iceland)', authHost: 'cloud.elko.is' },
+  { value: 'gigantti', label: 'Gigantti (Finland)', authHost: 'cloud.gigantti.fi' },
+  { value: 'letsgo', label: "Let's Go (Germany)", authHost: 'letsgo.jotta.cloud' },
+  { value: 'mediamarkt', label: 'MediaMarkt', authHost: 'mediamarkt.jottacloud.com' },
   { value: 'onlime', label: 'Onlime (Denmark)', authHost: 'cloud-auth.onlime.dk' },
-  { value: 'phonero', label: 'Phonero Sky', authHost: 'sky.phonero.no' },
-  { value: 'tele2', label: 'Tele2 Cloud (Sweden)', authHost: 'mittcloud-auth.tele2.se' },
-  { value: 'telia_no', label: 'Telia Sky (Norway)', authHost: 'sky-auth.telia.no' },
-  { value: 'telia_se', label: 'Telia Cloud (Sweden)', authHost: 'cloud-auth.telia.se' },
+  { value: 'phonero', label: 'Phonero', authHost: 'sky.phonero.no' },
+  { value: 'tele2', label: 'Tele2 (Sweden)', authHost: 'mittcloud-auth.tele2.se' },
+  { value: 'telia_no', label: 'Telia (Norway)', authHost: 'sky-auth.telia.no' },
+  { value: 'telia_se', label: 'Telia (Sweden)', authHost: 'cloud-auth.telia.se' },
 ];
 
 export const PROVIDERS: readonly ProviderDefinition[] = [

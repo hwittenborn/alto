@@ -51,9 +51,7 @@ describe('Jottacloud', () => {
   it('recognizes existing remotes, and names partner services', () => {
     expect(detectProvider({ type: 'jottacloud' })).toBe('jottacloud');
     const tokenURL = (h: string) => `https://${h}/auth/realms/x/protocol/openid-connect/token`;
-    expect(describeAccount({ type: 'jottacloud', tokenURL: tokenURL('cloud-auth.telia.se') })).toBe(
-      'Telia Cloud (Sweden)',
-    );
+    expect(describeAccount({ type: 'jottacloud', tokenURL: tokenURL('cloud-auth.telia.se') })).toBe('Telia (Sweden)');
     expect(describeAccount({ type: 'jottacloud', tokenURL: tokenURL('id.jottacloud.com') })).toBeNull();
   });
 });
