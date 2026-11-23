@@ -24,8 +24,7 @@ export const metadata: Metadata = {
 function lastUpdated(): Date {
   try {
     const file = path.resolve(process.cwd(), 'src/app/(site)/privacy/policy.mdx');
-    // The last commit that added or edited it: moving it (into the (site)
-    // route group) didn't change what it says.
+    // AM: commits that only rename the file don't count as updates.
     const date = execFileSync('git', ['log', '-1', '--follow', '--diff-filter=AM', '--format=%cI', '--', file], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
