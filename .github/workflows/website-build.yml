@@ -27,6 +27,8 @@ jobs:
       - run: npm ci --workspace @alto/website --include-workspace-root=false --ignore-scripts
       # The build ends by capturing the site's pictures of Alto (README.md's,
       # the Snap Store's) in a headless Chromium (apps/website/scripts/capture-media.ts).
+      # The site's postinstall installs it elsewhere, but install scripts are
+      # skipped here, and this also brings the system libraries it needs.
       - run: npx --workspace @alto/website playwright install --with-deps chromium
       - run: npm run build --workspace @alto/website
       # The pictures on their own, to look at or upload where they're used.

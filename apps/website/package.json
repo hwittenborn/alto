@@ -7,7 +7,8 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && tsx scripts/capture-media.ts"
+    "build": "next build && tsx scripts/capture-media.ts",
+    "postinstall": "playwright install chromium"
   },
   "dependencies": {
     "@alto/core": "0.1.0",
@@ -35,7 +36,7 @@
     "@types/node": "^24.9.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "playwright": "^1.65.1",
+    "playwright": "1.65.1",
     "tailwindcss": "^4.3.5",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"

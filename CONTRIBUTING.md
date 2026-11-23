@@ -106,4 +106,5 @@ the same live UI its homepage shows, so they stay current with the app. Each is 
 - `npm run build --workspace @alto/website` writes them all to `apps/website/out/media/`, and the website publishes
   them at `https://alto.hunterwittenborn.com/media/<id>.png`. CI also uploads them as the `media` artifact.
 
-Both need Chromium for Playwright: `npx --workspace @alto/website playwright install chromium`.
+Both capture them in Chromium, through Playwright, which `npm install` downloads (the website's `postinstall`). Playwright
+is pinned to an exact version, as each version brings its own Chromium, which can change how the pictures render.
