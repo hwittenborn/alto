@@ -19,13 +19,11 @@ export const metadata: Metadata = {
   title: { default: 'Alto', template: '%s · Alto' },
   description,
   icons: { icon: { url: appIconUrl, type: 'image/svg+xml' } },
-  // A link's preview (Discord, Slack, LinkedIn…): the site's own picture of Alto (src/media/shots.tsx), at its size.
   openGraph: {
     title: 'Alto',
     description,
     images: [{ url: '/media/og.png', width: 1200, height: 630, alt: 'Alto, syncing a folder to Google Drive' }],
   },
-  // X shows it large, too.
   twitter: { card: 'summary_large_image' },
 };
 

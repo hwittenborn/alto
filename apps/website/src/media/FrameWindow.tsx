@@ -1,10 +1,6 @@
 'use client';
 
-/**
- * One window filling its page, as the query says (?scheme=dark&account=protondrive):
- * for a picture with a light and a dark window, each in its own frame, since
- * GTK-JS themes a whole page at once.
- */
+// One window per iframe, since GTK-JS themes a whole page at once.
 import { useEffect, useState } from 'react';
 import type { DemoAssets } from '../demo/assets';
 import type { SiteProviderId } from '../lib/providers';
@@ -14,7 +10,7 @@ export default function FrameWindow({ assets }: { assets: DemoAssets }) {
   const [query, setQuery] = useState<URLSearchParams | null>(null);
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    // The page's own scheme the frame's: where they differ, the browser paints the frame opaque.
+    // Must match the iframe's color-scheme, or the browser paints it opaque.
     document.documentElement.style.colorScheme = query.get('scheme') === 'dark' ? 'dark' : 'light';
     setQuery(query);
   }, []);

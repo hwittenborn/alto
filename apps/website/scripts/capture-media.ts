@@ -1,9 +1,4 @@
-/**
- * The last step of `npm run build`: captures each picture of Alto
- * (src/media/shots.tsx) from its built page into out/media/<id>.png, and
- * checks it's within its size limit. Each page carries what the capture needs
- * (data-shot), so this doesn't import the pages' React code.
- */
+// Run after `next build`: screenshots each /media/shot/<id> page into out/media/<id>.png.
 import { createReadStream } from 'node:fs';
 import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -23,7 +18,7 @@ const TYPES: Record<string, string> = {
   '.woff2': 'font/woff2',
 };
 
-/** The built site, as GitHub Pages serves it: /media/shot/x is media/shot/x.html. */
+// Serves out/ like GitHub Pages: /x is x.html.
 const server = createServer(async (req, res) => {
   const name = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
   for (const candidate of [name, `${name}.html`, path.join(name, 'index.html')]) {
@@ -41,7 +36,6 @@ const server = createServer(async (req, res) => {
 await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
 const { port } = server.address() as { port: number };
 
-/** Each picture's facts, from its built page. */
 const pages = (await readdir(path.join(out, 'media/shot'))).filter((f) => f.endsWith('.html'));
 const shots = await Promise.all(
   pages.map(async (file) => {

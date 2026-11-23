@@ -242,7 +242,7 @@ function AccountContent({
 }: {
   remote: RemoteView;
   collapsed: boolean;
-  /** Open on its first folder's page (the media pages). */
+  /** Open on its first folder's page. */
   openFolder?: boolean;
 }) {
   const folders = useFolders(remote.name);
@@ -288,7 +288,6 @@ function AccountContent({
   return <AdwNavigationView pages={pages} stack={stack} onStackChange={setStack} style={FILL} />;
 }
 
-/** `arrived`: the accounts shown, in order, instead of as their avatars land (the media pages). */
 function Shell({ arrived: fixed, openFolder }: { arrived?: string[]; openFolder?: boolean }) {
   const remotes = useRemotes();
   const landed = useArrived();
@@ -385,10 +384,7 @@ function Shell({ arrived: fixed, openFolder }: { arrived?: string[]; openFolder?
   );
 }
 
-/**
- * The window, with `children` (the page's floating avatars) in its GTK scope.
- * Light or dark as the page is, unless `colorScheme` says (the media pages).
- */
+/** The window, with `children` (the page's floating avatars) in its GTK scope. */
 export default function DemoApp({
   client,
   children,
@@ -400,11 +396,11 @@ export default function DemoApp({
   client: AltoClient;
   children?: ReactNode;
   colorScheme?: 'light' | 'dark';
-  /** The accounts shown, in order (the first one open), rather than as their avatars land. */
+  /** The accounts shown (the first one open), instead of as their avatars land. */
   arrived?: string[];
   /** Open on the shown account's first folder's page. */
   openFolder?: boolean;
-  /** Drawn inside the window, over it: a dialog attached to it (the media pages). */
+  /** Drawn over the window, like a dialog. */
   inWindow?: ReactNode;
 }) {
   const { appIcon } = useDemoAssets();

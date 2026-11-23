@@ -68,7 +68,7 @@ const FILES = [
   'README.md',
 ];
 
-/** The conflict a posed folder shows (pose's `conflict`): a file changed on both sides. */
+/** A file changed on both sides, for pose's `conflict`. */
 export const CONFLICT = (now: number) => ({
   id: 'conflict:Thesis draft v7.odt',
   kind: 'conflict' as const,
@@ -131,12 +131,7 @@ export class FakeAlto {
     });
   }
 
-  /**
-   * Every account with its folders, held still for a picture (the media
-   * pages, src/app/media): the first folder partway through a sync, the rest
-   * synced a few minutes ago. Nothing moves afterwards. Returns the accounts'
-   * names, for the page to mark them arrived.
-   */
+  /** Every account, held still: the first folder mid-sync, the rest synced. Returns their names. */
   pose(now = Date.now(), { conflict = false }: { conflict?: boolean } = {}): string[] {
     this.reset();
     const names = SITE_PROVIDERS.map((provider, p) => {
@@ -146,7 +141,6 @@ export class FakeAlto {
         this.updateFolderNow(id, (f) => {
           f.runtime.lastCheckedAt = now - (2 + p + i) * 60_000;
           if (conflict && p === 0 && i === 2) {
-            // School: a file changed here and on the server since the last sync.
             f.runtime.issues = [CONFLICT(now)];
           }
           if (p === 0 && i === 0) {

@@ -1,15 +1,4 @@
-/**
- * The pictures the site makes of Alto, for wherever Alto is shown outside the
- * site: the Snap Store, link previews, README.md. Each is a page,
- * /media/shot/<id> (src/app/media/shot/[id]/page.tsx), captured as
- * /media/<id>.png: by `npm run build` into out/ (scripts/capture-media.ts), and
- * live in `next dev` (src/app/media/[file]/route.dev.ts). To add or change a
- * picture, edit SHOTS.
- *
- * The window in each is the website's own copy of Alto's (DemoApp), held still
- * (FakeAlto.pose), never scaled or tilted. Where a picture cuts it, it fades
- * out at the bottom.
- */
+// Every picture of Alto the site makes. Each renders at /media/shot/<id> and is captured as /media/<id>.png.
 import { PROVIDERS } from '@alto/core';
 import type { CSSProperties, ReactNode } from 'react';
 import { appIconUrl } from '../lib/app-icon';
@@ -18,31 +7,23 @@ import { isLightTile, type SiteProviderId } from '../lib/providers';
 import { mediaAssets } from './assets';
 import MediaWindow from './MediaWindowLoader';
 
-/** Alto's slogan, wherever a picture says what Alto is. */
 export const SLOGAN = 'Sync all of your cloud storage in one place';
 
 export interface Shot {
-  /** Its name: the page is /media/shot/<id>, the picture /media/<id>.png. */
   id: string;
-  /** Where it's used. */
   use: string;
-  /** The page's size, in CSS pixels; the picture is `width * scale` by `height * scale`. */
+  /** CSS pixels; the PNG is `width * scale` by `height * scale`. */
   width: number;
   height: number;
   scale: number;
   colorScheme: 'light' | 'dark';
-  /** At most this many bytes, where it's used. */
   maxBytes?: number;
-  /** It has no window (the capture needn't wait for one). */
   noWindow?: boolean;
   body: () => ReactNode;
 }
 
-// ---- What the pictures are made of ----
-
 type Box = { x: number; y: number; w: number; h: number };
 
-/** Alto's window at `box`. */
 function Win({
   box,
   scheme,
@@ -54,15 +35,12 @@ function Win({
 }: {
   box: Box;
   scheme?: 'light' | 'dark';
-  /** The account it's open on. */
   account?: SiteProviderId;
-  /** Open on the account's first folder's page. */
   folder?: boolean;
-  /** A file changed on both sides, with Alto's dialog open asking which to keep. */
   conflict?: boolean;
-  /** Its bottom fades out, where the picture cuts it. */
+  /** Fades out at the bottom, where the picture cuts it. */
   fade?: boolean;
-  /** In a frame of its own (FrameWindow): for a light and a dark window in one picture, as GTK-JS themes a whole page at once. */
+  /** In an iframe, so it can differ in theme from the page. */
   framed?: boolean;
 }) {
   return (
@@ -86,7 +64,6 @@ function Win({
   );
 }
 
-/** Alto's icon and name, and the slogan. */
 function Brand({ small, style }: { small?: boolean; style?: CSSProperties }) {
   return (
     <div className={`shot-brand${small ? ' small' : ''}`} style={style}>
@@ -97,7 +74,6 @@ function Brand({ small, style }: { small?: boolean; style?: CSSProperties }) {
   );
 }
 
-/** A headline and the line under it: centered on top, or on the left. */
 function Head({ title, sub, left, style }: { title: string; sub: string; left?: boolean; style?: CSSProperties }) {
   return (
     <div className={`shot-head ${left ? 'left' : 'center'}`} style={style}>
@@ -107,7 +83,7 @@ function Head({ title, sub, left, style }: { title: string; sub: string; left?: 
   );
 }
 
-/** Providers' chips, as the homepage's list (ProviderList.tsx) draws them, each at its spot: [id, left, top]. */
+/** [id, left, top] */
 function Chips({ at }: { at: Array<[string, number, number]> }) {
   const logos = allProviderLogos();
   return (
@@ -130,12 +106,10 @@ function Chips({ at }: { at: Array<[string, number, number]> }) {
   );
 }
 
-/** What's behind a picture: one of the grounds (src/app/media/grounds.css). */
 const Ground = ({ kind, grain }: { kind: 'halo' | 'mist' | 'field'; grain?: boolean }) => (
   <div className={`ground g-${kind}${grain ? ' grain' : ''}`} />
 );
 
-/** Alto's icon, name and slogan on the left, and its window on the right, open on a folder, whole. */
 function preview({ width, height }: { width: number; height: number }): ReactNode {
   const small = width < 1280;
   return (
@@ -147,13 +121,10 @@ function preview({ width, height }: { width: number; height: number }): ReactNod
   );
 }
 
-// ---- Sizes ----
-
-/** The Snap Store's: up to 2 MB a picture. */
 const SNAP_MAX = 2 * 1024 * 1024;
-/** The Snap Store's banner: 1920×640 (3:1), at 1.5x. */
+// 1920×640
 const BANNER = { width: 1280, height: 640 / 1.5, scale: 1.5, maxBytes: SNAP_MAX };
-/** A Snap Store screenshot: 1920×1080, at 1.25x. */
+// 1920×1080
 const SCREENSHOT = { width: 1536, height: 864, scale: 1.25, maxBytes: SNAP_MAX };
 
 export const SHOTS: Shot[] = [
@@ -170,8 +141,6 @@ export const SHOTS: Shot[] = [
       </>
     ),
   },
-  // The Snap Store's screenshots, in order: what Alto is, what it works with,
-  // that it's safe, that it's working, and how it looks.
   {
     id: 'snap-screenshot-1',
     use: 'Snap Store screenshot 1',
@@ -272,7 +241,7 @@ export const SHOTS: Shot[] = [
       </>
     ),
   },
-  // Link previews: GitHub's (uploaded by hand: Settings → Social preview, at most 1 MB) and the site's own.
+  // Uploaded by hand: Settings → Social preview.
   {
     id: 'github-preview',
     use: "the GitHub repository's social preview",
@@ -292,7 +261,6 @@ export const SHOTS: Shot[] = [
     colorScheme: 'light',
     body: () => preview({ width: 1200, height: 630 }),
   },
-  // README.md's: the window alone, on nothing (its shadow falls on the page), in each of GitHub's themes.
   ...(['light', 'dark'] as const).map((scheme): Shot => ({
     id: `readme-${scheme}`,
     use: `README.md, in GitHub's ${scheme} theme`,

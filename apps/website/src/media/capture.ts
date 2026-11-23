@@ -1,14 +1,8 @@
-/**
- * Captures a picture's page (src/media/shots.tsx) as a PNG, in a headless
- * Chromium: the page at its size and theme, once every window on it is drawn
- * ([data-media-window][data-ready]), on a transparent background.
- */
+// Screenshots a picture's page once every window on it is drawn.
 import type { Browser } from 'playwright';
 import type { Shot } from './shots';
 
-/** What a capture needs of a picture. */
 export type Capturable = Pick<Shot, 'width' | 'height' | 'scale' | 'colorScheme'> & {
-  /** It has no window to wait for. */
   noWindow?: boolean;
 };
 
@@ -21,8 +15,7 @@ export async function capture(browser: Browser, url: string, shot: Capturable): 
   });
   try {
     await page.goto(url);
-    // Every window drawn, in fonts that have loaded: in the page, or in its
-    // frames where it has them (a light and a dark window, FrameWindow).
+    // Windows may be in iframes (FrameWindow).
     await page.waitForLoadState('load');
     if (!shot.noWindow) {
       const drawn = () => {
@@ -37,7 +30,7 @@ export async function capture(browser: Browser, url: string, shot: Capturable): 
       }
     }
     await page.evaluate(() => document.fonts.ready);
-    // Clipped to the exact size, which needn't be whole CSS pixels (a 1920×640 banner at 1.5x).
+    // The size can be fractional (1920×640 at 1.5x).
     return await page.screenshot({
       omitBackground: true,
       animations: 'disabled',

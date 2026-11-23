@@ -1,11 +1,6 @@
 'use client';
 
-/**
- * Alto's window for a picture (the media pages, src/app/media): the website's
- * DemoApp, every account in its sidebar, held still (FakeAlto.pose), light
- * or dark as `colorScheme` says (else as the page is). Marks itself
- * data-ready once it's drawn, for the capture (src/media/capture.ts) to wait on.
- */
+// The demo window, posed and held still. Sets data-ready once drawn, for the capture.
 import { baseName, conflictText, createAltoClient, formatBytes, getProvider } from '@alto/core';
 import { AdwAlertDialog, GtkBox, GtkLabel } from '@gtk-js/adwaita';
 import { useEffect, useState } from 'react';
@@ -27,11 +22,11 @@ export default function MediaWindow({
 }: {
   assets: DemoAssets;
   colorScheme?: 'light' | 'dark';
-  /** The account the window shows: its folders, beside the sidebar. */
+  /** The account it's open on. */
   account?: SiteProviderId;
   /** Open on that account's first folder's page. */
   folder?: boolean;
-  /** A file changed on both sides, with Alto's dialog asking which version to keep (IssueDialog.tsx in the app). */
+  /** Show the conflict dialog. */
   conflict?: boolean;
 }) {
   const [ready, setReady] = useState(false);
@@ -42,7 +37,7 @@ export default function MediaWindow({
   });
 
   useEffect(() => {
-    // Every account, `account`'s first: the window opens on it.
+    // The window opens on the first.
     const shown = getProvider(account).label;
     const names = demo.alto.pose(undefined, { conflict });
     setArrived([shown, ...names.filter((n) => n !== shown)]);
@@ -70,13 +65,13 @@ export default function MediaWindow({
   );
 }
 
-/** "2.4 MB, modified Nov 21, 2026, 3:42 PM", as the app's IssueDialog describes each side. */
+/** As the app's IssueDialog describes each side. */
 function describeItem(item: { size: number; mtime: number }): string {
   const when = new Date(item.mtime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
   return `${formatBytes(item.size)}, modified ${when}`;
 }
 
-/** The app's conflict dialog (src/renderer/components/IssueDialog.tsx), open, with its words. */
+/** The app's conflict dialog (IssueDialog.tsx), open. */
 function ConflictDialog() {
   const [issue] = useState(() => CONFLICT(Date.now()));
   return (

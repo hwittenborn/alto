@@ -1,4 +1,3 @@
-/** A picture of Alto (src/media/shots.tsx), at its size. */
 import { notFound } from 'next/navigation';
 import { SHOTS } from '../../../../media/shots';
 
@@ -13,7 +12,7 @@ export default async function ShotPage({ params }: { params: Promise<{ id: strin
     <div
       className="shot"
       style={{ width: shot.width, height: shot.height }}
-      // What the capture (scripts/capture-media.ts) needs, read from the built page.
+      // Read by scripts/capture-media.ts.
       data-shot={JSON.stringify(facts)}
     >
       {body()}

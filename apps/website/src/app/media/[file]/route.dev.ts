@@ -1,13 +1,8 @@
-/**
- * In `next dev` only (next.config.ts), each picture at /media/<id>.png,
- * captured from its page as it is now: edit a picture (src/media/shots.tsx)
- * and reload its PNG. The build writes the same files (scripts/capture-media.ts).
- */
+// Dev only: serves each picture live at /media/<id>.png.
 import { type Browser, chromium } from 'playwright';
 import { capture } from '../../../media/capture';
 import { SHOTS } from '../../../media/shots';
 
-/** One browser for the dev server's life. */
 let browser: Promise<Browser> | undefined;
 
 export async function GET(request: Request, { params }: { params: Promise<{ file: string }> }) {

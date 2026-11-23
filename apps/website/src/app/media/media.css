@@ -1,5 +1,3 @@
-/* The media pages (layout.tsx): each is one picture of Alto (src/media/shots.tsx), at its size, from the top left. */
-
 html,
 body {
   margin: 0;
@@ -21,12 +19,10 @@ body {
   z-index: 1;
 }
 
-/* Cut by the picture's edge: its bottom fades out, so the cut falls on rows that are only context. */
 .shot-win.fade {
   mask: linear-gradient(to bottom, #000 calc(100% - 140px), transparent calc(100% - 8px));
 }
 
-/* Alto's icon, name and slogan. */
 .shot-brand {
   z-index: 2;
   display: flex;
@@ -71,7 +67,6 @@ body {
   max-width: 19ch;
 }
 
-/* A headline and the line under it. */
 .shot-head {
   z-index: 2;
   display: flex;
@@ -113,7 +108,6 @@ body {
   max-width: 64ch;
 }
 
-/* A provider's chip, as the homepage's list (ProviderList.tsx) draws it, large. */
 .shot-chip {
   z-index: 3;
   display: inline-flex;
