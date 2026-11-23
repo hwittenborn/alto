@@ -15,7 +15,8 @@ description: |
     folder's `.altoignore`. It syncs too, so every computer skips the same
     files.
 license: GPL-3.0-or-later
-website: https://github.com/hwittenborn/alto
+website: https://alto.hunterwittenborn.com
+contact: https://github.com/hwittenborn/alto/issues
 source-code: https://github.com/hwittenborn/alto
 issues: https://github.com/hwittenborn/alto/issues
 icon: assets/icons/com.hunterwittenborn.Alto.svg

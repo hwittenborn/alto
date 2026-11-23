@@ -1,0 +1,30 @@
+name: Update the Snap Store listing
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Only show what would change
+        type: boolean
+        default: true
+
+jobs:
+  pictures:
+    uses: ./.github/workflows/website-build.yml
+
+  upload:
+    needs: pictures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: media
+          path: media
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - run: pip install --quiet pymacaroons==0.13.0 requests==2.32.5
+      - run: python scripts/snap-listing.py media ${{ inputs.dry-run && '--dry-run' || '' }}
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

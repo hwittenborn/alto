@@ -44,3 +44,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.release-please.outputs.tag_name }}
+
+  # The Snap Store listing's banner and screenshots, from this release's website.
+  snap-listing:
+    needs: [release-please, build]
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/snap-listing.yml
+    secrets: inherit
