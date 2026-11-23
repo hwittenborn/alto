@@ -74,8 +74,9 @@ export const CONFLICT = (now: number) => ({
   kind: 'conflict' as const,
   path: 'Thesis draft v7.odt',
   reason: 'both-modified' as const,
-  local: { isDir: false, size: 2_480_000, mtime: now - 18 * 60_000 },
-  remote: { isDir: false, size: 2_512_000, mtime: now - 41 * 60_000 },
+  // Fixed, so the dialog's dates are the same in every picture.
+  local: { isDir: false, size: 2_480_000, mtime: Date.UTC(2026, 4, 18, 16, 12) },
+  remote: { isDir: false, size: 2_512_000, mtime: Date.UTC(2026, 4, 18, 15, 48) },
   detectedAt: now - 2 * 60_000,
 });
 

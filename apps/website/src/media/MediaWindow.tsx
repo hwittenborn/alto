@@ -67,7 +67,11 @@ export default function MediaWindow({
 
 /** As the app's IssueDialog describes each side. */
 function describeItem(item: { size: number; mtime: number }): string {
-  const when = new Date(item.mtime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+  const when = new Date(item.mtime).toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  });
   return `${formatBytes(item.size)}, modified ${when}`;
 }
 
