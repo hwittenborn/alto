@@ -1,0 +1,145 @@
+html,
+body {
+  margin: 0;
+  background: transparent;
+}
+
+.shot {
+  position: relative;
+  overflow: hidden;
+  font-family: 'Geist Variable', sans-serif;
+  color: #1f2328;
+}
+
+.shot > * {
+  position: absolute;
+}
+
+.shot-win {
+  z-index: 1;
+}
+
+.shot-win.fade {
+  mask: linear-gradient(to bottom, #000 calc(100% - 140px), transparent calc(100% - 8px));
+}
+
+.shot-brand {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.shot-brand img {
+  width: 88px;
+  height: 88px;
+  margin-left: -6px;
+}
+
+.shot-brand h1 {
+  margin: 0;
+  font-size: 64px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.shot-brand p {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+  opacity: 0.78;
+  max-width: 21ch;
+}
+
+.shot-brand.small img {
+  width: 72px;
+  height: 72px;
+}
+
+.shot-brand.small h1 {
+  font-size: 56px;
+}
+
+.shot-brand.small p {
+  font-size: 18px;
+  max-width: 19ch;
+}
+
+.shot-head {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shot-head.center {
+  left: 0;
+  right: 0;
+  align-items: center;
+  text-align: center;
+}
+
+.shot-head.left {
+  justify-content: center;
+}
+
+.shot-head h2 {
+  margin: 0;
+  text-wrap: balance;
+  font-size: 44px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  max-width: 30ch;
+}
+
+.shot-head.left h2 {
+  font-size: 48px;
+}
+
+.shot-head p {
+  margin: 0;
+  text-wrap: balance;
+  font-size: 19px;
+  line-height: 1.45;
+  opacity: 0.72;
+  max-width: 64ch;
+}
+
+.shot-chip {
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 24px 9px 9px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 78%);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 0 0 1px rgb(31 35 40 / 9%),
+    0 6px 18px -8px rgb(26 95 180 / 30%);
+  font-size: 26px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.shot-chip .mark {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 30px;
+}
+
+.shot-chip .mark.light {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+}
+
+.shot-chip .mark svg {
+  width: 1em;
+  height: 1em;
+}

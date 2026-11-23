@@ -1,0 +1,47 @@
+.ground {
+  --bg: #fafafb;
+  --ink: #1f2328;
+  --hue: #3584e4;
+  --hue-b: oklch(from #3584e4 l c calc(h - 30));
+  --tone: #c6d3df;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--bg);
+}
+
+.ground.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='.26' intercept='.84'/%3E%3CfeFuncG type='linear' slope='.26' intercept='.84'/%3E%3CfeFuncB type='linear' slope='.26' intercept='.84'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+
+.g-mist {
+  background:
+    radial-gradient(54% 70% at 4% 6%, color-mix(in oklab, var(--hue) 42%, transparent), transparent),
+    radial-gradient(46% 62% at 98% 16%, color-mix(in oklab, var(--tone) 48%, transparent), transparent),
+    radial-gradient(64% 64% at 66% 116%, color-mix(in oklab, var(--hue) 24%, transparent), transparent),
+    radial-gradient(34% 46% at 22% 104%, color-mix(in oklab, var(--hue-b) 18%, transparent), transparent), var(--bg);
+}
+
+.g-halo {
+  background:
+    radial-gradient(34% 40% at 50% 58%, color-mix(in oklab, var(--hue) 30%, transparent), transparent),
+    radial-gradient(70% 76% at 50% 58%, color-mix(in oklab, var(--hue) 15%, transparent), transparent),
+    radial-gradient(30% 34% at 68% 74%, color-mix(in oklab, var(--tone) 32%, transparent), transparent), var(--bg);
+}
+
+.g-field {
+  --bg: var(--tone);
+  --t-b: oklch(from var(--tone) l clamp(0, calc(c * 1.6 + 0.022), 0.075) calc(h - 30));
+  --t-c: oklch(from var(--tone) calc(l - 0.032) calc(c * 1.3 + 0.012) h);
+  background:
+    linear-gradient(112deg, transparent 38%, color-mix(in oklab, white 26%, transparent) 50%, transparent 62%),
+    radial-gradient(58% 86% at 8% 0, color-mix(in oklab, white 58%, transparent), transparent),
+    radial-gradient(54% 80% at 82% 6%, color-mix(in oklab, var(--t-b) 40%, transparent), transparent),
+    radial-gradient(60% 96% at 100% 100%, color-mix(in oklab, var(--t-c) 76%, transparent), transparent),
+    radial-gradient(40% 60% at 0 100%, color-mix(in oklab, var(--t-b) 50%, transparent), transparent), var(--bg);
+}

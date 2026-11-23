@@ -8,13 +8,13 @@
  * package.json (release-please sets it at each release), so the page stays
  * current with the latest release.
  */
-import rootPackage from '../../../../../package.json';
+import rootPackage from '../../../../../../package.json';
 import type { Metadata } from 'next';
-import { Icon } from '../../components/Icon';
-import { Link } from '../../components/Link';
-import { cssVars } from '../../lib/css';
-import { downloadIcon, icon } from '../../lib/icons';
-import { LINKS } from '../../lib/site';
+import { Icon } from '../../../components/Icon';
+import { Link } from '../../../components/Link';
+import { cssVars } from '../../../lib/css';
+import { downloadIcon, icon } from '../../../lib/icons';
+import { LINKS } from '../../../lib/site';
 
 export const metadata: Metadata = {
   title: { absolute: 'Install Alto' },

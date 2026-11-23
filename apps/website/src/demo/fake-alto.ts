@@ -13,7 +13,7 @@ import {
   overallStatus,
   type RemoteView,
 } from '@alto/core';
-import type { SiteProviderId } from '../lib/providers';
+import { SITE_PROVIDERS, type SiteProviderId } from '../lib/providers';
 
 const HOME = '/home/you';
 const GiB = 1024 ** 3;
@@ -68,6 +68,18 @@ const FILES = [
   'README.md',
 ];
 
+/** A file changed on both sides, for pose's `conflict`. */
+export const CONFLICT = (now: number) => ({
+  id: 'conflict:Thesis draft v7.odt',
+  kind: 'conflict' as const,
+  path: 'Thesis draft v7.odt',
+  reason: 'both-modified' as const,
+  // Fixed, so the dialog's dates are the same in every picture.
+  local: { isDir: false, size: 2_480_000, mtime: Date.UTC(2026, 4, 18, 16, 12) },
+  remote: { isDir: false, size: 2_512_000, mtime: Date.UTC(2026, 4, 18, 15, 48) },
+  detectedAt: now - 2 * 60_000,
+});
+
 type Listener = (state: AltoState) => void;
 
 export class FakeAlto {
@@ -118,6 +130,41 @@ export class FakeAlto {
       s.remotes = [];
       s.folders = [];
     });
+  }
+
+  /** Every account, held still: the first folder mid-sync, the rest synced. Returns their names. */
+  pose(now = Date.now(), { conflict = false }: { conflict?: boolean } = {}): string[] {
+    this.reset();
+    const names = SITE_PROVIDERS.map((provider, p) => {
+      const name = this.addRemoteNow(provider);
+      ACCOUNT_FOLDERS[provider].forEach(([local, remote], i) => {
+        const id = this.addFolderNow(name, this.freeLocalPath(local), remote);
+        this.updateFolderNow(id, (f) => {
+          f.runtime.lastCheckedAt = now - (2 + p + i) * 60_000;
+          if (conflict && p === 0 && i === 2) {
+            f.runtime.issues = [CONFLICT(now)];
+          }
+          if (p === 0 && i === 0) {
+            f.runtime.phase = 'syncing';
+            f.runtime.progress = {
+              done: 23,
+              total: 64,
+              current: [
+                { op: 'upload', path: 'Thesis draft v7.odt' },
+                { op: 'upload', path: 'IMG_2041.jpg' },
+              ],
+              bytesDone: 41_200_000,
+              bytesTotal: 118_000_000,
+              speed: 3_100_000,
+            };
+          }
+        });
+      });
+      return name;
+    });
+    this.state.ready = true;
+    this.emit();
+    return names;
   }
 
   /** `name` in the home folder, or a numbered one if another folder syncs it already. */
@@ -211,6 +258,11 @@ export class FakeAlto {
     };
     this.state.folders.push(folder);
     return id;
+  }
+
+  private updateFolderNow(id: string, change: (f: FolderView) => void) {
+    const folder = this.state.folders.find((f) => f.id === id);
+    if (folder) change(folder);
   }
 
   private updateFolder(id: string, change: (f: FolderView) => void) {

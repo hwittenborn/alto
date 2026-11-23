@@ -235,9 +235,20 @@ function FolderPage({ id, collapsed }: { id: string; collapsed: boolean }) {
 }
 
 /** An account: its folders, as the app lists them, each opening its own page. */
-function AccountContent({ remote, collapsed }: { remote: RemoteView; collapsed: boolean }) {
+function AccountContent({
+  remote,
+  collapsed,
+  openFolder,
+}: {
+  remote: RemoteView;
+  collapsed: boolean;
+  /** Open on its first folder's page. */
+  openFolder?: boolean;
+}) {
   const folders = useFolders(remote.name);
-  const [stack, setStack] = useState<string[]>(['folders']);
+  const [stack, setStack] = useState<string[]>(() =>
+    openFolder && folders[0] ? ['folders', folders[0].id] : ['folders'],
+  );
   const usage = remote.usage;
   const description =
     usage?.used !== undefined && usage.total
@@ -277,9 +288,10 @@ function AccountContent({ remote, collapsed }: { remote: RemoteView; collapsed: 
   return <AdwNavigationView pages={pages} stack={stack} onStackChange={setStack} style={FILL} />;
 }
 
-function Shell() {
+function Shell({ arrived: fixed, openFolder }: { arrived?: string[]; openFolder?: boolean }) {
   const remotes = useRemotes();
-  const arrived = useArrived();
+  const landed = useArrived();
+  const arrived = fixed ?? landed;
   const [picked, setPicked] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -338,7 +350,7 @@ function Shell() {
   );
 
   const content: ReactNode = remote ? (
-    <AccountContent key={remote.name} remote={remote} collapsed={collapsed} />
+    <AccountContent key={remote.name} remote={remote} collapsed={collapsed} openFolder={openFolder} />
   ) : (
     <AdwToolbarView
       style={FILL}
@@ -373,7 +385,24 @@ function Shell() {
 }
 
 /** The window, with `children` (the page's floating avatars) in its GTK scope. */
-export default function DemoApp({ client, children }: { client: AltoClient; children?: ReactNode }) {
+export default function DemoApp({
+  client,
+  children,
+  colorScheme,
+  arrived,
+  openFolder,
+  inWindow,
+}: {
+  client: AltoClient;
+  children?: ReactNode;
+  colorScheme?: 'light' | 'dark';
+  /** The accounts shown (the first one open), instead of as their avatars land. */
+  arrived?: string[];
+  /** Open on the shown account's first folder's page. */
+  openFolder?: boolean;
+  /** Drawn over the window, like a dialog. */
+  inWindow?: ReactNode;
+}) {
   const { appIcon } = useDemoAssets();
   // Adwaita's icons, and Alto's own.
   const icons = useMemo(
@@ -381,11 +410,12 @@ export default function DemoApp({ client, children }: { client: AltoClient; chil
     [appIcon],
   );
   return (
-    <AdwaitaProvider style={FILL} icons={icons}>
+    <AdwaitaProvider style={FILL} icons={icons} colorScheme={colorScheme}>
       <AltoProvider client={client}>
         {/* Its window buttons do nothing: there's no window to close. */}
         <GtkWindow allocateShadow style={FILL} onClose={() => {}} onMinimize={() => {}} onMaximize={() => {}}>
-          <Shell />
+          <Shell arrived={arrived} openFolder={openFolder} />
+          {inWindow}
         </GtkWindow>
         {children}
       </AltoProvider>

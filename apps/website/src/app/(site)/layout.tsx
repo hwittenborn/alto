@@ -4,10 +4,10 @@
 import '@fontsource-variable/geist';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import SiteFooter from '../components/SiteFooter';
-import SiteHeader from '../components/SiteHeader';
-import { appIconUrl } from '../lib/app-icon';
-import { SITE } from '../lib/site';
+import SiteFooter from '../../components/SiteFooter';
+import SiteHeader from '../../components/SiteHeader';
+import { appIconUrl } from '../../lib/app-icon';
+import { SITE } from '../../lib/site';
 import './globals.css';
 
 const description =
@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   title: { default: 'Alto', template: '%s · Alto' },
   description,
   icons: { icon: { url: appIconUrl, type: 'image/svg+xml' } },
-  openGraph: { title: 'Alto', description },
+  openGraph: {
+    title: 'Alto',
+    description,
+    images: [{ url: '/media/og.png', width: 1200, height: 630, alt: 'Alto, syncing a folder to Google Drive' }],
+  },
+  twitter: { card: 'summary_large_image' },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

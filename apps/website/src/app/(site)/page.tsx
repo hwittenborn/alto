@@ -4,14 +4,14 @@
  * provider Alto works with, and the install band.
  */
 import type { Metadata } from 'next';
-import DemoStage from '../demo/DemoStageLoader';
-import { appIconSvg } from '../lib/app-icon';
-import { Icon } from '../components/Icon';
-import { Link } from '../components/Link';
-import { ProvidersSection } from '../components/ProviderList';
-import { cssVars } from '../lib/css';
-import { allProviderLogos, downloadIcon, providerLogos } from '../lib/icons';
-import { LINKS } from '../lib/site';
+import DemoStage from '../../demo/DemoStageLoader';
+import { appIconSvg } from '../../lib/app-icon';
+import { Icon } from '../../components/Icon';
+import { Link } from '../../components/Link';
+import { ProvidersSection } from '../../components/ProviderList';
+import { cssVars } from '../../lib/css';
+import { allProviderLogos, downloadIcon, providerLogos } from '../../lib/icons';
+import { LINKS } from '../../lib/site';
 
 export const metadata: Metadata = { alternates: { canonical: '/' } };
 
