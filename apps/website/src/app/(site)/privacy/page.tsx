@@ -9,9 +9,9 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import type { Metadata } from 'next';
-import DocPage from '../../components/DocPage';
-import { formatDate } from '../../lib/dates';
-import { SITE } from '../../lib/site';
+import DocPage from '../../../components/DocPage';
+import { formatDate } from '../../../lib/dates';
+import { SITE } from '../../../lib/site';
 import Policy from './policy.mdx';
 
 export const metadata: Metadata = {
@@ -23,8 +23,10 @@ export const metadata: Metadata = {
 
 function lastUpdated(): Date {
   try {
-    const file = path.resolve(process.cwd(), 'src/app/privacy/policy.mdx');
-    const date = execFileSync('git', ['log', '-1', '--follow', '--format=%cI', '--', file], {
+    const file = path.resolve(process.cwd(), 'src/app/(site)/privacy/policy.mdx');
+    // The last commit that added or edited it: moving it (into the (site)
+    // route group) didn't change what it says.
+    const date = execFileSync('git', ['log', '-1', '--follow', '--diff-filter=AM', '--format=%cI', '--', file], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();

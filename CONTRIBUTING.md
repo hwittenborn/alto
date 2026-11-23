@@ -40,6 +40,7 @@ Alto is split into packages so the sync engine can be reused outside Electron (i
 | `packages/node`  | `@alto/node`: Node adapters for the rclone daemon, the local file system (chokidar) and SQLite storage |
 | `packages/react` | `@alto/react`: renderer-independent React hooks over the Alto state                                    |
 | `src/`           | The Electron app: the main process (tray, notifications, autostart, sign-in page) and the gtk-js UI    |
+| `apps/website`   | The website, with the app running live in the page, and the pictures of Alto made from it              |
 
 ## How it works
 
@@ -93,3 +94,16 @@ Then, outside of `providers.ts`:
   import that instead. Without one, the provider gets a generic folder icon.
 - If a field needs more than a required check, add the validation to `packages/core/src/validation.ts`.
 - Add the provider to the list in the README.
+
+## Pictures of Alto
+
+The Snap Store's banner and screenshots, the link previews and README.md's screenshot are made by the website, from
+the same live UI its homepage shows, so they stay current with the app. Each is listed in
+`apps/website/src/media/shots.tsx`, as a page at `/media/shot/<id>`.
+
+- `npm run dev --workspace @alto/website` serves each one as `/media/<id>.png`, captured as you load it, so you can
+  edit a picture and reload it.
+- `npm run build --workspace @alto/website` writes them all to `apps/website/out/media/`, and the website publishes
+  them at `https://alto.hunterwittenborn.com/media/<id>.png`. CI also uploads them as the `media` artifact.
+
+Both need Chromium for Playwright: `npx --workspace @alto/website playwright install chromium`.

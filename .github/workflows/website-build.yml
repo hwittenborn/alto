@@ -14,8 +14,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           # The privacy policy's "Last updated" date is its file's last commit
-          # (apps/website/src/app/privacy/page.tsx), so the history is needed,
-          # though not the old versions of every file.
+          # (apps/website/src/app/(site)/privacy/page.tsx), so the history is
+          # needed, though not the old versions of every file.
           fetch-depth: 0
           filter: blob:none
       - uses: actions/setup-node@v7
@@ -25,7 +25,16 @@ jobs:
       # Just the site's dependencies, not the desktop app's (Electron and its
       # packaging tools), and none of their install scripts.
       - run: npm ci --workspace @alto/website --include-workspace-root=false --ignore-scripts
+      # The build ends by capturing the site's pictures of Alto (README.md's,
+      # the Snap Store's) in a headless Chromium (apps/website/scripts/capture-media.ts).
+      - run: npx --workspace @alto/website playwright install --with-deps chromium
       - run: npm run build --workspace @alto/website
+      # The pictures on their own, to look at or upload where they're used.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: media
+          path: apps/website/out/media/*.png
+          if-no-files-found: error
       - if: inputs.upload
         uses: actions/upload-pages-artifact@v5
         with:

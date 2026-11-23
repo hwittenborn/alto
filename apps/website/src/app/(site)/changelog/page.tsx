@@ -5,15 +5,15 @@
  * Above them, what's on main and not yet released (lib/unreleased.ts).
  */
 import type { Metadata } from 'next';
-import DocPage from '../../components/DocPage';
-import { Icon } from '../../components/Icon';
-import { Link } from '../../components/Link';
-import { type Inline, parseChangelog } from '../../lib/changelog';
-import { formatDate } from '../../lib/dates';
-import { icon } from '../../lib/icons';
-import { repoFile } from '../../lib/repo';
-import { LINKS } from '../../lib/site';
-import { unreleased } from '../../lib/unreleased';
+import DocPage from '../../../components/DocPage';
+import { Icon } from '../../../components/Icon';
+import { Link } from '../../../components/Link';
+import { type Inline, parseChangelog } from '../../../lib/changelog';
+import { formatDate } from '../../../lib/dates';
+import { icon } from '../../../lib/icons';
+import { repoFile } from '../../../lib/repo';
+import { LINKS } from '../../../lib/site';
+import { unreleased } from '../../../lib/unreleased';
 
 export const metadata: Metadata = {
   title: 'Changelog',

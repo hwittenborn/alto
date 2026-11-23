@@ -101,7 +101,7 @@ function arc(
  */
 function revealRow(row: HTMLElement, avatar: HTMLElement): void {
   const { circle, full } = rowClips(row, avatar);
-  // The site's --ease-enter (src/app/globals.css).
+  // The site's --ease-enter (src/app/(site)/globals.css).
   const easing = getComputedStyle(document.documentElement).getPropertyValue('--ease-enter');
   row.animate([{ clipPath: circle }, { clipPath: full }], { duration: 520, delay: 60, easing, fill: 'backwards' });
   // By `translate`, not `transform`: the activity spinner turns by its
