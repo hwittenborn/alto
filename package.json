@@ -1,7 +1,7 @@
 {
   "name": "alto",
   "productName": "Alto",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Sync all of your cloud storage in one place",
   "main": ".vite/build/main.cjs",
   "private": true,
