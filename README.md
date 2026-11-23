@@ -16,7 +16,10 @@ Alto keeps folders on your computer in sync with your cloud storage, such as Goo
 > Looking for the old Celeste code? It's on the [`celeste-rs`](https://github.com/hwittenborn/alto/tree/celeste-rs)
 > branch.
 
-![Alto's main window](https://raw.githubusercontent.com/wiki/hwittenborn/alto/screenshots/main.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://alto.hunterwittenborn.com/media/readme-dark.png" />
+  <img alt="Alto's main window" src="https://alto.hunterwittenborn.com/media/readme-light.png" />
+</picture>
 
 ## Features
 
